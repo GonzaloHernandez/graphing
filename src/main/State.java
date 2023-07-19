@@ -1,6 +1,8 @@
 package main;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.util.Vector;
 
 public class State {
@@ -45,8 +47,18 @@ public class State {
 	
 	//-------------------------------------------------------------------------------------
 	
-	public void draw(Graphics g,GrapherSettings settings) {
+	public void draw(Graphics g1,GrapherSettings settings) {
 		
+		Graphics2D g = (Graphics2D) g1;
+
+		g.setRenderingHint(
+			RenderingHints.KEY_ANTIALIASING,
+			RenderingHints.VALUE_ANTIALIAS_ON);
+		
+		g.setRenderingHint(
+			RenderingHints.KEY_TEXT_ANTIALIASING,
+			RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
 		for (int i=0 ; i<connections.size() ; i++) {
 			Connection connection = (Connection)connections.elementAt(i);
 			connection.draw(g,settings);

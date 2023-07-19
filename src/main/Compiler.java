@@ -3,6 +3,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.AdjustmentEvent;
@@ -76,7 +78,18 @@ class Tablero extends JComponent {
 		adiEscuchadores();
 	}
 	//---------------------------------------------------------------------------
-	public void paint(Graphics g) {
+	public void paint(Graphics g1) {
+
+		Graphics2D g = (Graphics2D) g1;
+
+		g.setRenderingHint(
+			RenderingHints.KEY_ANTIALIASING,
+			RenderingHints.VALUE_ANTIALIAS_ON);
+		
+		g.setRenderingHint(
+			RenderingHints.KEY_TEXT_ANTIALIASING,
+			RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
 		Font	fmen,flin;
 		Color	cmen,cpoi,clin;
 		int		smen;
@@ -225,6 +238,7 @@ class Compiler extends JInternalFrame {
 	
 		getContentPane().add(vista,"Center");
 		getContentPane().add(campo,"South");
+
 	}
 	//---------------------------------------------------------------------------
 	private void adiListeners() {
@@ -241,6 +255,7 @@ class Compiler extends JInternalFrame {
 				tablero.repaint();
 			}
 		});
+		
 		tablero.addMouseListener(new MouseListener() {
 			public void mouseClicked(MouseEvent e) {
 				if (e.getButton()==3) {

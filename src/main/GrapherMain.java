@@ -29,7 +29,6 @@ import javax.swing.JSplitPane;
 public class GrapherMain extends JFrame{
 
 	//-------------------------------------------------------------------------------------
-
 	final int	family			= 1;
 	final int	version			= 0;
 	final int	construcction	= 8;

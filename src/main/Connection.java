@@ -4,6 +4,7 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.RenderingHints;
 import java.awt.geom.QuadCurve2D;
 
 public class Connection {
@@ -18,7 +19,7 @@ public class Connection {
 
 	private	State				source,target;
 	private	int					status;
-	private	ConectionType				type;
+	private	ConectionType		type;
 	private	QuadCurve2D.Double	curve;
 	private	Point				start,end,middle,control,text,arrowleft,arrowright,arrow;
 	private	int					distance;
@@ -66,9 +67,19 @@ public class Connection {
 	
 	//-------------------------------------------------------------------------------------
 
-	public void draw(Graphics g,GrapherSettings settings) {
+	public void draw(Graphics g1,GrapherSettings settings) {
 		
-		double	angle,hypotenuse,alpha,theta,grandHypotenuse,beta,gamma,dx,dy;
+		Graphics2D g = (Graphics2D) g1;
+
+		g.setRenderingHint(
+			RenderingHints.KEY_ANTIALIASING,
+			RenderingHints.VALUE_ANTIALIAS_ON);
+		
+		g.setRenderingHint(
+			RenderingHints.KEY_TEXT_ANTIALIASING,
+			RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+			double	angle,hypotenuse,alpha,theta,grandHypotenuse,beta,gamma,dx,dy;
 		
 		if (source.equals(target)){
 			switch (status) {
