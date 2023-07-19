@@ -1,5 +1,6 @@
 package main;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -22,7 +23,10 @@ public class State {
 	private	int		diferencex,diferencey;
 	private	Vector	<Connection>connections;
 	private	boolean	accepted;
-	
+
+	private int		value;
+	private int		owner;
+
 	//-------------------------------------------------------------------------------------
 	
 	public State(int number,int x,int y) {
@@ -31,6 +35,8 @@ public class State {
 		this.y			= y;
 		this.status		= FOCUSED;
 		this.accepted	= false;
+		this.value		= 0;
+		this.owner		= 0;
 		connections		= new Vector<Connection>();
 	}
 	
@@ -42,9 +48,24 @@ public class State {
 		this.y			= y;
 		this.status		= status;
 		this.accepted	= accepted;
+		this.value		= 0;
+		this.owner		= 0;
 		connections		= new Vector<Connection>();
 	}
 	
+	//-------------------------------------------------------------------------------------
+	
+	public State(int number,int x,int y,int status,boolean accepted,int value,int owner) {
+		this.number		= number;
+		this.x			= x;
+		this.y			= y;
+		this.status		= status;
+		this.accepted	= accepted;
+		this.value		= value;
+		this.owner		= owner;
+		connections		= new Vector<Connection>();
+	}
+
 	//-------------------------------------------------------------------------------------
 	
 	public void draw(Graphics g1,GrapherSettings settings) {
@@ -69,11 +90,33 @@ public class State {
 			case STILL:		g.setColor(new Color(220,220,255));	break;
 		}
 		
-		g.fillOval(x-RADIUS,y-RADIUS,RADIUS*2,RADIUS*2);
-		g.setColor(Color.BLACK);
-		g.drawOval(x-RADIUS,y-RADIUS,RADIUS*2,RADIUS*2);
+		if (owner % 2 == 0) {
+			g.fillOval(x-RADIUS,y-RADIUS,RADIUS*2,RADIUS*2);
+			g.setColor(Color.BLACK);
+			g.drawOval(x-RADIUS,y-RADIUS,RADIUS*2,RADIUS*2);
+		}
+		else {
+			g.fillRect(x-RADIUS,y-RADIUS,RADIUS*2,RADIUS*2);
+			g.setColor(Color.BLACK);
+			g.drawRect(x-RADIUS,y-RADIUS,RADIUS*2,RADIUS*2);
+		}
+
 		if (accepted) g.drawOval(x-RADIUS+3,y-RADIUS+3,(RADIUS-3)*2,(RADIUS-3)*2);
-		if (settings.numberStates) g.drawString(""+number,x-(3*(new String(""+number)).length()),y+4);
+		if (settings.showStateNumbers) {
+			if (settings.showStateValues) {
+				g.setFont(new Font("Arial",Font.ITALIC,9));
+				g.drawString(""+number,x-(3*(new String(""+number)).length()),y+RADIUS-1);
+			}
+			else {
+				g.setFont(new Font("Arial",Font.ITALIC,13));
+				g.drawString(""+number,x-(3*(new String(""+number)).length()),y+4);
+			}
+		}
+		if (settings.showStateValues) {
+			g.setFont(new Font("Arial",Font.PLAIN,13));
+			g.drawString(""+value,x-(3*(new String(""+value)).length()),y+4);
+		}
+
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -103,6 +146,17 @@ public class State {
 	
 	//-------------------------------------------------------------------------------------
 
+	public void setValue(int value){
+		this.value = value;
+	}
+
+	//-------------------------------------------------------------------------------------
+
+	public void setOwner(int owner){
+		this.owner = owner;
+	}
+	//-------------------------------------------------------------------------------------
+
 	public void setMouseDiference(int mousex,int mousey) {
 		diferencex	= mousex - x;
 		diferencey	= mousey - y;
@@ -118,6 +172,18 @@ public class State {
 
 	public int getNumber() {
 		return number;
+	}
+	
+	//-------------------------------------------------------------------------------------
+
+	public int getValue() {
+		return value;
+	}
+	
+	//-------------------------------------------------------------------------------------
+
+	public int getOwner() {
+		return owner;
 	}
 	
 	//-------------------------------------------------------------------------------------

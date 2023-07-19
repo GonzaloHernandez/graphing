@@ -16,8 +16,10 @@ public class GeneralView extends JPanel {
 	//-------------------------------------------------------------------------------------
 
 	protected	GrapherMain	main;
-	protected	JCheckBox	nameTypes;
-	protected	JCheckBox	numberStates;
+	protected	JCheckBox	showTypeNames;
+	protected	JCheckBox	showStateNumbers;
+	protected	JCheckBox	showStateValues;
+	protected	JCheckBox	allowStateZero;
 	protected	JTextArea	comment;
 	
 	//-------------------------------------------------------------------------------------
@@ -31,14 +33,18 @@ public class GeneralView extends JPanel {
 	//-------------------------------------------------------------------------------------
 
 	private void initElements(){
-		nameTypes		= new JCheckBox("Vew type names");
-		numberStates	= new JCheckBox("View state numbers");
-		comment			= new JTextArea();
+		showTypeNames		= new JCheckBox("View type names");
+		showStateNumbers	= new JCheckBox("View state numbers");
+		showStateValues		= new JCheckBox("View state Values");
+		allowStateZero		= new JCheckBox("Allow state Zero");
+		comment				= new JTextArea();
 	
 		comment.setWrapStyleWord(true);
 		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
-		add(nameTypes);
-		add(numberStates);
+		add(showTypeNames);
+		add(showStateNumbers);
+		add(showStateValues);
+		add(allowStateZero);
 		add(new JLabel("Comment"));
 		add(new JScrollPane(comment));
 	}
@@ -46,22 +52,38 @@ public class GeneralView extends JPanel {
 	//-------------------------------------------------------------------------------------
 
 	private void progListeneres(){
-		nameTypes.addActionListener(new ActionListener(){
+		showTypeNames.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
-				main.currentSession.board.settings.nameTypes	= nameTypes.isSelected();
+				main.currentSession.board.settings.showTypeNames	= showTypeNames.isSelected();
 				main.currentSession.setModified(true);
 				main.currentSession.board.repaint();
 			}
 		});
 
-		numberStates.addActionListener(new ActionListener(){
+		showStateNumbers.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
-				main.currentSession.board.settings.numberStates	= numberStates.isSelected();
+				main.currentSession.board.settings.showStateNumbers	= showStateNumbers.isSelected();
 				main.currentSession.setModified(true);
 				main.currentSession.board.repaint();
 			}
 		});
 		
+		showStateValues.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				main.currentSession.board.settings.showStateValues	= showStateValues.isSelected();
+				main.currentSession.setModified(true);
+				main.currentSession.board.repaint();
+			}
+		});
+		
+		allowStateZero.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				main.currentSession.board.settings.allowStateZero	= allowStateZero.isSelected();
+				main.currentSession.setModified(true);
+				main.currentSession.board.repaint();
+			}
+		});
+
 		comment.addCaretListener(new CaretListener(){
 
 			public void caretUpdate(CaretEvent arg0) {
@@ -75,8 +97,10 @@ public class GeneralView extends JPanel {
 	//-------------------------------------------------------------------------------------
 
 	public void refresh(){
-		nameTypes.setSelected(main.currentSession.board.settings.nameTypes);
-		numberStates.setSelected(main.currentSession.board.settings.numberStates);
+		showTypeNames.setSelected(main.currentSession.board.settings.showTypeNames);
+		showStateNumbers.setSelected(main.currentSession.board.settings.showStateNumbers);
+		showStateValues.setSelected(main.currentSession.board.settings.showStateValues);
+		allowStateZero.setSelected(main.currentSession.board.settings.allowStateZero);
 		comment.setText(main.currentSession.board.settings.comment);
 	}
 

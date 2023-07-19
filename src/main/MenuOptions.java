@@ -51,7 +51,7 @@ public class MenuOptions extends JPopupMenu{
 	
 	private	GrapherMain		main;
 	private GrapherMenu		connectionTypes;
-	private	GrapherItem		stateDelete,stateDeleteAllOutgoings,stateAccepted;
+	private	GrapherItem		stateDelete,stateDeleteAllOutgoings,stateAccepted,stateOnwer;
 	private	GrapherItem		connectionDelete,connectionTune,connectionNoType;
 	private	GrapherItem		restart,load,save,saveAs,print,simulate,help;
 	private	TypeMenuItem	typeItems[];
@@ -76,6 +76,7 @@ public class MenuOptions extends JPopupMenu{
 		stateDelete				= new GrapherItem("Delete state",defaultFont,"delete_state.png");
 		stateDeleteAllOutgoings	= new GrapherItem("Delete all outgoing conections",defaultFont,"delete_connection.png");
 		stateAccepted			= new GrapherItem("Set final state",defaultFont,"accepted_state.png");
+		stateOnwer				= new GrapherItem("Switch owner",defaultFont,"");
 		
 		connectionTypes			= new GrapherMenu("Set state",defaultFont,"type_connection.png");
 		connectionNoType		= new GrapherItem("Unset state",defaultFont,"no_type_connection.png");
@@ -97,6 +98,7 @@ public class MenuOptions extends JPopupMenu{
 		stateMenu.add(stateDelete);
 		stateMenu.add(stateDeleteAllOutgoings);
 		stateMenu.add(stateAccepted);
+		stateMenu.add(stateOnwer);
 		connectionMenu.add(connectionTypes);
 		connectionMenu.add(connectionNoType);
 		connectionMenu.add(connectionDelete);
@@ -254,6 +256,14 @@ public class MenuOptions extends JPopupMenu{
 			}
 		});		
 		
+		stateOnwer.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				main.currentSession.board.stateTarget.setOwner(1-main.currentSession.board.stateTarget.getOwner());
+				main.currentSession.setModified(true);
+				main.currentSession.board.repaint();
+			}
+		});		
+
 		connectionDelete.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
 				State source = main.currentSession.board.currentConnection.getSource();

@@ -236,7 +236,7 @@ public class Connection {
 
 		//--- draw label ---
 		
-		if (type!=null && settings.nameTypes) {
+		if (type!=null && settings.showTypeNames) {
 			g.setColor(Color.BLUE);
 			String label = type.getName();
 			drawCenterString(g,label,text);

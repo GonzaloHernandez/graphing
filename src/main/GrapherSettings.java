@@ -5,19 +5,28 @@ public class GrapherSettings {
 
 	//---------------------------------------------------------------------------
 	
-	protected	boolean	nameTypes;
-	protected	boolean	numberStates;
+	protected	boolean	showTypeNames;
+	protected	boolean	showStateNumbers;
 	protected	String	comment;
 	protected	Vector	<ConectionType>types;
 	protected	int	measure;
-	
+
+	protected	boolean showStateValues;
+	protected	boolean allowStateZero;
+
+	protected	boolean programmingView;
+
 	//---------------------------------------------------------------------------
 	
 	public GrapherSettings(boolean nameTypes,boolean numberStates,String comment,Vector <ConectionType>types){
-		this.nameTypes		= nameTypes;
-		this.numberStates	= numberStates;
-		this.comment		= comment;
-		this.types			= types;
-		this.measure		= 1; // 0=Centimeters  1=Inch
+		this.showTypeNames		= nameTypes;
+		this.showStateNumbers	= numberStates;
+		this.comment			= comment;
+		this.types				= types;
+		this.measure			= 1; // 0=Centimeters  1=Inch
+		this.showStateValues	= true;
+		this.allowStateZero		= false;
+		this.programmingView	= true;
 	}
+
 }

@@ -29,7 +29,6 @@ import javax.swing.KeyStroke;
 public class Board extends JComponent implements Printable{
 	
 	//-------------------------------------------------------------------------------------
-
 	
 	protected	int				mousex,mousey;
 	protected	boolean			controled;
@@ -108,6 +107,8 @@ public class Board extends JComponent implements Printable{
 		for (int i=0 ; i<states.size() ; i++) {
 			states.elementAt(i).draw(g,settings);
 		}
+
+		export();
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -209,7 +210,7 @@ public class Board extends JComponent implements Printable{
 						controled = false;
 						return;
 					}
-					if (stateTarget.getNumber() > 0) {
+					if (settings.allowStateZero || stateTarget.getNumber() > 0) {
 						for (int i=0 ; i<states.size() ; i++) {
 							State state = (State)states.elementAt(i);
 							if (state.isArea(e.getX(),e.getY())) {
@@ -292,7 +293,10 @@ public class Board extends JComponent implements Printable{
 		addMouseWheelListener(new MouseWheelListener(){
 
 			public void mouseWheelMoved(MouseWheelEvent e) {
-				if (currentConnection != null){
+				if (stateTarget!=null && e.isShiftDown()) {
+					stateTarget.setValue(stateTarget.getValue()-e.getWheelRotation());
+				} 
+				else if (currentConnection != null){
 					if (!e.isControlDown()){
 						currentConnection.setAmountDistance(-e.getWheelRotation()*2);
 					}
@@ -412,9 +416,9 @@ public class Board extends JComponent implements Printable{
 	        	}
 	        }
 	        
-	        settings.nameTypes		= file.readBoolean();
-	        settings.numberStates	= file.readBoolean();
-	        settings.comment		= file.readUTF();
+	        settings.showTypeNames		= file.readBoolean();
+	        settings.showStateNumbers	= file.readBoolean();
+	        settings.comment			= file.readUTF();
 	        
 	        session.setSize(file.readShort(),file.readShort());
 	        
@@ -500,8 +504,8 @@ public class Board extends JComponent implements Printable{
 		        }
 	        }
 	        
-	        file.writeBoolean(settings.nameTypes);
-	        file.writeBoolean(settings.numberStates);
+	        file.writeBoolean(settings.showTypeNames);
+	        file.writeBoolean(settings.showStateNumbers);
 	        file.writeUTF(settings.comment);	        
 	        
 	        file.writeShort(session.getWidth());
@@ -518,6 +522,39 @@ public class Board extends JComponent implements Printable{
 
 	//-------------------------------------------------------------------------------------
 
+	public boolean export() {
+		String values = "= [";
+		String owners = "= [";
+
+		for (int i=0;i<states.size();i++){
+			values += states.elementAt(i).getValue() + ",";
+			owners += states.elementAt(i).getOwner() + ",";
+		}
+
+		values += "]";
+		owners += "]";
+
+		String matrix = "= [\n";
+		for (int s=0;s<states.size();s++){
+			matrix += "[";
+			for (int t=0;t<states.size();t++){
+				boolean found = false;
+				for (int i=0;i<states.elementAt(s).getConnections().size();i++){
+					if (states.elementAt(s).getConnections().elementAt(i).getTarget().getNumber()==t) {
+						found = true;
+					}
+		        }
+				matrix += found?"1,":"0,";
+	        }
+			matrix += "]" + "\n";
+		}
+	    matrix += "]";
+
+	    session.main.properties.exportView.info.setText(matrix + "\n" + values + "\n" + owners);
+		return true;
+	}
+
+	//-------------------------------------------------------------------------------------
 	public String getFileName(){
 		return fileName;
 	}
