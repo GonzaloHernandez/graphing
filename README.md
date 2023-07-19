@@ -16,6 +16,12 @@ Meanwhile, the compiled output files will be generated in the `bin` folder by de
 
 > If you want to customize the folder structure, open `.vscode/settings.json` and update the related settings there.
 
+## Compile and Use
+
+`javac --source-path src/ -d bin src/main/GrapherMain.java`
+
+`java -cp bin main.GrapherMain`
+
 ## Dependency Management
 
 This version does not require dependencies for now.
