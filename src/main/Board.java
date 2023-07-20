@@ -342,7 +342,7 @@ public class Board extends JComponent implements Printable{
 	        this.fileName = fileName;
 	        session.setTitle(fileName);
 	        
-	        short	n,number,x,y,numberSource,numberTarget,numberType,distance;
+	        short	n,number,x,y, value,owner, numberSource,numberTarget,numberType,distance;
 	        double	rotation;
 	        boolean	accepted;
 	        State	source=null,target=null;
@@ -378,7 +378,11 @@ public class Board extends JComponent implements Printable{
 	        	x 			= file.readShort();
 	        	y			= file.readShort();
 	        	accepted	= file.readBoolean();
-	        	states.add(new State(number,x,y,State.STILL,accepted));
+
+	        	value		= file.readShort();
+				owner		= file.readShort();
+
+				states.add(new State(number,x,y,State.STILL,accepted,value,owner));
 	        }
 	        
 	        n = file.readShort();
@@ -468,7 +472,7 @@ public class Board extends JComponent implements Printable{
 	        file.writeShort(4);
 	        file.writeUTF("GRAPHER");
 	        file.writeShort(1);
-	        file.writeShort(0);
+	        file.writeShort(1);
 	        
 	        short	connectionsCount = 0;
 	        
@@ -485,7 +489,11 @@ public class Board extends JComponent implements Printable{
 	        	file.writeShort(states.elementAt(i).getX());
 	        	file.writeShort(states.elementAt(i).getY());
 	        	file.writeBoolean(states.elementAt(i).isAccepted());
-	        	connectionsCount += states.elementAt(i).getConnections().size();
+
+	        	file.writeShort(states.elementAt(i).getValue());
+	        	file.writeShort(states.elementAt(i).getOwner());
+
+				connectionsCount += states.elementAt(i).getConnections().size();
 	        }
 	        
 	        file.writeShort(connectionsCount);
@@ -683,7 +691,18 @@ public class Board extends JComponent implements Printable{
         }
 	}
 
-	public int print(Graphics g, PageFormat pf, int pi) throws PrinterException {
+	public int print(Graphics g1, PageFormat pf, int pi) throws PrinterException {
+
+		Graphics2D g = (Graphics2D) g1;
+
+		g.setRenderingHint(
+			RenderingHints.KEY_ANTIALIASING,
+			RenderingHints.VALUE_ANTIALIAS_ON);
+		
+		g.setRenderingHint(
+			RenderingHints.KEY_TEXT_ANTIALIASING,
+			RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
 		if (pi >= 1) return Printable.NO_SUCH_PAGE;
 		g.setColor(Color.WHITE);
 		g.fillRect(0,0,getWidth(),getHeight());

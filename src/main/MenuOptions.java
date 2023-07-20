@@ -76,7 +76,7 @@ public class MenuOptions extends JPopupMenu{
 		stateDelete				= new GrapherItem("Delete state",defaultFont,"delete_state.png");
 		stateDeleteAllOutgoings	= new GrapherItem("Delete all outgoing conections",defaultFont,"delete_connection.png");
 		stateAccepted			= new GrapherItem("Set final state",defaultFont,"accepted_state.png");
-		stateOnwer				= new GrapherItem("Switch owner",defaultFont,"");
+		stateOnwer				= new GrapherItem("Switch owner",defaultFont,"owner.png");
 		
 		connectionTypes			= new GrapherMenu("Set state",defaultFont,"type_connection.png");
 		connectionNoType		= new GrapherItem("Unset state",defaultFont,"no_type_connection.png");

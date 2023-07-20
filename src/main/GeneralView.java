@@ -40,6 +40,7 @@ public class GeneralView extends JPanel {
 		comment				= new JTextArea();
 	
 		comment.setWrapStyleWord(true);
+		comment.setLineWrap(true);
 		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
 		add(showTypeNames);
 		add(showStateNumbers);

@@ -8,8 +8,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.event.CaretEvent;
-import javax.swing.event.CaretListener;
 
 public class ExportView extends JPanel {
 
@@ -52,22 +50,12 @@ public class ExportView extends JPanel {
 				main.currentSession.board.repaint();
 			}
 		});
-
-		info.addCaretListener(new CaretListener(){
-
-			public void caretUpdate(CaretEvent arg0) {
-				main.currentSession.board.settings.comment = info.getText();
-				main.currentSession.setModified(true);
-			}
-		});
-	
 	}
 
 	//-------------------------------------------------------------------------------------
 
 	public void refresh(){
 		programmingView.setSelected(main.currentSession.board.settings.programmingView);
-		info.setText(main.currentSession.board.settings.comment);
 	}
 
 }

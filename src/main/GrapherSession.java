@@ -41,8 +41,6 @@ public class GrapherSession extends JInternalFrame{
 		addInternalFrameListener(new InternalFrameListener(){
 
 			public void internalFrameOpened(InternalFrameEvent arg0) {
-				// TODO Auto-generated method stub
-				
 			}
 
 			public void internalFrameClosing(InternalFrameEvent arg0) {
@@ -50,18 +48,12 @@ public class GrapherSession extends JInternalFrame{
 			}
 
 			public void internalFrameClosed(InternalFrameEvent arg0) {
-				// TODO Auto-generated method stub
-
 			}
 
 			public void internalFrameIconified(InternalFrameEvent arg0) {
-				// TODO Auto-generated method stub
-				
 			}
 
 			public void internalFrameDeiconified(InternalFrameEvent arg0) {
-				// TODO Auto-generated method stub
-				
 			}
 
 			public void internalFrameActivated(InternalFrameEvent arg0) {

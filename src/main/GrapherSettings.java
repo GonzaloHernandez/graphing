@@ -24,7 +24,7 @@ public class GrapherSettings {
 		this.comment			= comment;
 		this.types				= types;
 		this.measure			= 1; // 0=Centimeters  1=Inch
-		this.showStateValues	= true;
+		this.showStateValues	= false;
 		this.allowStateZero		= false;
 		this.programmingView	= true;
 	}

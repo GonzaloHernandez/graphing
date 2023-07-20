@@ -1,10 +1,10 @@
 package main;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.RenderingHints;
 import java.awt.geom.QuadCurve2D;
 
 public class Connection {
@@ -67,24 +67,14 @@ public class Connection {
 	
 	//-------------------------------------------------------------------------------------
 
-	public void draw(Graphics g1,GrapherSettings settings) {
+	public void draw(Graphics2D g,GrapherSettings settings) {
 		
-		Graphics2D g = (Graphics2D) g1;
-
-		g.setRenderingHint(
-			RenderingHints.KEY_ANTIALIASING,
-			RenderingHints.VALUE_ANTIALIAS_ON);
-		
-		g.setRenderingHint(
-			RenderingHints.KEY_TEXT_ANTIALIASING,
-			RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-
-			double	angle,hypotenuse,alpha,theta,grandHypotenuse,beta,gamma,dx,dy;
+		double	angle,hypotenuse,alpha,theta,grandHypotenuse,beta,gamma,dx,dy;
 		
 		if (source.equals(target)){
 			switch (status) {
 				case MARKED:	g.setColor(Color.YELLOW);	break;
-				case STILL:		g.setColor(Color.BLACK);	break;
+				case STILL:		if (type!=null) g.setColor(Color.BLACK); else g.setColor(Color.GRAY); break;
 				case FOCUSED:	g.setColor(Color.RED);		break;
 			}
 			
@@ -378,6 +368,7 @@ public class Connection {
 		int			widthString		= metrics.stringWidth(s);//charsWidth(s.toCharArray(),0,s.length());
 		int			heightString	= metrics.getAscent();
 		
+		g.setFont(new Font("Arial",Font.ITALIC,12));
 		g.drawString(s,p.x-widthString/2,p.y+heightString/2);		
 	}
 	
