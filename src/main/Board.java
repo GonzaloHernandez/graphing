@@ -531,20 +531,13 @@ public class Board extends JComponent implements Printable{
 	//-------------------------------------------------------------------------------------
 
 	public boolean export() {
-		String values = "= [";
-		String owners = "= [";
+		int v = session.main.currentSession.board.settings.programmingView;
 
-		for (int i=0;i<states.size();i++){
-			values += states.elementAt(i).getValue() + ",";
-			owners += states.elementAt(i).getOwner() + ",";
-		}
+		//----------------------------------------------------------
 
-		values += "]";
-		owners += "]";
-
-		String matrix = "= [\n";
+		String matrix = "[";
 		for (int s=0;s<states.size();s++){
-			matrix += "[";
+			matrix += v==1?"[":"|";
 			for (int t=0;t<states.size();t++){
 				boolean found = false;
 				for (int i=0;i<states.elementAt(s).getConnections().size();i++){
@@ -552,13 +545,57 @@ public class Board extends JComponent implements Printable{
 						found = true;
 					}
 		        }
-				matrix += found?"1,":"0,";
+				matrix += found?"1":"0";
+				if (t<states.size()-1) matrix += ","; 
+				else 
+					matrix += v==1?"]":"";
 	        }
-			matrix += "]" + "\n";
+			if (s<states.size()-1) matrix += "\n"; 
+			else 
+				matrix += v==1?"]\n":"|]\n";
 		}
-	    matrix += "]";
 
-	    session.main.properties.exportView.info.setText(matrix + "\n" + values + "\n" + owners);
+		//----------------------------------------------------------
+
+		String from = "[";
+		String to	= "[";
+		int nConections = 0;
+
+		for (State s : states) {
+			for (Connection c : s.getConnections()) {
+				from	+= c.getSource().getNumber() + ",";
+				to		+= c.getTarget().getNumber() + ",";
+				nConections ++;
+			}
+		}
+
+		from	= from	.substring(0, from.length()-1) 	+ "]";
+		to		= to	.substring(0, to.length()-1) 	+ "]";
+
+		//----------------------------------------------------------
+
+		String values = "[";
+		String owners = "[";
+
+		for (int i=0;i<states.size();i++){
+			values += states.elementAt(i).getValue() + ",";
+			owners += states.elementAt(i).getOwner() + ",";
+		}
+
+		values += "]\n";
+		owners += "]\n";
+
+		//----------------------------------------------------------
+
+		session.main.properties.exportView.info.setText(
+			"Adjacency matrix\n"+
+			matrix + "\n" + 
+			"List of edges ("+nConections+")\n" +
+			from + "\n" +
+			to + "\n" +
+			"\n" +
+			values + "\n" + 
+			owners);
 		return true;
 	}
 
