@@ -1,8 +1,9 @@
 package main;
+import java.awt.BorderLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -32,11 +33,18 @@ public class ExportView extends JPanel {
 		programmingView		= new JComboBox<>(views);
 		info				= new JTextArea();
 	
+		setLayout(new BorderLayout());
+		
+		JPanel	objects	= new JPanel(new GridLayout(3,1));
+		
 		info.setWrapStyleWord(true);
-		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
-		add(programmingView);
-		add(new JLabel("Representation"));
-		add(new JScrollPane(info));
+
+		objects.add(new JLabel("View"));
+		objects.add(programmingView);
+		objects.add(new JLabel("Representation"));
+		
+		add(objects,BorderLayout.NORTH);
+		add(new JScrollPane(info),BorderLayout.CENTER);
 
 		info.setEditable(false);
 	}

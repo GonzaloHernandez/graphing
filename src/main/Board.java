@@ -471,8 +471,8 @@ public class Board extends JComponent implements Printable{
 	        file.writeShort(7);
 	        file.writeShort(4);
 	        file.writeUTF("GRAPHER");
-	        file.writeShort(1);
-	        file.writeShort(1);
+	        file.writeShort(session.main.family);
+	        file.writeShort(session.main.version);
 	        
 	        short	connectionsCount = 0;
 	        
@@ -536,6 +536,7 @@ public class Board extends JComponent implements Printable{
 		//----------------------------------------------------------
 
 		String matrix = "[";
+		int size = states.size();
 		for (int s=0;s<states.size();s++){
 			matrix += v==1?"[":"|";
 			for (int t=0;t<states.size();t++){
@@ -569,8 +570,8 @@ public class Board extends JComponent implements Printable{
 			}
 		}
 
-		from	= from	.substring(0, from.length()-1) 	+ "]";
-		to		= to	.substring(0, to.length()-1) 	+ "]";
+		from	= from	.substring(0, from.length()-1) 	+ "]\n";
+		to		= to	.substring(0, to.length()-1) 	+ "]\n";
 
 		//----------------------------------------------------------
 
@@ -582,19 +583,20 @@ public class Board extends JComponent implements Printable{
 			owners += states.elementAt(i).getOwner() + ",";
 		}
 
-		values += "]\n";
-		owners += "]\n";
+		values = values.substring(0, values.length()-1) + "]\n";
+		owners = owners.substring(0, owners.length()-1) + "]\n";
 
 		//----------------------------------------------------------
 
 		session.main.properties.exportView.info.setText(
-			"Adjacency matrix\n"+
+			"Adjacency matrix ("+size+"x"+size+")\n"+
 			matrix + "\n" + 
 			"List of edges ("+nConections+")\n" +
-			from + "\n" +
-			to + "\n" +
-			"\n" +
+			from +
+			to +
+			"\nValue of states ("+size+")\n"  +
 			values + "\n" + 
+			"Owners ("+size+")\n" +
 			owners);
 		return true;
 	}

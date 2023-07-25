@@ -70,17 +70,17 @@ public class MenuOptions extends JPopupMenu{
 		Font defaultFont		= new Font("Arial",Font.PLAIN,10);
 		
 		stateMenu				= new GrapherMenu("State",defaultFont,"state.png");
-		connectionMenu			= new GrapherMenu("Conection",defaultFont,"connection.png");
+		connectionMenu			= new GrapherMenu("Connection",defaultFont,"connection.png");
 		grapherMenu				= new GrapherMenu("Grapher",defaultFont,"application.png");
 				
 		stateDelete				= new GrapherItem("Delete state",defaultFont,"delete_state.png");
-		stateDeleteAllOutgoings	= new GrapherItem("Delete all outgoing conections",defaultFont,"delete_connection.png");
+		stateDeleteAllOutgoings	= new GrapherItem("Delete all outgoing connections",defaultFont,"delete_connection.png");
 		stateAccepted			= new GrapherItem("Set final state",defaultFont,"accepted_state.png");
 		stateOnwer				= new GrapherItem("Switch owner",defaultFont,"owner.png");
 		
 		connectionTypes			= new GrapherMenu("Set state",defaultFont,"type_connection.png");
 		connectionNoType		= new GrapherItem("Unset state",defaultFont,"no_type_connection.png");
-		connectionDelete		= new GrapherItem("Delte conection",defaultFont,"delete_connection.png");
+		connectionDelete		= new GrapherItem("Delete connection",defaultFont,"delete_connection.png");
 		connectionTune			= new GrapherItem("Tune arc",defaultFont,"tune_connection.png");
 		
 		restart					= new GrapherItem("Restar session",defaultFont,"new.png");
