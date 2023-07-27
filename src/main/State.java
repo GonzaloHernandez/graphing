@@ -90,8 +90,9 @@ public class State {
 		}
 
 		if (accepted) g.drawOval(x-RADIUS+3,y-RADIUS+3,(RADIUS-3)*2,(RADIUS-3)*2);
-		if (settings.showStateNumbers) {
-			if (settings.showStateValues) {
+		if (settings.showStateSequence) {
+			g.setColor(Color.GRAY);
+			if (settings.showStatePriorities) {
 				g.setFont(new Font("Arial",Font.ITALIC,9));
 				g.drawString(""+number,x-(3*(new String(""+number)).length()),y+RADIUS-1);
 			}
@@ -100,7 +101,8 @@ public class State {
 				g.drawString(""+number,x-(3*(new String(""+number)).length()),y+4);
 			}
 		}
-		if (settings.showStateValues) {
+		if (settings.showStatePriorities) {
+			g.setColor(Color.BLACK);
 			g.setFont(new Font("Arial",Font.PLAIN,13));
 			g.drawString(""+value,x-(3*(new String(""+value)).length()),y+4);
 		}

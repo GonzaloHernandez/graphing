@@ -34,9 +34,9 @@ public class GeneralView extends JPanel {
 
 	private void initElements(){
 		showTypeNames		= new JCheckBox("View type names");
-		showStateNumbers	= new JCheckBox("View state numbers");
-		showStateValues		= new JCheckBox("View state Values");
-		allowStateZero		= new JCheckBox("Allow state Zero");
+		showStateNumbers	= new JCheckBox("View state sequence");
+		showStateValues		= new JCheckBox("View state priorities");
+		allowStateZero		= new JCheckBox("Allow state zero");
 		comment				= new JTextArea();
 	
 		comment.setWrapStyleWord(true);
@@ -63,7 +63,7 @@ public class GeneralView extends JPanel {
 
 		showStateNumbers.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
-				main.currentSession.board.settings.showStateNumbers	= showStateNumbers.isSelected();
+				main.currentSession.board.settings.showStateSequence	= showStateNumbers.isSelected();
 				main.currentSession.setModified(true);
 				main.currentSession.board.repaint();
 			}
@@ -71,7 +71,7 @@ public class GeneralView extends JPanel {
 		
 		showStateValues.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
-				main.currentSession.board.settings.showStateValues	= showStateValues.isSelected();
+				main.currentSession.board.settings.showStatePriorities	= showStateValues.isSelected();
 				main.currentSession.setModified(true);
 				main.currentSession.board.repaint();
 			}
@@ -99,8 +99,8 @@ public class GeneralView extends JPanel {
 
 	public void refresh(){
 		showTypeNames.setSelected(main.currentSession.board.settings.showTypeNames);
-		showStateNumbers.setSelected(main.currentSession.board.settings.showStateNumbers);
-		showStateValues.setSelected(main.currentSession.board.settings.showStateValues);
+		showStateNumbers.setSelected(main.currentSession.board.settings.showStateSequence);
+		showStateValues.setSelected(main.currentSession.board.settings.showStatePriorities);
 		allowStateZero.setSelected(main.currentSession.board.settings.allowStateZero);
 		comment.setText(main.currentSession.board.settings.comment);
 	}
