@@ -175,7 +175,8 @@ public class Board extends JComponent implements Printable{
 				else if (e.getButton() == MouseEvent.BUTTON3) {
 					if (stateTarget!=null && currentConnection!=null) {
 						session.main.menuOptions.show(true,true,true);
-					}else if (stateTarget!=null) {
+					}
+					else if (stateTarget!=null) {
 						session.main.menuOptions.show(true,false,true);
 					}
 					else if (currentConnection!=null) {
@@ -544,6 +545,8 @@ public class Board extends JComponent implements Printable{
 	//-------------------------------------------------------------------------------------
 
 	public boolean export() {
+		if (session.main.currentSession == null) return false;
+
 		int v = session.main.currentSession.board.settings.programmingView;
 
 		//----------------------------------------------------------
