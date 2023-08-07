@@ -15,14 +15,14 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
 class TypeMenuItem extends JMenuItem {
-	private ConectionType	type;
-	public TypeMenuItem(String label,ConectionType type) {
+	private ConnectionType	type;
+	public TypeMenuItem(String label,ConnectionType type) {
 		super(label);
 		this.type	= type;
 		setFont(new Font("Arial",Font.ITALIC,10));
 		setIcon(new ImageIcon("icons/type.png"));
 	}
-	public ConectionType getType() {
+	public ConnectionType getType() {
 		return type;
 	}
 }
@@ -121,7 +121,7 @@ public class MenuOptions extends JPopupMenu{
 		connectionTypes.removeAll();
 		typeItems	= new TypeMenuItem[main.currentSession.board.types.size()];
 		for (int i=0 ; i<main.currentSession.board.types.size() ; i++) {
-			ConectionType type = (ConectionType)main.currentSession.board.types.elementAt(i); 
+			ConnectionType type = (ConnectionType)main.currentSession.board.types.elementAt(i); 
 			typeItems[i]= new TypeMenuItem(type.getName(),type);
 			
 			typeItems[i].addActionListener(new ActionListener() {
@@ -131,8 +131,8 @@ public class MenuOptions extends JPopupMenu{
 					main.currentSession.setModified(true);
 				}
 			});
-			
 			connectionTypes.add(typeItems[i]);
+			if (i==0) ((JMenu)connectionTypes).addSeparator();
 		}
 	}
 	

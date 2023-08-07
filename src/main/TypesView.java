@@ -61,7 +61,7 @@ public class TypesView extends JPanel {
 		TableModel model = new TableModel() {
 
 			public int getRowCount() {
-				return main.currentSession.board.types.size();
+				return main.currentSession.board.types.size()-1;
 			}
 
 			public int getColumnCount() {
@@ -82,8 +82,8 @@ public class TypesView extends JPanel {
 
 			public Object getValueAt(int row, int column) {
 				switch(column) {
-					case 0:	return main.currentSession.board.types.elementAt(row).getName();
-					case 1: return main.currentSession.board.types.elementAt(row).getSymbols();		
+					case 0:	return main.currentSession.board.types.elementAt(row+1).getName();
+					case 1: return main.currentSession.board.types.elementAt(row+1).getSymbols();		
 				}
 				return null;
 			}
@@ -123,10 +123,10 @@ public class TypesView extends JPanel {
 						}
 					}
 				}
-				if (add.getText().equals("Guardar")){
+				if (add.getText().equals("Save")){
 					int n;
 					n = main.currentSession.board.types.size();
-					main.currentSession.board.types.add(new ConectionType(n+1,name.getText(),symbols.getText()));
+					main.currentSession.board.types.add(new ConnectionType(n+1,name.getText(),symbols.getText()));
 				}
 				loadTable();
 				name.setText("");
@@ -142,7 +142,7 @@ public class TypesView extends JPanel {
 					State state = main.currentSession.board.states.elementAt(s);
 					for (int c=0;c<state.getConnections().size();c++){
 						Connection connection = state.getConnections().elementAt(c); 
-						if (connection.getType()!=null && connection.getType().equals(main.currentSession.board.types.elementAt(table.getSelectedRow()))){
+						if (connection.getType()!=null && connection.getType().equals(main.currentSession.board.types.elementAt(table.getSelectedRow()+1))){
 							if (!question) {
 								String opc = main.currentSession.board.session.main.messageBox("Type currently used.|Do you want to keep updating the connections?","Warning!","Yes|Cancel");
 								if (opc.equals("Cancel")||opc.equals("")) return;
@@ -153,8 +153,8 @@ public class TypesView extends JPanel {
 					}
 				}
 				main.currentSession.board.repaint();
-				main.currentSession.board.types.remove(table.getSelectedRow());
-				for (int i=0;i<main.currentSession.board.types.size();i++){
+				main.currentSession.board.types.remove(table.getSelectedRow()+1);
+				for (int i=1;i<main.currentSession.board.types.size();i++){
 					main.currentSession.board.types.elementAt(i).setNumber(i+1);
 				}
 				loadTable();

@@ -36,7 +36,7 @@ public class Board extends JComponent implements Printable{
 	protected	GrapherSettings	settings;
 	protected	Vector			<State>states;
 	protected	GrapherSession	session;
-	protected	Vector			<ConectionType>types;
+	protected	Vector			<ConnectionType>types;
 	protected	Connection		currentConnection;
 	protected	State			stateSource,stateTarget;
 	protected	boolean			menuBlock;
@@ -60,11 +60,13 @@ public class Board extends JComponent implements Printable{
 		this.fileName	= "";
 		this.compiler	= null;
 		
-		types	= new Vector<ConectionType>();
-		types.add(new ConectionType(1,"number","0123456789"));
-		types.add(new ConectionType(2,"point","."));
-		types.add(new ConectionType(3,"uppercase","ABCDEFGHIJKLMNOPQRSTUVWXYZ"));
-		types.add(new ConectionType(4,"lowercase","abcdefghijklmnopqrstuvwxyz"));
+		types	= new Vector<ConnectionType>();
+
+		types.add(new ConnectionType(0,"Free Value", "0"));
+		types.add(new ConnectionType(1,"number","0123456789"));
+		types.add(new ConnectionType(2,"point","."));
+		types.add(new ConnectionType(3,"uppercase","ABCDEFGHIJKLMNOPQRSTUVWXYZ"));
+		types.add(new ConnectionType(4,"lowercase","abcdefghijklmnopqrstuvwxyz"));
 		
 		settings	= new GrapherSettings(true,true,"",types);
 		states		= new Vector<State>();
@@ -297,11 +299,14 @@ public class Board extends JComponent implements Printable{
 					stateTarget.setValue(stateTarget.getValue()-e.getWheelRotation());
 				} 
 				else if (currentConnection != null){
-					if (!e.isControlDown()){
-						currentConnection.setAmountDistance(-e.getWheelRotation()*2);
+					if (e.isShiftDown() && currentConnection.getType()!=null && currentConnection.getType().getNumber() == 0){
+						currentConnection.setValue(currentConnection.getValue()- e.getWheelRotation());
 					}
-					else{
+					else if (e.isControlDown()){
 						currentConnection.setAmountRotation((Math.PI/16)*-e.getWheelRotation());
+					}
+					else if (!e.isShiftDown()){
+						currentConnection.setAmountDistance(-e.getWheelRotation()*2);
 					}
 					session.setModified(true);
 				}
@@ -346,7 +351,7 @@ public class Board extends JComponent implements Printable{
 	        double	rotation;
 	        boolean	accepted;
 	        State	source=null,target=null;
-	        ConectionType	type=null;
+	        ConnectionType	type=null;
 	        String	name,symbols;
 	        
 	        states.removeAllElements();
@@ -369,7 +374,7 @@ public class Board extends JComponent implements Printable{
 	        	number	= file.readShort();
 	        	name 	= file.readUTF();
 	        	symbols	= file.readUTF();
-	        	types.add(new ConectionType(number,name,symbols));
+	        	types.add(new ConnectionType(number,name,symbols));
 	        }
 	        
 	        n = file.readShort();
@@ -392,6 +397,7 @@ public class Board extends JComponent implements Printable{
 	        	numberType		= file.readShort();
 	        	distance		= file.readShort();
 	        	rotation		= file.readDouble();
+				value			= file.readShort();
 	        	
 	        	for (int s=0;s<states.size();s++){
 	        		if (states.elementAt(s).getNumber()==numberSource){
@@ -413,10 +419,10 @@ public class Board extends JComponent implements Printable{
 		        			break;
 		        		}
 		        	}
-		        	source.addConnection(target,type,distance,rotation);	        		
+		        	source.addConnection(target,type,distance,rotation,value);
 	        	}
 	        	else {
-	        		source.addConnection(target,null,distance,rotation);
+	        		source.addConnection(target,null,distance,rotation,value);
 	        	}
 	        }
 	        
@@ -509,8 +515,9 @@ public class Board extends JComponent implements Printable{
 		        	else {
 		        		file.writeShort(-1);
 		        	}
-		        	file.writeShort(states.elementAt(s).getConnections().elementAt(i).getDistance());
+		        	file.writeShort (states.elementAt(s).getConnections().elementAt(i).getDistance());
 		        	file.writeDouble(states.elementAt(s).getConnections().elementAt(i).getRotation());
+		        	file.writeShort (states.elementAt(s).getConnections().elementAt(i).getValue());
 		        }
 	        }
 	        
@@ -652,7 +659,7 @@ public class Board extends JComponent implements Printable{
 		for (int s=0;s<states.size();s++){
 			for (int t=0;t<types.size();t++){
 				gra[s][t] = 0;
-				ConectionType type = types.elementAt(t);
+				ConnectionType type = types.elementAt(t);
 				for (int c=0;c<states.elementAt(s).getConnections().size();c++){
 					Connection connection = states.elementAt(s).getConnections().elementAt(c);
 					if (connection.getType().equals(type)){

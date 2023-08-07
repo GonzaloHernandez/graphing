@@ -1,5 +1,5 @@
 package main;
-public class ConectionType {
+public class ConnectionType {
 	
 	//-------------------------------------------------------------------------------------
 
@@ -8,7 +8,7 @@ public class ConectionType {
 	
 	//-------------------------------------------------------------------------------------
 
-	public ConectionType(int number,String name,String symbols) {
+	public ConnectionType(int number,String name,String symbols) {
 		this.number		= number;
 		this.name		= name;
 		this.symbols	= symbols;

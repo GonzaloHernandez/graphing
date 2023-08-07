@@ -8,7 +8,7 @@ public class GrapherSettings {
 	protected	boolean	showTypeNames;
 	protected	boolean	showStateSequence;
 	protected	String	comment;
-	protected	Vector	<ConectionType>types;
+	protected	Vector	<ConnectionType>types;
 	protected	int	measure;
 
 	protected	boolean showStatePriorities;
@@ -18,7 +18,7 @@ public class GrapherSettings {
 
 	//---------------------------------------------------------------------------
 	
-	public GrapherSettings(boolean nameTypes,boolean numberStates,String comment,Vector <ConectionType>types){
+	public GrapherSettings(boolean nameTypes,boolean numberStates,String comment,Vector <ConnectionType>types){
 		this.showTypeNames		= nameTypes;
 		this.showStateSequence	= numberStates;
 		this.comment			= comment;

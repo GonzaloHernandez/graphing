@@ -216,13 +216,13 @@ public class State {
 	
 	//-------------------------------------------------------------------------------------
 	
-	public void addConnection(State target,ConectionType type,int distance,double rotation) {
+	public void addConnection(State target,ConnectionType type,int distance,double rotation,int value) {
 		for (int c=0;c<getConnections().size();c++){
 			if (getConnections().elementAt(c).getTarget().equals(target)) { 
 				return;
 			}
 		}
-		connections.add(new Connection(this,target,type,Connection.STILL,distance,rotation));
+		connections.add(new Connection(this,target,type,Connection.STILL,distance,rotation,value));
 	}
 	
 	//-------------------------------------------------------------------------------------

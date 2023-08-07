@@ -129,7 +129,7 @@ public class WindowTypes extends JDialog {
 					}
 				}
 				if (add.getText().equals("Save")){
-					board.types.add(new ConectionType(board.types.size()+1,name.getText(),symbols.getText()));
+					board.types.add(new ConnectionType(board.types.size()+1,name.getText(),symbols.getText()));
 				}
 				loadTable();
 				name.setText("");

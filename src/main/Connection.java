@@ -19,15 +19,16 @@ public class Connection {
 
 	private	State				source,target;
 	private	int					status;
-	private	ConectionType		type;
+	private	ConnectionType		type;
 	private	QuadCurve2D.Double	curve;
 	private	Point				start,end,middle,control,text,arrowleft,arrowright,arrow;
 	private	int					distance;
 	private	double				rotation;
+	private int					value;
 	
 	//-------------------------------------------------------------------------------------
 
-	public Connection(State source,State target,ConectionType type) {
+	public Connection(State source,State target,ConnectionType type) {
 		this.source		= source;
 		this.target		= target;
 		this.type		= type;
@@ -42,12 +43,13 @@ public class Connection {
 		this.arrowright	= new Point();
 		this.arrow		= new Point();
 		this.rotation	= 0;
+		this.value		= 0;
 		if (source.equals(target))	this.distance =30; else this.distance = 0; 
 	}
 	
 	//-------------------------------------------------------------------------------------
 
-	public Connection(State source,State target,ConectionType type,int status,int distance,double rotation) {
+	public Connection(State source,State target,ConnectionType type,int status,int distance,double rotation,int value) {
 		this.source		= source;
 		this.target		= target;
 		this.type		= type;
@@ -62,7 +64,8 @@ public class Connection {
 		this.arrowright	= new Point();
 		this.arrow		= new Point();
 		this.distance	= distance;
-		this.rotation	= rotation;	 
+		this.rotation	= rotation;
+		this.value		= value;
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -228,7 +231,12 @@ public class Connection {
 		
 		if (type!=null && settings.showTypeNames) {
 			g.setColor(Color.BLUE);
-			String label = type.getName();
+			String label = "";
+			if (type.getNumber()==0) {
+				label = "" + getValue();
+			} else {
+				label = type.getName();
+			}
 			drawCenterString(g,label,text);
 		}
 		
@@ -306,7 +314,7 @@ public class Connection {
 
 	//-------------------------------------------------------------------------------------
 
-	public void setType(ConectionType type) {
+	public void setType(ConnectionType type) {
 		this.type	= type;
 	}
 	
@@ -323,7 +331,11 @@ public class Connection {
 	}
 
 	//-------------------------------------------------------------
-	
+
+	public void setValue(int value) {
+		this.value = value;
+	}
+
 	public void setAmountRotation(double dif){
 		rotation	+=	dif;
 		if (rotation>2*Math.PI){
@@ -345,7 +357,7 @@ public class Connection {
 	
 	//-------------------------------------------------------------
 
-	public ConectionType getType(){
+	public ConnectionType getType(){
 		return type;
 	}	
 	
@@ -359,6 +371,12 @@ public class Connection {
 
 	public double getRotation(){
 		return rotation;
+	}
+
+	//-------------------------------------------------------------
+
+	public int getValue() {
+		return value;
 	}
 	
 	//-------------------------------------------------------------
