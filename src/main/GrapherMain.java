@@ -31,7 +31,7 @@ public class GrapherMain extends JFrame{
 	//-------------------------------------------------------------------------------------
 	final int	family			= 1;
 	final int	version			= 1;
-	final int	construcction	= 6;
+	final int	construcction	= 8;
 	
 	//-------------------------------------------------------------------------------------
 
@@ -48,20 +48,19 @@ public class GrapherMain extends JFrame{
 	protected	PropertiesView	properties;
 	protected	JMenu			recent;
 	
+	protected	boolean			showAbout;
+
 	//-------------------------------------------------------------------------------------
 
 	public GrapherMain() {
 		super("Graphing");
-	    int w = Toolkit.getDefaultToolkit().getScreenSize().width;
-	    int h = Toolkit.getDefaultToolkit().getScreenSize().height;
 		
-		setSize(800,550);
-		setLocation(w/2-400,h/2-275);
+		setSize(1200,800);
 		initElements();
 		progListeners();
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		setVisible(true);
-		new About(this);
+		if (showAbout) new About(this);
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -116,6 +115,8 @@ public class GrapherMain extends JFrame{
 		addSamples();
 		
 		add(split);
+		
+		showAbout = true;
 		load();
 	}
 	
@@ -302,6 +303,7 @@ public class GrapherMain extends JFrame{
 				JMenuItem item = recent.getItem(i);
 				file.writeUTF(item.getText());
 			}
+			file.writeBoolean(showAbout);
 	        
 	        file.close();
 	        
@@ -323,6 +325,7 @@ public class GrapherMain extends JFrame{
 				addRecentSession(file.readUTF());
 			}
 	        
+			showAbout = file.readBoolean();
 	        file.close();
 	        
 	    } catch (IOException e) {

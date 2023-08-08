@@ -126,8 +126,36 @@ public class Board extends JComponent implements Printable{
 	public void progListeners() {
 		addKeyListener(new KeyListener(){
 
-			public void keyPressed(KeyEvent arg0) {
-				
+			public void keyPressed(KeyEvent e) {
+				if (currentConnection != null) {
+					if (!e.isControlDown()){
+						if (e.getKeyCode() == KeyEvent.VK_A) {
+							currentConnection.setAmountDistance(2);
+						}
+						else if (e.getKeyCode() == KeyEvent.VK_Z){
+							currentConnection.setAmountDistance(-2);
+						}
+						else if (e.getKeyCode() == KeyEvent.VK_DELETE) {
+							State source = currentConnection.getSource();
+							source.deleteConnecion(currentConnection);
+						}
+					}
+					else{
+						if (e.getKeyCode() == KeyEvent.VK_A) {
+							currentConnection.setAmountRotation(-(Math.PI/16));
+						}
+						else if (e.getKeyCode() == KeyEvent.VK_Z){
+							currentConnection.setAmountRotation((Math.PI/16));
+						}
+					}
+					session.setModified(true);
+				}
+				if (e.isControlDown()){
+					if (e.getKeyCode() == KeyEvent.VK_S) {
+						save(false);
+					}
+				}
+				repaint();
 			}
 
 			public void keyReleased(KeyEvent arg0) {
@@ -135,28 +163,7 @@ public class Board extends JComponent implements Printable{
 			}
 
 			public void keyTyped(KeyEvent e) {
-				
-				if (currentConnection != null){
-					if (!e.isControlDown()){
-						if (e.getKeyChar()=='a') {
-							currentConnection.setAmountDistance(2);
-						}
-						else if (e.getKeyChar()=='z'){
-							currentConnection.setAmountDistance(-2);
-						}
-					}
-					else{
-						if ((int)e.getKeyChar()==1) {
-							currentConnection.setAmountRotation(-(Math.PI/16));
-						}
-						else if ((int)e.getKeyChar()==26){
-							currentConnection.setAmountRotation((Math.PI/16));
-						}
-						
-					}
-					session.setModified(true);
-				}
-				repaint();
+
 			}
 			
 		});

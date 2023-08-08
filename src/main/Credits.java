@@ -1,7 +1,9 @@
 package main;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -64,7 +66,17 @@ public class Credits extends JDialog implements Runnable{
 		});
 	}
 	
-	public void paint(Graphics g){
+	public void paint(Graphics g1){
+		Graphics2D g = (Graphics2D) g1;
+
+		g.setRenderingHint(
+			RenderingHints.KEY_ANTIALIASING,
+			RenderingHints.VALUE_ANTIALIAS_ON);
+		
+		g.setRenderingHint(
+			RenderingHints.KEY_TEXT_ANTIALIASING,
+			RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
 		g.drawString("Wait...",100,100);
 		g.drawImage(img,0,0,main);
 		g.setColor(Color.BLACK);
@@ -74,8 +86,8 @@ public class Credits extends JDialog implements Runnable{
 	//-------------------------------------------------------------------------------------
 
 	public void run() {
+		img = Toolkit.getDefaultToolkit().getImage("icons/udenar.png");
 		for (int i=0;i<3;i++){
-			img = Toolkit.getDefaultToolkit().getImage("icons/udenar.png");
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
