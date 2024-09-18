@@ -203,8 +203,8 @@ public class Connection {
 		if (arrow.y<end.y)	gamma	= alpha - beta; 
 		else				gamma	= alpha + beta;
 		
-		dx	= Math.sin(gamma)*10;
-		dy	= Math.cos(gamma)*10;
+		dx	= Math.sin(gamma)*8;
+		dy	= Math.cos(gamma)*8;
 
 		arrowleft.x = end.x - (int)(dx);
 		if (arrow.y<end.y)	arrowleft.y = end.y - (int)(dy);
@@ -217,15 +217,20 @@ public class Connection {
 		if (arrow.y<end.y)	gamma	= alpha + beta; 
 		else				gamma	= alpha - beta;
 		
-		dx	= Math.sin(gamma)*10;
-		dy	= Math.cos(gamma)*10;
+		dx	= Math.sin(gamma)*8;
+		dy	= Math.cos(gamma)*8;
 
 		arrowright.x = end.x - (int)(dx);
 		if (arrow.y<end.y)	arrowright.y = end.y - (int)(dy);
 		else				arrowright.y = end.y + (int)(dy);
 		
-		g.drawLine(arrowleft.x,arrowleft.y,end.x,end.y);
-		g.drawLine(arrowright.x,arrowright.y,end.x,end.y);
+		// g.drawLine(arrowleft.x,arrowleft.y,end.x,end.y);
+		// g.drawLine(arrowright.x,arrowright.y,end.x,end.y);
+		// g.drawLine(arrowright.x,arrowright.y,arrowleft.x,arrowleft.y);
+
+		int xs [] = {end.x,arrowleft.x,arrowright.x};
+		int ys [] = {end.y,arrowleft.y,arrowright.y};
+		g.fillPolygon(xs,ys,3);
 
 		//--- draw label ---
 		

@@ -135,21 +135,31 @@ public class Board extends JComponent implements Printable{
 						else if (e.getKeyCode() == KeyEvent.VK_Z){
 							currentConnection.setAmountDistance(-2);
 						}
-						else if (e.getKeyCode() == KeyEvent.VK_DELETE) {
-							State source = currentConnection.getSource();
-							source.deleteConnecion(currentConnection);
-						}
 					}
-					else{
+					else {
 						if (e.getKeyCode() == KeyEvent.VK_A) {
 							currentConnection.setAmountRotation(-(Math.PI/16));
 						}
 						else if (e.getKeyCode() == KeyEvent.VK_Z){
 							currentConnection.setAmountRotation((Math.PI/16));
 						}
+						else if (e.getKeyCode() == KeyEvent.VK_DELETE) {
+							State source = currentConnection.getSource();
+							source.deleteConnecion(currentConnection);
+						}
 					}
 					session.setModified(true);
 				}
+
+				if (stateTarget != null) {
+					if (e.isControlDown()) {
+						if (e.getKeyCode() == KeyEvent.VK_DELETE) {
+							deleteState(stateTarget);
+							session.setModified(true);
+						}
+					}
+				}
+
 				if (e.isControlDown()){
 					if (e.getKeyCode() == KeyEvent.VK_S) {
 						save(false);
