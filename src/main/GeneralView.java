@@ -19,7 +19,8 @@ public class GeneralView extends JPanel {
 	protected	JCheckBox	showTypeNames;
 	protected	JCheckBox	showStateNumbers;
 	protected	JCheckBox	showStateValues;
-	protected	JCheckBox	allowStateZero;
+	protected	JCheckBox	allowFirstState;
+	protected	JCheckBox	firstZero;
 	protected	JTextArea	comment;
 	
 	//-------------------------------------------------------------------------------------
@@ -36,7 +37,9 @@ public class GeneralView extends JPanel {
 		showTypeNames		= new JCheckBox("View type names");
 		showStateNumbers	= new JCheckBox("View state sequence");
 		showStateValues		= new JCheckBox("View state priorities");
-		allowStateZero		= new JCheckBox("Allow state zero");
+		allowFirstState		= new JCheckBox("Allow first state");
+		firstZero			= new JCheckBox("First state is 0");
+
 		comment				= new JTextArea();
 	
 		comment.setWrapStyleWord(true);
@@ -45,7 +48,8 @@ public class GeneralView extends JPanel {
 		add(showTypeNames);
 		add(showStateNumbers);
 		add(showStateValues);
-		add(allowStateZero);
+		add(allowFirstState);
+		add(firstZero);
 		add(new JLabel("Comment"));
 		add(new JScrollPane(comment));
 	}
@@ -63,7 +67,7 @@ public class GeneralView extends JPanel {
 
 		showStateNumbers.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
-				main.currentSession.board.settings.showStateSequence	= showStateNumbers.isSelected();
+				main.currentSession.board.settings.showStateSequence = showStateNumbers.isSelected();
 				main.currentSession.setModified(true);
 				main.currentSession.board.repaint();
 			}
@@ -71,15 +75,23 @@ public class GeneralView extends JPanel {
 		
 		showStateValues.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
-				main.currentSession.board.settings.showStatePriorities	= showStateValues.isSelected();
+				main.currentSession.board.settings.showStatePriorities = showStateValues.isSelected();
 				main.currentSession.setModified(true);
 				main.currentSession.board.repaint();
 			}
 		});
 		
-		allowStateZero.addActionListener(new ActionListener(){
+		allowFirstState.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
-				main.currentSession.board.settings.allowStateZero	= allowStateZero.isSelected();
+				main.currentSession.board.settings.allowFirsState = allowFirstState.isSelected();
+				main.currentSession.setModified(true);
+				main.currentSession.board.repaint();
+			}
+		});
+
+		firstZero.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				main.currentSession.board.settings.firstZero = firstZero.isSelected();
 				main.currentSession.setModified(true);
 				main.currentSession.board.repaint();
 			}
@@ -101,7 +113,8 @@ public class GeneralView extends JPanel {
 		showTypeNames.setSelected(main.currentSession.board.settings.showTypeNames);
 		showStateNumbers.setSelected(main.currentSession.board.settings.showStateSequence);
 		showStateValues.setSelected(main.currentSession.board.settings.showStatePriorities);
-		allowStateZero.setSelected(main.currentSession.board.settings.allowStateZero);
+		allowFirstState.setSelected(main.currentSession.board.settings.allowFirsState);
+		firstZero.setSelected(main.currentSession.board.settings.firstZero);
 		comment.setText(main.currentSession.board.settings.comment);
 	}
 

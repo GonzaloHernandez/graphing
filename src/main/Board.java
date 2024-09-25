@@ -230,7 +230,7 @@ public class Board extends JComponent implements Printable{
 						controled = false;
 						return;
 					}
-					if (settings.allowStateZero || stateTarget.getNumber() > 0) {
+					if (settings.allowFirsState || stateTarget.getNumber() > 0) {
 						for (int i=0 ; i<states.size() ; i++) {
 							State state = (State)states.elementAt(i);
 							if (state.isArea(e.getX(),e.getY())) {
@@ -447,7 +447,7 @@ public class Board extends JComponent implements Printable{
 	        settings.showTypeNames			= file.readBoolean();
 	        settings.showStateSequence		= file.readBoolean();
 	        settings.showStatePriorities	= file.readBoolean();
-	        settings.allowStateZero			= file.readBoolean();
+	        settings.allowFirsState			= file.readBoolean();
 	        settings.comment				= file.readUTF();
 	        
 	        session.setSize(file.readShort(),file.readShort());
@@ -542,7 +542,7 @@ public class Board extends JComponent implements Printable{
 	        file.writeBoolean(settings.showTypeNames);
 	        file.writeBoolean(settings.showStateSequence);
 			file.writeBoolean(settings.showStatePriorities);
-			file.writeBoolean(settings.allowStateZero);
+			file.writeBoolean(settings.allowFirsState);
 
 			file.writeUTF(settings.comment);	        
 	        
@@ -564,7 +564,8 @@ public class Board extends JComponent implements Printable{
 	public boolean export() {
 		if (session.main.currentSession == null) return false;
 
-		int v = session.main.currentSession.board.settings.programmingView;
+		int v		= session.main.currentSession.board.settings.programmingView;
+		int first	= session.main.currentSession.board.settings.firstZero?0:1;
 
 		//----------------------------------------------------------
 
@@ -597,14 +598,14 @@ public class Board extends JComponent implements Printable{
 
 		for (State s : states) {
 			for (Connection c : s.getConnections()) {
-				from	+= c.getSource().getNumber() + ",";
-				to		+= c.getTarget().getNumber() + ",";
+				from	+= c.getSource().getNumber()+first + ",";
+				to		+= c.getTarget().getNumber()+first + ",";
 				nConections ++;
 			}
 		}
 
-		from	= from	.substring(0, from.length()-1) 	+ "]\n";
-		to		= to	.substring(0, to.length()-1) 	+ "]\n";
+		from	= from	.substring(0, from.length()-1) 	+ "]";
+		to		= to	.substring(0, to.length()-1) 	+ "]";
 
 		//----------------------------------------------------------
 
@@ -616,21 +617,23 @@ public class Board extends JComponent implements Printable{
 			owners += states.elementAt(i).getOwner() + ",";
 		}
 
-		values = values.substring(0, values.length()-1) + "]\n";
-		owners = owners.substring(0, owners.length()-1) + "]\n";
+		values = values.substring(0, values.length()-1) + "]";
+		owners = owners.substring(0, owners.length()-1) + "]";
 
 		//----------------------------------------------------------
 
 		session.main.properties.exportView.info.setText(
 			"Adjacency matrix ("+size+"x"+size+")\n"+
-			matrix + "\n" + 
-			"List of edges ("+nConections+")\n" +
-			from +
-			to +
-			"\nValue of states ("+size+")\n"  +
-			values + "\n" + 
-			"Owners ("+size+")\n" +
-			owners);
+			matrix + 
+			"\n" +
+			"nvertices = " + size + ";\n" +
+			"owners = " + owners + ";\n" +
+			"colors = " + values + ";\n" +
+			"\n" +
+			"nedges = " + nConections + ";\n" +
+			"edgesv = " + from + ";\n" +
+			"edgesw = " + to + ";\n"
+		);
 		return true;
 	}
 

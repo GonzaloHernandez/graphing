@@ -12,7 +12,8 @@ public class GrapherSettings {
 	protected	int	measure;
 
 	protected	boolean showStatePriorities;
-	protected	boolean allowStateZero;
+	protected	boolean allowFirsState;
+	protected	boolean firstZero;
 
 	protected	int programmingView;
 
@@ -25,7 +26,8 @@ public class GrapherSettings {
 		this.types				= types;
 		this.measure			= 1; // 0=Centimeters  1=Inch
 		this.showStatePriorities	= false;
-		this.allowStateZero		= false;
+		this.allowFirsState		= false;
+		this.firstZero			= false;
 		this.programmingView	= 2;
 	}
 
