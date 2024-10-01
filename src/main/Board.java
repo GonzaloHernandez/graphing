@@ -143,7 +143,7 @@ public class Board extends JComponent implements Printable{
 						else if (e.getKeyCode() == KeyEvent.VK_Z){
 							currentConnection.setAmountRotation((Math.PI/16));
 						}
-						else if (e.getKeyCode() == KeyEvent.VK_DELETE) {
+						else if (e.getKeyCode() == KeyEvent.VK_DELETE || e.getKeyCode() == KeyEvent.VK_X ) {
 							State source = currentConnection.getSource();
 							source.deleteConnecion(currentConnection);
 						}
@@ -153,11 +153,20 @@ public class Board extends JComponent implements Printable{
 
 				if (stateTarget != null) {
 					if (e.isControlDown()) {
-						if (e.getKeyCode() == KeyEvent.VK_DELETE) {
+						if (e.getKeyCode() == KeyEvent.VK_DELETE || e.getKeyCode() == KeyEvent.VK_X ) {
 							deleteState(stateTarget);
 							session.setModified(true);
 						}
 					}
+					else if (e.getKeyCode() == KeyEvent.VK_A) {
+						stateTarget.setValue(stateTarget.getValue()+1);
+						session.setModified(true);
+					} 
+					else if (e.getKeyCode() == KeyEvent.VK_Z) {
+						stateTarget.setValue(stateTarget.getValue()-1);
+						session.setModified(true);
+					} 
+	
 				}
 
 				if (e.isControlDown()){
