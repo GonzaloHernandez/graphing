@@ -165,8 +165,11 @@ public class Board extends JComponent implements Printable{
 					else if (e.getKeyCode() == KeyEvent.VK_Z) {
 						stateTarget.setValue(stateTarget.getValue()-1);
 						session.setModified(true);
+					}
+					else if (e.getKeyCode() == KeyEvent.VK_O) {
+						stateTarget.setOwner(1-stateTarget.getOwner());
+						session.setModified(true);
 					} 
-	
 				}
 
 				if (e.isControlDown()){
