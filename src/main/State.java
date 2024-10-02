@@ -66,11 +66,11 @@ public class State {
 
 	//-------------------------------------------------------------------------------------
 	
-	public void draw(Graphics2D g,GrapherSettings settings) {
+	public int draw(Graphics2D g,GrapherSettings settings,int connectionSequence) {
 		
 		for (int i=0 ; i<connections.size() ; i++) {
 			Connection connection = (Connection)connections.elementAt(i);
-			connection.draw(g,settings);
+			connectionSequence = connection.draw(g,settings,connectionSequence);
 		}
 		switch (status) {
 			case FOCUSED:	g.setColor(Color.RED);		break;
@@ -107,7 +107,7 @@ public class State {
 			g.setFont(new Font("Arial",Font.PLAIN,13));
 			g.drawString(""+value,x-(3*(new String(""+value)).length()),y+4);
 		}
-
+		return connectionSequence;
 	}
 	
 	//-------------------------------------------------------------------------------------

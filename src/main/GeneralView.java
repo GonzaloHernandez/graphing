@@ -18,6 +18,7 @@ public class GeneralView extends JPanel {
 	protected	GrapherMain	main;
 	protected	JCheckBox	showTypeNames;
 	protected	JCheckBox	showStateNumbers;
+	protected	JCheckBox	showConnectionNumbers;
 	protected	JCheckBox	showStateValues;
 	protected	JCheckBox	allowFirstState;
 	protected	JCheckBox	firstZero;
@@ -34,11 +35,12 @@ public class GeneralView extends JPanel {
 	//-------------------------------------------------------------------------------------
 
 	private void initElements(){
-		showTypeNames		= new JCheckBox("View type names");
-		showStateNumbers	= new JCheckBox("View state sequence");
-		showStateValues		= new JCheckBox("View state priorities");
-		allowFirstState		= new JCheckBox("Allow first state");
-		firstZero			= new JCheckBox("First state is 0");
+		showTypeNames			= new JCheckBox("View type names");
+		showStateNumbers		= new JCheckBox("View state sequence");
+		showConnectionNumbers	= new JCheckBox("View connection sequence");
+		showStateValues			= new JCheckBox("View state priorities");
+		allowFirstState			= new JCheckBox("Allow first state");
+		firstZero				= new JCheckBox("Start at Zero (0)");
 
 		comment				= new JTextArea();
 	
@@ -47,6 +49,7 @@ public class GeneralView extends JPanel {
 		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
 		add(showTypeNames);
 		add(showStateNumbers);
+		add(showConnectionNumbers);
 		add(showStateValues);
 		add(allowFirstState);
 		add(firstZero);
@@ -73,6 +76,14 @@ public class GeneralView extends JPanel {
 			}
 		});
 		
+		showConnectionNumbers.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				main.currentSession.board.settings.showConnectionSequence = showConnectionNumbers.isSelected();
+				main.currentSession.setModified(true);
+				main.currentSession.board.repaint();
+			}
+		});
+
 		showStateValues.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
 				main.currentSession.board.settings.showStatePriorities = showStateValues.isSelected();

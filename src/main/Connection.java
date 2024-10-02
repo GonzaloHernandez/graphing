@@ -70,7 +70,7 @@ public class Connection {
 	
 	//-------------------------------------------------------------------------------------
 
-	public void draw(Graphics2D g,GrapherSettings settings) {
+	public int draw(Graphics2D g,GrapherSettings settings,int connectionSequence) {
 		
 		double	angle,hypotenuse,alpha,theta,grandHypotenuse,beta,gamma,dx,dy;
 		
@@ -234,17 +234,19 @@ public class Connection {
 
 		//--- draw label ---
 		
-		if (type!=null && settings.showTypeNames) {
+		if (settings.showTypeNames || settings.showConnectionSequence) {
 			g.setColor(Color.BLUE);
-			String label = "";
-			if (type.getNumber()==0) {
-				label = "" + getValue();
-			} else {
-				label = type.getName();
+			String label = settings.showConnectionSequence?""+connectionSequence+":":"";
+			if (type!=null && settings.showTypeNames) {
+				if (type.getNumber()==0) {
+					label += getValue();
+				} else {
+					label += type.getName();
+				}
 			}
 			drawCenterString(g,label,text);
 		}
-		
+		return connectionSequence+1;
 	}
 	
 	//-------------------------------------------------------------------------------------
