@@ -803,8 +803,9 @@ public class Board extends JComponent implements Printable{
 				g.drawLine(stateSource.getX(),stateSource.getY(),mousex,mousey);
 			}
 		}
+		int connectionSequence = settings.firstZero?0:1;
 		for (int i=0 ; i<states.size() ; i++) {
-			states.elementAt(i).draw(g,settings);
+			states.elementAt(i).draw(g,settings,connectionSequence);
 		}
 		return 0;
 	}

@@ -138,14 +138,14 @@ public class GrapherMain extends JFrame{
 				}
 			}
 			public void windowActivated(WindowEvent e){
-				split.setDividerLocation(getWidth()-270);
+				split.setDividerLocation(getWidth()-310);
 			}
 		});
 		
 		addComponentListener(new ComponentListener(){
 
 			public void componentResized(ComponentEvent arg0) {
-				split.setDividerLocation(getWidth()-222);
+				split.setDividerLocation(getWidth()-310);
 			}
 
 			public void componentMoved(ComponentEvent arg0) {
