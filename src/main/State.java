@@ -271,8 +271,8 @@ public class State {
 			backConnection.setDistance(0);
 		}
 		else {
-			directedConnection.setDistance(50);
-			backConnection.setDistance(50);
+			directedConnection.setDistance(15);
+			backConnection.setDistance(15);
 		}
 	}
 }
