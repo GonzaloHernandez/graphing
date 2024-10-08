@@ -177,6 +177,9 @@ public class Board extends JComponent implements Printable{
 					if (e.getKeyCode() == KeyEvent.VK_S) {
 						save(false);
 					}
+					else if (e.getKeyCode() == KeyEvent.VK_J) {
+						createJurdzinsky(4,3);
+					}
 				}
 				repaint();
 			}
@@ -808,5 +811,21 @@ public class Board extends JComponent implements Printable{
 			states.elementAt(i).draw(g,settings,connectionSequence);
 		}
 		return 0;
+	}
+
+	public void createJurdzinsky(int levels, int blocks) {
+		// int nvertices	= ((blocks*3)+1)*(levels-1) + ((blocks*2)+1);
+		// int nedges		= (blocks*6)*(levels-1) + (blocks*4) + (blocks*2*(levels-1));
+
+		int left = 50;
+		int top = 50;
+		int dist = 50;
+		for (int l=1; l<levels; l++) {
+			for (int b=1; b<=blocks; b++) {
+				addState(left+(l-1)*((b-1)*dist),       top+(l-1)*50);
+				addState(left+(l-1)*((b-1)*dist+dist/2),top+(l-1)*50+dist/2);
+				addState(left+(l-1)*((b-1)*dist+dist),  top+(l-1)*50);
+			}
+		}
 	}
 }
