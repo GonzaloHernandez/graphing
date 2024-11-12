@@ -116,10 +116,12 @@ public class Board extends JComponent implements Printable{
 	
 	//-------------------------------------------------------------------------------------
 	
-	public void addState(int x,int y){
-		states.add(new State(states.size(),x,y));
+	public State addState(int x,int y){
+		State n = new State(states.size(),x,y);
+		states.add(n);
 		repaint();
 		session.setModified(true);
+		return n;
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -178,7 +180,7 @@ public class Board extends JComponent implements Printable{
 						save(false);
 					}
 					else if (e.getKeyCode() == KeyEvent.VK_J) {
-						createJurdzinsky(4,3);
+						createJurdzinsky(4,2);
 					}
 				}
 				repaint();
@@ -608,8 +610,8 @@ public class Board extends JComponent implements Printable{
 
 		//----------------------------------------------------------
 
-		String from = "[";
-		String to	= "[";
+		String from = "";
+		String to	= "";
 		int nConections = 0;
 
 		for (State s : states) {
@@ -620,35 +622,42 @@ public class Board extends JComponent implements Printable{
 			}
 		}
 
-		from	= from	.substring(0, from.length()-1) 	+ "]";
-		to		= to	.substring(0, to.length()-1) 	+ "]";
+		from	= from	.substring(0, from.length()-1);
+		to		= to	.substring(0, to.length()-1);
 
 		//----------------------------------------------------------
 
-		String values = "[";
-		String owners = "[";
+		String values = "";
+		String owners = "";
 
 		for (int i=0;i<states.size();i++){
 			values += states.elementAt(i).getValue() + ",";
 			owners += states.elementAt(i).getOwner() + ",";
 		}
 
-		values = values.substring(0, values.length()-1) + "]";
-		owners = owners.substring(0, owners.length()-1) + "]";
+		values = values.substring(0, values.length()-1);
+		owners = owners.substring(0, owners.length()-1);
 
 		//----------------------------------------------------------
 
 		session.main.properties.exportView.info.setText(
 			"Adjacency matrix ("+size+"x"+size+")\n"+
 			matrix + 
-			"\n" +
+			"-------------------------------------\n" +
 			"nvertices = " + size + ";\n" +
-			"owners = " + owners + ";\n" +
-			"colors = " + values + ";\n" +
-			"\n" +
-			"nedges = " + nConections + ";\n" +
-			"edgesv = " + from + ";\n" +
-			"edgesw = " + to + ";\n"
+			"owners    = [" + owners + "];\n" +
+			"colors    = [" + values + "];\n" +
+			"nedges    = " + nConections + ";\n" +
+			"edgesv    = [" + from + "];\n" +
+			"edgesw    = [" + to + "];\n" +
+			"-------------------------------------\n" +
+			"int nvertices = " + size + ";\n" +
+			"int owners[]  = {" + owners + "};\n" +
+			"int colors[]  = {" + values + "};\n" +
+			"int nedges    = " + nConections + ";\n" +
+			"int edgesv[]  = {" + from + "};\n" +
+			"int edgesw[]  = {" + to + "};\n"
+
 		);
 		return true;
 	}
@@ -819,12 +828,19 @@ public class Board extends JComponent implements Printable{
 
 		int left = 50;
 		int top = 50;
-		int dist = 50;
-		for (int l=1; l<levels; l++) {
-			for (int b=1; b<=blocks; b++) {
-				addState(left+(l-1)*((b-1)*dist),       top+(l-1)*50);
-				addState(left+(l-1)*((b-1)*dist+dist/2),top+(l-1)*50+dist/2);
-				addState(left+(l-1)*((b-1)*dist+dist),  top+(l-1)*50);
+		int delta = 70;
+		for (int l=0; l<levels-1; l++) {
+			for (int b=0; b<blocks; b++) {
+				State s1 = addState(left+(b*delta*2)           , top+(l*delta*3/2)+delta*3/4);
+				State s2 = addState(left+(b*delta*2)+delta*1/2 , top+(l*delta*3/2));
+				State s3 = addState(left+(b*delta*2)+delta     , top+(l*delta*3/2)+delta*3/4);
+				s1.addConnection(s2);
+				s2.addConnection(s3);
+				s3.addConnection(s1);
+				s1.addConnection(s3);
+				if (b>0) {
+					
+				}
 			}
 		}
 	}

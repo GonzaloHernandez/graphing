@@ -1,5 +1,6 @@
 package main;
 import java.awt.BorderLayout;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -38,6 +39,7 @@ public class ExportView extends JPanel {
 		JPanel	objects	= new JPanel(new GridLayout(3,1));
 		
 		info.setWrapStyleWord(true);
+		info.setFont(new Font("Andale Mono", Font.PLAIN, 11));
 
 		objects.add(new JLabel("View"));
 		objects.add(programmingView);
