@@ -622,8 +622,10 @@ public class Board extends JComponent implements Printable{
 			}
 		}
 
-		from	= from	.substring(0, from.length()-1);
-		to		= to	.substring(0, to.length()-1);
+		if (from.length()>0) {
+			from	= from	.substring(0, from.length()-1);
+			to		= to	.substring(0, to.length()-1);	
+		}
 
 		//----------------------------------------------------------
 
@@ -635,8 +637,10 @@ public class Board extends JComponent implements Printable{
 			owners += states.elementAt(i).getOwner() + ",";
 		}
 
-		values = values.substring(0, values.length()-1);
-		owners = owners.substring(0, owners.length()-1);
+		if (values.length()>0) {
+			values = values.substring(0, values.length()-1);
+			owners = owners.substring(0, owners.length()-1);	
+		}
 
 		//----------------------------------------------------------
 

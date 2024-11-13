@@ -329,7 +329,7 @@ public class GrapherMain extends JFrame{
 	        file.close();
 	        
 	    } catch (IOException e) {
-	    	e.printStackTrace();
+	    	System.out.println("Creating configuration (CNF) file.");
 	    }
 	}
 
