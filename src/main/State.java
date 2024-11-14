@@ -125,8 +125,8 @@ public class State {
 	//-------------------------------------------------------------------------------------
 
 	public void setLocation(int mousex,int mousey) {
-		x = mousex - diferencex;
-		y = mousey - diferencey;
+		x = (int)(Math.round((mousex-diferencex)/10.0)*10);
+		y = (int)(Math.round((mousey-diferencey)/10.0)*10);
 	}
 	
 	//-------------------------------------------------------------------------------------

@@ -203,7 +203,9 @@ public class Board extends JComponent implements Printable{
 				if (e.getButton() == MouseEvent.BUTTON1) {
 					if (!e.isControlDown()) {
 						if (e.getButton()==MouseEvent.BUTTON1 && e.getClickCount() == 2) {
-							addState(e.getX(),e.getY());
+							int mousex = (int)(Math.round(e.getX()/10)*10);
+							int mousey = (int)(Math.round(e.getY()/10)*10);
+							addState(mousex,mousey);
 						}
 					}
 				}
@@ -272,7 +274,9 @@ public class Board extends JComponent implements Printable{
 				mousey = e.getY();
 				if (!e.isControlDown()) {
 					if (!controled && stateTarget!=null) {
-						stateTarget.setLocation(e.getX(),e.getY());
+						mousex = (int)(Math.round(mousex/10)*10);
+						mousey = (int)(Math.round(mousey/10)*10);
+						stateTarget.setLocation(mousex,mousey);
 						session.setModified(true);
 					}
 				}
@@ -280,7 +284,7 @@ public class Board extends JComponent implements Printable{
 					stateTarget = null;
 					for (int i=0 ; i<states.size() ; i++) {
 						State state = (State)states.elementAt(i);
-						if (state.isArea(e.getX(),e.getY())) {
+						if (state.isArea(mousex,mousey)) {
 							stateTarget = state;
 							if (state != stateSource) {
 								state.setStatus(State.FOCUSED);
