@@ -468,9 +468,12 @@ public class Board extends JComponent implements Printable{
 	        
 	        settings.showTypeNames			= file.readBoolean();
 	        settings.showStateSequence		= file.readBoolean();
+	        settings.showConnectionSequence	= file.readBoolean();
 	        settings.showStatePriorities	= file.readBoolean();
 	        settings.allowFirsState			= file.readBoolean();
-	        settings.comment				= file.readUTF();
+	        settings.firstZero				= file.readBoolean();
+
+			settings.comment				= file.readUTF();
 	        
 	        session.setSize(file.readShort(),file.readShort());
 	        
@@ -563,8 +566,10 @@ public class Board extends JComponent implements Printable{
 	        
 	        file.writeBoolean(settings.showTypeNames);
 	        file.writeBoolean(settings.showStateSequence);
+	        file.writeBoolean(settings.showConnectionSequence);
 			file.writeBoolean(settings.showStatePriorities);
 			file.writeBoolean(settings.allowFirsState);
+			file.writeBoolean(settings.firstZero);
 
 			file.writeUTF(settings.comment);	        
 	        

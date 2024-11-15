@@ -130,6 +130,7 @@ public class GeneralView extends JPanel {
 	public void refresh(){
 		showTypeNames.setSelected(main.currentSession.board.settings.showTypeNames);
 		showStateNumbers.setSelected(main.currentSession.board.settings.showStateSequence);
+		showConnectionNumbers.setSelected(main.currentSession.board.settings.showConnectionSequence);
 		showStateValues.setSelected(main.currentSession.board.settings.showStatePriorities);
 		allowFirstState.setSelected(main.currentSession.board.settings.allowFirsState);
 		firstZero.setSelected(main.currentSession.board.settings.firstZero);

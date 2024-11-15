@@ -120,7 +120,6 @@ public class GrapherMain extends JFrame{
 		showAbout = true;
 
 		UIManager.put("InternalFrame.titleFont",defaultFont);
-
 		load();
 	}
 	
@@ -349,8 +348,10 @@ public class GrapherMain extends JFrame{
 		if (recent.getItemCount()==5) {
 			recent.remove(0);
 		}
-		
-		final JMenuItem item = new GrapherItem(fileName,new Font("Arial",Font.PLAIN,10),"session.png");
+
+		Font defaultFont	= new Font("Cantarell",Font.PLAIN,11);
+
+		final JMenuItem item = new GrapherItem(fileName, defaultFont,"session.png");
 		recent.add(item);
 
 		item.addActionListener(new ActionListener(){

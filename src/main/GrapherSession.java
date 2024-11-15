@@ -1,8 +1,6 @@
 package main;
-import java.awt.Font;
 
 import javax.swing.JInternalFrame;
-import javax.swing.UIManager;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
 
