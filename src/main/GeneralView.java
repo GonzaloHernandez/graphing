@@ -1,4 +1,6 @@
 package main;
+import java.awt.Component;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -55,6 +57,11 @@ public class GeneralView extends JPanel {
 		add(firstZero);
 		add(new JLabel("Comment"));
 		add(new JScrollPane(comment));
+
+		Font defaultFont	= new Font("Cantarell",Font.PLAIN,11);
+		for (Component component : getComponents()) {
+			component.setFont(defaultFont);			
+		}
 	}
 	
 	//-------------------------------------------------------------------------------------

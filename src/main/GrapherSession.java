@@ -1,5 +1,8 @@
 package main;
+import java.awt.Font;
+
 import javax.swing.JInternalFrame;
+import javax.swing.UIManager;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
 
@@ -28,8 +31,7 @@ public class GrapherSession extends JInternalFrame{
 
 	//-------------------------------------------------------------------------------------
 
-	private void initElements() {
-		
+	private void initElements() {		
 		board	= new Board(this);
 		getContentPane().add(board,"Center");
 	}

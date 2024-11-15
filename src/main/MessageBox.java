@@ -1,4 +1,5 @@
 package main;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -67,6 +68,14 @@ public class MessageBox extends JDialog{
 					dispose();
 				}
 			});
+		}
+		
+		Font defaultFont	= new Font("Cantarell",Font.PLAIN,11);
+		for (JLabel component : info) {
+			component.setFont(defaultFont);			
+		}
+		for (JButton component : controls) {
+			component.setFont(defaultFont);			
 		}
 		
 		add(ps,"Center");

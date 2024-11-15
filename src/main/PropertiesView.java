@@ -1,5 +1,7 @@
 package main;
 import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Font;
 
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
@@ -34,6 +36,11 @@ public class PropertiesView extends JPanel{
 		printView	= new PrintView(main);
 		exportView	= new ExportView(main);
 		add(tab,"Center");
+		
+		Font defaultFont	= new Font("Cantarell",Font.PLAIN,11);
+		for (Component component : getComponents()) {
+			component.setFont(defaultFont);			
+		}
 	}
 	
 	//--------------------------------------------------------------------------

@@ -1,5 +1,7 @@
 package main;
 import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -53,6 +55,11 @@ public class TypesView extends JPanel {
 		delete.setEnabled(false);
 		table.setRowSelectionAllowed(true);
 		if (main.currentSession!=null) loadTable();		
+
+		Font defaultFont	= new Font("Cantarell",Font.PLAIN,11);
+		for (Component component : controls.getComponents()) {
+			component.setFont(defaultFont);			
+		}
 	}
 	
 	//-------------------------------------------------------------------------------------

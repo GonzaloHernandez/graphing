@@ -67,7 +67,7 @@ public class MenuOptions extends JPopupMenu{
 	//-------------------------------------------------------------------------------------
 
 	private void initElements(){
-		Font defaultFont		= new Font("Arial",Font.PLAIN,10);
+		Font defaultFont		= new Font("Cantarell",Font.PLAIN,11);
 		
 		stateMenu				= new GrapherMenu("State",defaultFont,"state.png");
 		connectionMenu			= new GrapherMenu("Connection",defaultFont,"connection.png");

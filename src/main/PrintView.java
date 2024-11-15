@@ -1,5 +1,6 @@
 package main;
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -53,11 +54,6 @@ public class PrintView extends JPanel{
 		bottom				= new JTextField();
 		right				= new JTextField();
 		
-		measure.setFont(new Font("Arial",Font.PLAIN,10));
-		paperSize.setFont(new Font("Arial",Font.PLAIN,10));
-		orientation.setFont(new Font("Arial",Font.PLAIN,10));
-		measurePaperSize.setFont(new Font("Arial",Font.PLAIN,10));
-
 		setLayout(new BorderLayout());
 		
 		GridBagLayout		grid	= new GridBagLayout(); 
@@ -109,6 +105,10 @@ public class PrintView extends JPanel{
 		objects.add(bottom,gbc);
 		
 		add(objects,"North");
+		Font defaultFont	= new Font("Cantarell",Font.PLAIN,11);
+		for (Component component : objects.getComponents()) {
+			component.setFont(defaultFont);			
+		}
 	}
 	
 	//-------------------------------------------------------------------------------------

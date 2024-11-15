@@ -1,5 +1,6 @@
 package main;
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -30,6 +31,8 @@ public class ExportView extends JPanel {
 	//-------------------------------------------------------------------------------------
 
 	private void initElements(){
+		Font defaultFont	= new Font("Cantarell",Font.PLAIN,11);
+
 		String views[]={"Java view","Python view","MiniZinc view"};
 		programmingView		= new JComboBox<>(views);
 		info				= new JTextArea();
@@ -49,6 +52,10 @@ public class ExportView extends JPanel {
 		add(new JScrollPane(info),BorderLayout.CENTER);
 
 		info.setEditable(false);
+
+		for (Component component : objects.getComponents()) {
+			component.setFont(defaultFont);			
+		}
 	}
 	
 	//-------------------------------------------------------------------------------------

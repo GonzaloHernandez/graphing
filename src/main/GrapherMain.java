@@ -25,6 +25,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JSplitPane;
+import javax.swing.UIManager;
 
 public class GrapherMain extends JFrame{
 
@@ -66,7 +67,7 @@ public class GrapherMain extends JFrame{
 	//-------------------------------------------------------------------------------------
 
 	private void initElements(){
-		Font defaultFont	= new Font("Arial",Font.PLAIN,10);
+		Font defaultFont	= new Font("Cantarell",Font.PLAIN,11);
 		messageReturn		= null;
 						
 		Image icon = Toolkit.getDefaultToolkit().getImage("icons/grapher.png");
@@ -117,6 +118,9 @@ public class GrapherMain extends JFrame{
 		add(split);
 		
 		showAbout = true;
+
+		UIManager.put("InternalFrame.titleFont",defaultFont);
+
 		load();
 	}
 	
