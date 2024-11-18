@@ -1,0 +1,3 @@
+javac --source-path src/ -d build src/main/GrapherMain.java --release 9
+cd build
+jar cfm Graphing.jar Manifest.txt  main/*.class
