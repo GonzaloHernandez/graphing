@@ -371,12 +371,14 @@ public class Board extends JComponent implements Printable{
 			if (messageReturn.equals("No")||messageReturn.equals("")) return;
 		}
 		FileDialog dialog = new FileDialog(session.main,"Select a file",FileDialog.LOAD);
+		dialog.setDirectory(session.main.curdir);
 		dialog.setFile("*.aut");
 		dialog.setVisible(true);
 		
 		if (dialog.getFile()==null) return;
-		
-		load(dialog.getDirectory()+dialog.getFile());
+		session.main.curdir = dialog.getDirectory();
+
+		load(session.main.curdir+dialog.getFile());
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -496,10 +498,12 @@ public class Board extends JComponent implements Printable{
 		try {
 			if (saveAs || fileName.equals("")) {
 				FileDialog dialog = new FileDialog(session.main,"Select a file name",FileDialog.SAVE);
+				dialog.setDirectory(session.main.curdir);
 				dialog.setFile("*.aut");
 				dialog.setVisible(true);
 				if (dialog.getFile()==null) return false;
-				fileName = dialog.getDirectory()+dialog.getFile();
+				session.main.curdir = dialog.getDirectory();
+				fileName = session.main.curdir+dialog.getFile();
 			}
 			
 			JInternalFrame iframes[] =  session.main.desktop.getAllFrames();

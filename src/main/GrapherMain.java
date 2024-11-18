@@ -50,6 +50,7 @@ public class GrapherMain extends JFrame{
 	protected	JMenu			recent;
 	
 	protected	boolean			showAbout;
+	protected	String			curdir;
 
 	//-------------------------------------------------------------------------------------
 
@@ -120,6 +121,7 @@ public class GrapherMain extends JFrame{
 		showAbout = true;
 
 		UIManager.put("InternalFrame.titleFont",defaultFont);
+		curdir = System.getProperty("user.dir");		
 		load();
 	}
 	
@@ -245,11 +247,13 @@ public class GrapherMain extends JFrame{
 	private void openSession(String fileName){
 		if (fileName == null) {
 			FileDialog dialog = new FileDialog(this,"Select a file",FileDialog.LOAD);
+			dialog.setDirectory(curdir);
 			dialog.setFile("*.aut");
 			dialog.setVisible(true);
 		
 			if (dialog.getFile()==null) return;
-			fileName = dialog.getDirectory()+dialog.getFile(); 
+			curdir = dialog.getDirectory();
+			fileName = curdir+dialog.getFile(); 
 		}
 		
 		JInternalFrame iframes[] = desktop.getAllFrames();
@@ -300,6 +304,7 @@ public class GrapherMain extends JFrame{
 		try {
 			RandomAccessFile file = new RandomAccessFile(new File(fileName), "rw");
 	        
+			file.writeUTF(curdir);
 			file.writeInt(recent.getItemCount());
 			
 			for (int i=0;i<recent.getItemCount();i++){
@@ -322,6 +327,7 @@ public class GrapherMain extends JFrame{
 		try {
 			RandomAccessFile file = new RandomAccessFile(new File(fileName), "r");
 	        
+			curdir = file.readUTF();
 			int count = file.readInt();
 			
 			for (int i=0;i<count;i++){
