@@ -18,9 +18,9 @@ Meanwhile, the compiled output files will be generated in the `bin` folder by de
 
 ## Compile and Use
 
-`javac --source-path src/ -d bin src/main/GrapherMain.java`
+`javac --source-path src/ -d build src/main/GrapherMain.java`
 
-`java -cp bin main.GrapherMain`
+`java -cp build main.GrapherMain`
 
 ## Dependency Management
 
