@@ -22,6 +22,10 @@ Meanwhile, the compiled output files will be generated in the `bin` folder by de
 
 `java -cp build main.GrapherMain`
 
+## JAR file ready to use
+
+`releases/Graphing.jar`
+
 ## Dependency Management
 
 This version does not require dependencies for now.
