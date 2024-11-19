@@ -118,7 +118,7 @@ public class GrapherMain extends JFrame{
 		
 		add(split);
 		
-		showAbout = true;
+		showAbout = false;
 
 		UIManager.put("InternalFrame.titleFont",defaultFont);
 		curdir = System.getProperty("user.dir");		

@@ -18,13 +18,11 @@ Meanwhile, the compiled output files will be generated in the `bin` folder by de
 
 ## Compile and Use
 
-`javac --source-path src/ -d build src/main/GrapherMain.java`
+`javac --source-path src/ -d bin src/main/GrapherMain.java`
 
-`java -cp build main.GrapherMain`
+`java -cp bin main.GrapherMain`
 
 ## JAR file ready to use
-
-`releases/Graphing.jar`
 
 [Graphing.jar](https://github.com/GonzaloHernandez/graphing/raw/refs/heads/master/releases/Graphing.jar)
 
