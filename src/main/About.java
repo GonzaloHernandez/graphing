@@ -3,21 +3,19 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.RenderingHints;
-import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
+import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 
-public class About extends JDialog implements Runnable{
+public class About extends JDialog {
 
 	//-------------------------------------------------------------------------------------
 
 	private	GrapherMain	main;
-	private	Image		img;
-	private	Thread		thread;
+	private	ImageIcon	img;
 
 	//-------------------------------------------------------------------------------------
 
@@ -39,7 +37,6 @@ public class About extends JDialog implements Runnable{
 		setUndecorated(true);
 
 		progListeners();
-		start();
 		
 		setVisible(true);
 	}
@@ -85,8 +82,11 @@ public class About extends JDialog implements Runnable{
 			RenderingHints.KEY_TEXT_ANTIALIASING,
 			RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
+
+		img = new ImageIcon(GrapherMain.class.getResource("icons/press.png"));
+		
 		g.drawString("Wait...",100,100);
-		g.drawImage(img,0,0,main);
+		g.drawImage(img.getImage(),0,0,main);
 		g.setColor(Color.BLACK);
 		g.drawRect(0,0,getWidth()-1,getHeight()-1);
 		g.setColor(Color.WHITE);
@@ -103,30 +103,4 @@ public class About extends JDialog implements Runnable{
 	}
 
 	//-------------------------------------------------------------------------------------
-
-	public void run() {
-		img = Toolkit.getDefaultToolkit().getImage("icons/press.png");
-		for (int i=0;i<3;i++){
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				
-			}		
-			
-			// repaint();
-		}
-		try {
-			Thread.sleep(3000);
-		} catch (InterruptedException e) {
-			
-		}	
-		dispose();
-	}
-	
-	//-------------------------------------------------------------------------------------
-
-	public void start(){
-		thread=new Thread(this);
-		thread.start();
-	}
 }

@@ -1,3 +1,5 @@
 javac --source-path src/ -d bin src/main/GrapherMain.java --release 9
+
 cd bin
-jar cfm ../releases/Graphing.jar ../releases/Manifest.txt main/*.class
+
+jar cfm ../releases/Graphing-v1.1.8.jar ../releases/Manifest.txt main/*

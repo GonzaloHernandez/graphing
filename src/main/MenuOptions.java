@@ -31,7 +31,8 @@ class GrapherMenu extends JMenu {
 	public GrapherMenu(String label,Font font,String icon) {
 		super(label);
 		setFont(font);
-		if (icon!=null) setIcon(new ImageIcon("icons/"+icon));
+		ImageIcon img = new ImageIcon(GrapherMain.class.getResource("icons/"+icon));
+		if (icon!=null) setIcon(img);
 	}
 }
 
@@ -39,7 +40,8 @@ class GrapherItem extends JMenuItem {
 	public GrapherItem(String label,Font font,String icon) {
 		super(label);
 		setFont(font);
-		if (icon!=null) setIcon(new ImageIcon("icons/"+icon));
+		ImageIcon img = new ImageIcon(GrapherMain.class.getResource("icons/"+icon));
+		if (icon!=null) setIcon(img);
 	}
 }
 
