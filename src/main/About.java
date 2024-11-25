@@ -82,22 +82,21 @@ public class About extends JDialog {
 			RenderingHints.KEY_TEXT_ANTIALIASING,
 			RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
-
 		img = new ImageIcon(GrapherMain.class.getResource("icons/press.png"));
-		
+
 		g.drawString("Wait...",100,100);
 		g.drawImage(img.getImage(),0,0,main);
 		g.setColor(Color.BLACK);
 		g.drawRect(0,0,getWidth()-1,getHeight()-1);
 		g.setColor(Color.WHITE);
-		g.setFont(new Font("Arial",Font.BOLD,13));
+		g.setFont(new Font("Cantarell",Font.PLAIN,11));
 		g.drawString("Version "+main.family+"."+main.version+" construction "+main.construcction,10,20);
 		g.setColor(Color.WHITE);
 		g.fillRect(315, 8, 12, 13);
 		g.setColor(new Color(50,100,255));
 		g.drawRect(315, 8, 12, 13);
 		if (main.showAbout) {
-			g.drawString("x",317,19);
+			g.drawString("x",319,18);
 		}
 		g.drawString("Show again",330,20);
 	}

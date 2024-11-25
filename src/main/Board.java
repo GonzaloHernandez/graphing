@@ -658,23 +658,24 @@ public class Board extends JComponent implements Printable{
 		//----------------------------------------------------------
 
 		session.main.properties.exportView.info.setText(
-			"Adjacency matrix ("+size+"x"+size+")\n"+
-			matrix + 
-			"-------------------------------------\n" +
 			"nvertices = " + size + ";\n" +
 			"owners    = [" + owners + "];\n" +
 			"colors    = [" + values + "];\n" +
 			"nedges    = " + nConections + ";\n" +
-			"edgesv    = [" + from + "];\n" +
-			"edgesw    = [" + to + "];\n" +
+			"sources   = [" + from + "];\n" +
+			"targets   = [" + to + "];\n" +
 			"-------------------------------------\n" +
 			"int nvertices = " + size + ";\n" +
 			"int owners[]  = {" + owners + "};\n" +
 			"int colors[]  = {" + values + "};\n" +
 			"int nedges    = " + nConections + ";\n" +
-			"int edgesv[]  = {" + from + "};\n" +
-			"int edgesw[]  = {" + to + "};\n"
-
+			"int sources[] = {" + from + "};\n" +
+			"int targets[] = {" + to + "};\n" +
+			"-------------------------------------\n" +
+			"Adjacency matrix ("+size+"x"+size+")\n"+
+			matrix + 
+			"-------------------------------------\n" +
+			""
 		);
 		return true;
 	}
