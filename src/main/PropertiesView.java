@@ -34,7 +34,7 @@ public class PropertiesView extends JPanel{
 		generalView	= new GeneralView(main);
 		typesView	= new TypesView(main);
 		printView	= new PrintView(main);
-		exportView	= new ExportView(main);
+		// exportView	= new ExportView(main);
 		add(tab,"Center");
 		
 		Font defaultFont	= new Font("Cantarell",Font.PLAIN,11);
@@ -51,12 +51,12 @@ public class PropertiesView extends JPanel{
 			tab.addTab("General",generalView);
 			tab.addTab("Types",typesView);
 			tab.addTab("Printing",printView);
-			tab.addTab("Export",exportView);
+			// tab.addTab("Export",exportView);
 			selectedTab = aux;
 			generalView.refresh();
 			typesView.refresh();
 			printView.refresh();
-			exportView.refresh();
+			generalView.exportView.refresh();
 			tab.setSelectedIndex(selectedTab);
 		}
 		else {

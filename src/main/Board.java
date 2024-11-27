@@ -657,7 +657,7 @@ public class Board extends JComponent implements Printable{
 
 		//----------------------------------------------------------
 
-		session.main.properties.exportView.info.setText(
+		session.main.properties.generalView.exportView.info.setText(
 			"nvertices = " + size + ";\n" +
 			"owners    = [" + owners + "];\n" +
 			"colors    = [" + values + "];\n" +

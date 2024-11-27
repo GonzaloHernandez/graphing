@@ -1,4 +1,5 @@
 package main;
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -6,9 +7,9 @@ import java.awt.event.ActionListener;
 
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
@@ -24,7 +25,9 @@ public class GeneralView extends JPanel {
 	protected	JCheckBox	showStateValues;
 	protected	JCheckBox	allowFirstState;
 	protected	JCheckBox	firstZero;
+	protected	JTabbedPane	info;
 	protected	JTextArea	comment;
+	protected	ExportView	exportView;
 	
 	//-------------------------------------------------------------------------------------
 
@@ -44,10 +47,15 @@ public class GeneralView extends JPanel {
 		allowFirstState			= new JCheckBox("Allow first state");
 		firstZero				= new JCheckBox("Start at Zero (0)");
 
-		comment				= new JTextArea();
-	
+		info					= new JTabbedPane();
+
+		JPanel commentView		= new JPanel();				
+		comment					= new JTextArea();
+		exportView				= new ExportView(main);
+
 		comment.setWrapStyleWord(true);
 		comment.setLineWrap(true);
+
 		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
 		add(showTypeNames);
 		add(showStateNumbers);
@@ -55,8 +63,13 @@ public class GeneralView extends JPanel {
 		add(showStateValues);
 		add(allowFirstState);
 		add(firstZero);
-		add(new JLabel("Comment"));
-		add(new JScrollPane(comment));
+		add(info);
+		commentView.setLayout(new BorderLayout());
+		commentView.add(new JScrollPane(comment),BorderLayout.CENTER);
+
+		info.addTab("Comment", commentView);
+		info.addTab("Export", exportView);
+				
 
 		Font defaultFont	= new Font("Cantarell",Font.PLAIN,11);
 		for (Component component : getComponents()) {

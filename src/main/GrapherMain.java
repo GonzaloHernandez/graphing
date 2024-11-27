@@ -32,7 +32,7 @@ public class GrapherMain extends JFrame{
 	//-------------------------------------------------------------------------------------
 	final int	family			= 1;
 	final int	version			= 1;
-	final int	construcction	= 9;
+	final int	construcction	= 10;
 	
 	//-------------------------------------------------------------------------------------
 
