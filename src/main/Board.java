@@ -18,6 +18,7 @@ import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Vector;
@@ -371,6 +372,14 @@ public class Board extends JComponent implements Printable{
 			if (messageReturn.equals("No")||messageReturn.equals("")) return;
 		}
 		FileDialog dialog = new FileDialog(session.main,"Select a file",FileDialog.LOAD);
+        
+		dialog.setFilenameFilter(new FilenameFilter() {
+            @Override
+            public boolean accept(java.io.File dir, String name) {
+                return name.toLowerCase().endsWith(".aut");
+            }
+        });
+
 		dialog.setDirectory(session.main.curdir);
 		dialog.setFile("*.aut");
 		dialog.setVisible(true);
@@ -584,9 +593,65 @@ public class Board extends JComponent implements Printable{
 	        file.setLength(file.getFilePointer());
 	        file.close();
 	        session.setModified(false);
+
+			//----------------------------------------------------------
+
+			int size = states.size();
+			
+			String values = "";
+			String owners = "";
+
+			for (int i=0;i<states.size();i++){
+				values += states.elementAt(i).getValue() + ",";
+				owners += states.elementAt(i).getOwner() + ",";
+			}
+
+			if (values.length()>0) {
+				values = values.substring(0, values.length()-1);
+				owners = owners.substring(0, owners.length()-1);	
+			}
+
+
+			String sources = "";
+			String targets = "";
+			int nConections = 0;
+
+			
+			for (State s : states) {
+				for (Connection c : s.getConnections()) {
+					sources	+= c.getSource().getNumber()+1 + ",";
+					targets	+= c.getTarget().getNumber()+1 + ",";
+					nConections ++;
+				}
+			}
+
+			if (sources.length()>0) {
+				sources	= sources.substring(0, sources.length()-1);
+				targets	= targets.substring(0, targets.length()-1);	
+			}
+	
+			String dzn = 	"nvertices = " + size + ";\n" +
+							"owners    = [" + owners + "];\n" +
+							"colors    = [" + values + "];\n" +
+							"nedges    = " + nConections + ";\n" +
+							"sources   = [" + sources + "];\n" +
+							"targets   = [" + targets + "];\n";
+
+			String dznFileName = fileName.substring(0, fileName.length()-4)+".dzn";
+
+			RandomAccessFile dznFile = new RandomAccessFile(new File(dznFileName), "rw");
+
+			dznFile.writeBytes(dzn);
+			
+			dznFile.close();
+
+			//----------------------------------------------------------
+
 	    } catch (IOException e) {
 	    	e.printStackTrace();
 	    }
+
+
 	    return true;
 	}
 

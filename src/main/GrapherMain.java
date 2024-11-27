@@ -14,6 +14,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyVetoException;
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.URI;
@@ -247,6 +248,14 @@ public class GrapherMain extends JFrame{
 	private void openSession(String fileName){
 		if (fileName == null) {
 			FileDialog dialog = new FileDialog(this,"Select a file",FileDialog.LOAD);
+
+			dialog.setFilenameFilter(new FilenameFilter() {
+				@Override
+				public boolean accept(java.io.File dir, String name) {
+					return name.toLowerCase().endsWith(".aut");
+				}
+			});
+
 			dialog.setDirectory(curdir);
 			dialog.setFile("*.aut");
 			dialog.setVisible(true);
