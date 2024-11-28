@@ -1,8 +1,0 @@
-javac --source-path src/ -d bin src/main/GrapherMain.java --release 9
-cp icons/ bin/main/ -r
-cd bin
-jar cfm ../releases/Graphing-v1.1.10.jar ../releases/Manifest.txt main/*
-cd ..
-
-
-java -cp bin main.GrapherMain

@@ -615,7 +615,6 @@ public class Board extends JComponent implements Printable{
 			String sources = "";
 			String targets = "";
 			int nConections = 0;
-
 			
 			for (State s : states) {
 				for (Connection c : s.getConnections()) {
@@ -640,9 +639,8 @@ public class Board extends JComponent implements Printable{
 			String dznFileName = fileName.substring(0, fileName.length()-4)+".dzn";
 
 			RandomAccessFile dznFile = new RandomAccessFile(new File(dznFileName), "rw");
-
+			dznFile.setLength(0);
 			dznFile.writeBytes(dzn);
-			
 			dznFile.close();
 
 			//----------------------------------------------------------
@@ -736,9 +734,9 @@ public class Board extends JComponent implements Printable{
 			"int nedges    = " + nConections + ";\n" +
 			"int sources[] = {" + from + "};\n" +
 			"int targets[] = {" + to + "};\n" +
-			"-------------------------------------\n" +
-			"Adjacency matrix ("+size+"x"+size+")\n"+
-			matrix + 
+			// "-------------------------------------\n" +
+			// "Adjacency matrix ("+size+"x"+size+")\n"+
+			// matrix + 
 			"-------------------------------------\n" +
 			""
 		);
