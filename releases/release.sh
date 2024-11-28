@@ -9,8 +9,8 @@ CONSTRUCTION=11  # Update as needed
 JAVA_FILE="src/main/GrapherMain.java"
 RELEASES_DIR="releases"
 README_FILE="README.md"
-OUTPUT_FILE="$RELEASES_DIR/Graphing-v$VERSION.$CONSTRUCTION.jar"
-JAR_NAME="Graphing-v$VERSION.$CONSTRUCTION.jar"
+OUTPUT_FILE="$RELEASES_DIR/Graphing-v$FAMILY.$VERSION.$CONSTRUCTION.jar"
+JAR_NAME="Graphing-v$FAMILY.$VERSION.$CONSTRUCTION.jar"
 
 # Step 1: Remove previous releases matching the naming pattern
 echo "::Removing previous releases..."
