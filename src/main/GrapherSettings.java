@@ -15,12 +15,14 @@ public class GrapherSettings {
 	protected	boolean showStatePriorities;
 	protected	boolean allowFirsState;
 	protected	boolean firstZero;
+	protected	boolean saveDzn;
 
 	protected	int programmingView;
 
 	//---------------------------------------------------------------------------
 	
-	public GrapherSettings(boolean nameTypes,boolean numberStates,String comment,Vector <ConnectionType>types){
+	public GrapherSettings(boolean nameTypes,boolean numberStates,String comment,
+	Vector <ConnectionType>types){
 		this.showTypeNames			= nameTypes;
 		this.showStateSequence		= numberStates;
 		this.showConnectionSequence	= false;
@@ -30,7 +32,8 @@ public class GrapherSettings {
 		this.showStatePriorities	= false;
 		this.allowFirsState			= false;
 		this.firstZero				= false;
-		this.programmingView		= 2;
+		this.saveDzn				= false;
+		this.programmingView		= 0;
 	}
 
 }

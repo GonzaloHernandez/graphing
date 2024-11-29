@@ -33,7 +33,7 @@ public class ExportView extends JPanel {
 	private void initElements(){
 		Font defaultFont	= new Font("Cantarell",Font.PLAIN,11);
 
-		String views[]={"Java view","Python view","MiniZinc view"};
+		String views[]={"Lists","Adjacent matrix"};
 		programmingView		= new JComboBox<>(views);
 		info				= new JTextArea();
 	

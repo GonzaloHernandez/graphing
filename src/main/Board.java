@@ -487,6 +487,8 @@ public class Board extends JComponent implements Printable{
 			settings.comment				= file.readUTF();
 	        
 	        session.setSize(file.readShort(),file.readShort());
+
+			settings.saveDzn				= file.readBoolean();
 	        
 	        file.close(); 
 	        repaint();
@@ -585,10 +587,11 @@ public class Board extends JComponent implements Printable{
 			file.writeBoolean(settings.firstZero);
 
 			file.writeUTF(settings.comment);	        
-	        
+
 	        file.writeShort(session.getWidth());
 	        file.writeShort(session.getHeight());
 
+			file.writeBoolean(settings.saveDzn);
 
 	        file.setLength(file.getFilePointer());
 	        file.close();
@@ -596,52 +599,54 @@ public class Board extends JComponent implements Printable{
 
 			//----------------------------------------------------------
 
-			int size = states.size();
+			if (settings.saveDzn) {
+				int size = states.size();
 			
-			String values = "";
-			String owners = "";
-
-			for (int i=0;i<states.size();i++){
-				values += states.elementAt(i).getValue() + ",";
-				owners += states.elementAt(i).getOwner() + ",";
-			}
-
-			if (values.length()>0) {
-				values = values.substring(0, values.length()-1);
-				owners = owners.substring(0, owners.length()-1);	
-			}
-
-
-			String sources = "";
-			String targets = "";
-			int nConections = 0;
-			
-			for (State s : states) {
-				for (Connection c : s.getConnections()) {
-					sources	+= c.getSource().getNumber()+1 + ",";
-					targets	+= c.getTarget().getNumber()+1 + ",";
-					nConections ++;
-				}
-			}
-
-			if (sources.length()>0) {
-				sources	= sources.substring(0, sources.length()-1);
-				targets	= targets.substring(0, targets.length()-1);	
-			}
+				String values = "";
+				String owners = "";
 	
-			String dzn = 	"nvertices = " + size + ";\n" +
-							"owners    = [" + owners + "];\n" +
-							"colors    = [" + values + "];\n" +
-							"nedges    = " + nConections + ";\n" +
-							"sources   = [" + sources + "];\n" +
-							"targets   = [" + targets + "];\n";
-
-			String dznFileName = fileName.substring(0, fileName.length()-4)+".dzn";
-
-			RandomAccessFile dznFile = new RandomAccessFile(new File(dznFileName), "rw");
-			dznFile.setLength(0);
-			dznFile.writeBytes(dzn);
-			dznFile.close();
+				for (int i=0;i<states.size();i++){
+					values += states.elementAt(i).getValue() + ",";
+					owners += states.elementAt(i).getOwner() + ",";
+				}
+	
+				if (values.length()>0) {
+					values = values.substring(0, values.length()-1);
+					owners = owners.substring(0, owners.length()-1);	
+				}
+	
+	
+				String sources = "";
+				String targets = "";
+				int nConections = 0;
+				
+				for (State s : states) {
+					for (Connection c : s.getConnections()) {
+						sources	+= c.getSource().getNumber()+1 + ",";
+						targets	+= c.getTarget().getNumber()+1 + ",";
+						nConections ++;
+					}
+				}
+	
+				if (sources.length()>0) {
+					sources	= sources.substring(0, sources.length()-1);
+					targets	= targets.substring(0, targets.length()-1);	
+				}
+		
+				String dzn = 	"nvertices = " + size + ";\n" +
+								"owners    = [" + owners + "];\n" +
+								"colors    = [" + values + "];\n" +
+								"nedges    = " + nConections + ";\n" +
+								"sources   = [" + sources + "];\n" +
+								"targets   = [" + targets + "];\n";
+	
+				String dznFileName = fileName.substring(0, fileName.length()-4)+".dzn";
+	
+				RandomAccessFile dznFile = new RandomAccessFile(new File(dznFileName), "rw");
+				dznFile.setLength(0);
+				dznFile.writeBytes(dzn);
+				dznFile.close();
+			}
 
 			//----------------------------------------------------------
 
@@ -663,26 +668,27 @@ public class Board extends JComponent implements Printable{
 
 		//----------------------------------------------------------
 
-		String matrix = "[";
 		int size = states.size();
-		for (int s=0;s<states.size();s++){
-			matrix += v==1?"[":"|";
-			for (int t=0;t<states.size();t++){
-				boolean found = false;
-				for (int i=0;i<states.elementAt(s).getConnections().size();i++){
-					if (states.elementAt(s).getConnections().elementAt(i).getTarget().getNumber()==t) {
-						found = true;
-					}
-		        }
-				matrix += found?"1":"0";
-				if (t<states.size()-1) matrix += ","; 
-				else 
-					matrix += v==1?"]":"";
-	        }
-			if (s<states.size()-1) matrix += "\n"; 
-			else 
-				matrix += v==1?"]\n":"|]\n";
-		}
+
+		// String matrix = "[";
+		// for (int s=0;s<states.size();s++){
+		// 	matrix += v==1?"[":"|";
+		// 	for (int t=0;t<states.size();t++){
+		// 		boolean found = false;
+		// 		for (int i=0;i<states.elementAt(s).getConnections().size();i++){
+		// 			if (states.elementAt(s).getConnections().elementAt(i).getTarget().getNumber()==t) {
+		// 				found = true;
+		// 			}
+		//         }
+		// 		matrix += found?"1":"0";
+		// 		if (t<states.size()-1) matrix += ","; 
+		// 		else 
+		// 			matrix += v==1?"]":"";
+	    //     }
+		// 	if (s<states.size()-1) matrix += "\n"; 
+		// 	else 
+		// 		matrix += v==1?"]\n":"|]\n";
+		// }
 
 		//----------------------------------------------------------
 
@@ -721,22 +727,23 @@ public class Board extends JComponent implements Printable{
 		//----------------------------------------------------------
 
 		session.main.properties.generalView.exportView.info.setText(
+			"\n" +
 			"nvertices = " + size + ";\n" +
 			"owners    = [" + owners + "];\n" +
 			"colors    = [" + values + "];\n" +
 			"nedges    = " + nConections + ";\n" +
 			"sources   = [" + from + "];\n" +
 			"targets   = [" + to + "];\n" +
+			"\n" +
 			"-------------------------------------\n" +
+			"\n" +			
 			"int nvertices = " + size + ";\n" +
 			"int owners[]  = {" + owners + "};\n" +
 			"int colors[]  = {" + values + "};\n" +
 			"int nedges    = " + nConections + ";\n" +
 			"int sources[] = {" + from + "};\n" +
 			"int targets[] = {" + to + "};\n" +
-			// "-------------------------------------\n" +
-			// "Adjacency matrix ("+size+"x"+size+")\n"+
-			// matrix + 
+			"\n" +
 			"-------------------------------------\n" +
 			""
 		);

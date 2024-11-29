@@ -25,6 +25,7 @@ public class GeneralView extends JPanel {
 	protected	JCheckBox	showStateValues;
 	protected	JCheckBox	allowFirstState;
 	protected	JCheckBox	firstZero;
+	protected	JCheckBox	saveDzn;
 	protected	JTabbedPane	info;
 	protected	JTextArea	comment;
 	protected	ExportView	exportView;
@@ -46,6 +47,7 @@ public class GeneralView extends JPanel {
 		showStateValues			= new JCheckBox("View state priorities");
 		allowFirstState			= new JCheckBox("Allow first state");
 		firstZero				= new JCheckBox("Start at Zero (0)");
+		saveDzn					= new JCheckBox("Save dzn file");
 
 		info					= new JTabbedPane();
 
@@ -63,6 +65,7 @@ public class GeneralView extends JPanel {
 		add(showStateValues);
 		add(allowFirstState);
 		add(firstZero);
+		add(saveDzn);
 		add(info);
 		commentView.setLayout(new BorderLayout());
 		commentView.add(new JScrollPane(comment),BorderLayout.CENTER);
@@ -128,6 +131,12 @@ public class GeneralView extends JPanel {
 			}
 		});
 
+		saveDzn.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				main.currentSession.board.settings.saveDzn = saveDzn.isSelected();
+				main.currentSession.setModified(true);
+			}
+		});
 		comment.addCaretListener(new CaretListener(){
 
 			public void caretUpdate(CaretEvent arg0) {
@@ -147,6 +156,7 @@ public class GeneralView extends JPanel {
 		showStateValues.setSelected(main.currentSession.board.settings.showStatePriorities);
 		allowFirstState.setSelected(main.currentSession.board.settings.allowFirsState);
 		firstZero.setSelected(main.currentSession.board.settings.firstZero);
+		saveDzn.setSelected(main.currentSession.board.settings.saveDzn);
 		comment.setText(main.currentSession.board.settings.comment);
 	}
 
