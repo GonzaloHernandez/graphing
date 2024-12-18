@@ -509,6 +509,14 @@ public class Board extends JComponent implements Printable{
 		try {
 			if (saveAs || fileName.equals("")) {
 				FileDialog dialog = new FileDialog(session.main,"Select a file name",FileDialog.SAVE);
+
+				dialog.setFilenameFilter(new FilenameFilter() {
+					@Override
+					public boolean accept(java.io.File dir, String name) {
+						return name.endsWith(".aut");
+					}
+				});
+
 				dialog.setDirectory(session.main.curdir);
 				dialog.setFile("*.aut");
 				dialog.setVisible(true);
