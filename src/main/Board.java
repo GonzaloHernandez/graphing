@@ -688,7 +688,7 @@ public class Board extends JComponent implements Printable{
 		// 				found = true;
 		// 			}
 		//         }
-		// 		matrix += found?"1":"0";
+		// 		matrix += found?s:"0";
 		// 		if (t<states.size()-1) matrix += ","; 
 		// 		else 
 		// 			matrix += v==1?"]":"";
@@ -697,6 +697,32 @@ public class Board extends JComponent implements Printable{
 		// 	else 
 		// 		matrix += v==1?"]\n":"|]\n";
 		// }
+
+		String labels = "{";
+		for (int i=1; i< types.size() ; i++) {
+			labels += types.elementAt(i).getName() + (i<types.size()-1?",":"");
+		}
+		labels += "};";
+		
+		String matrix = "[";
+		for (int s=0;s<states.size();s++){
+			matrix += v==1?"[":"|";
+			for (int t=1;t<states.size();t++){
+				boolean found = false;
+				for (int i=0;i<states.elementAt(s).getConnections().size();i++){
+					if (states.elementAt(s).getConnections().elementAt(i).getTarget().getNumber()==t) {
+						found = true;
+					}
+		        }
+				matrix += found?(t+1):"0";
+				if (t<states.size()-1) matrix += ","; 
+				else 
+					matrix += v==1?"]":"";
+	        }
+			if (s<states.size()-1) matrix += "\n"; 
+			else 
+				matrix += v==1?"];\n":"|];\n";
+		}
 
 		//----------------------------------------------------------
 
@@ -753,7 +779,12 @@ public class Board extends JComponent implements Printable{
 			"int targets[] = {" + to + "};\n" +
 			"\n" +
 			"-------------------------------------\n" +
-			""
+			"\n" +
+			labels + "\n" +
+			"\n" +
+			matrix +
+			"-------------------------------------\n" +
+			"\n"
 		);
 		return true;
 	}
