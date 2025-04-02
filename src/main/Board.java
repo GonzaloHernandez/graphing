@@ -12,6 +12,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.awt.image.BufferedImage;
 import java.awt.print.PageFormat;
 import java.awt.print.Paper;
 import java.awt.print.Printable;
@@ -23,6 +24,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Vector;
 
+import javax.imageio.ImageIO;
 import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
 import javax.swing.KeyStroke;
@@ -947,6 +949,27 @@ public class Board extends JComponent implements Printable{
 			states.elementAt(i).draw(g,settings,connectionSequence);
 		}
 		return 0;
+	}
+
+	public void screenshot(Graphics g1) {
+        // Create an image with the component's dimensions
+        int width = getWidth() * 2;
+        int height = getHeight() * 2;
+
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        
+        Graphics2D g2 = image.createGraphics();
+		g2.scale(2,2);
+        paint(g2);
+        g2.dispose();
+
+		String pngFileName = fileName.substring(0, fileName.length()-4)+".png";
+        try {
+            ImageIO.write(image, "png", new File(pngFileName));
+            System.out.println("Image saved: " + pngFileName);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }		
 	}
 
 	public void createJurdzinsky(int levels, int blocks) {

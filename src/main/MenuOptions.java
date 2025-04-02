@@ -89,7 +89,7 @@ public class MenuOptions extends JPopupMenu{
 		load					= new GrapherItem("Load automata",defaultFont,"open.png");
 		save					= new GrapherItem("Save automata",defaultFont,"save.png");
 		saveAs					= new GrapherItem("Save automata as ...",defaultFont,"saveas.png");
-		print					= new GrapherItem("Print",defaultFont,"print.png");
+		print					= new GrapherItem("Export as PNG",defaultFont,"print.png");
 		simulate				= new GrapherItem("Simulate",defaultFont,"simulate.png");
 		help					= new GrapherItem("Help",defaultFont,"help.png");
 				
@@ -318,7 +318,8 @@ public class MenuOptions extends JPopupMenu{
 		
 		print.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
-				main.currentSession.board.print();
+				// main.currentSession.board.print();
+				main.currentSession.board.screenshot(getGraphics());
 			}
 		});
 		
