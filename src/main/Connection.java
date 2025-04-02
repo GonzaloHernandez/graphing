@@ -236,7 +236,7 @@ public class Connection {
 		
 		if (settings.showTypeNames || settings.showConnectionSequence) {
 			g.setColor(Color.BLUE);
-			String label = settings.showConnectionSequence?""+connectionSequence+":":"";
+			String label = settings.showConnectionSequence?""+connectionSequence+" ":"";
 			if (type!=null && settings.showTypeNames) {
 				if (type.getNumber()==0) {
 					label += getValue();
