@@ -45,13 +45,15 @@ public class Board extends JComponent implements Printable{
 	protected	boolean			menuBlock;
 	protected	Compiler		compiler;
 	protected	PageFormat		pageFormat;
+	protected	double			scaleFactor;
 		
 	//-------------------------------------------------------------------------------------
 	
 	public Board(GrapherSession session) {
-		this.session	= session;
-		this.menuBlock	= false;
-		this.compiler	= null;
+		this.session		= session;
+		this.menuBlock		= false;
+		this.compiler		= null;
+		this.scaleFactor	= 1.0;
 		getInputMap().put(KeyStroke.getKeyStroke("A"), "actionName");
 		initElements();
 		progListeners();
@@ -90,6 +92,8 @@ public class Board extends JComponent implements Printable{
 
 		Graphics2D g = (Graphics2D) g1;
 
+		g.scale(scaleFactor,scaleFactor);
+
 		g.setRenderingHint(
 			RenderingHints.KEY_ANTIALIASING,
 			RenderingHints.VALUE_ANTIALIAS_ON);
@@ -115,6 +119,7 @@ public class Board extends JComponent implements Printable{
 		}
 
 		export();
+		session.main.properties.elementsView.refresh();
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -182,10 +187,14 @@ public class Board extends JComponent implements Printable{
 					if (e.getKeyCode() == KeyEvent.VK_S) {
 						save(false);
 					}
-					else if (e.getKeyCode() == KeyEvent.VK_J) {
-						createJurdzinsky(4,2);
+					else if (e.getKeyCode() == KeyEvent.VK_EQUALS) {
+						scaleFactor += 0.1;
+					}
+					else if (e.getKeyCode() == KeyEvent.VK_MINUS) {
+						scaleFactor -= 0.1;
 					}
 				}
+
 				repaint();
 			}
 
@@ -206,8 +215,8 @@ public class Board extends JComponent implements Printable{
 				if (e.getButton() == MouseEvent.BUTTON1) {
 					if (!e.isControlDown()) {
 						if (e.getButton()==MouseEvent.BUTTON1 && e.getClickCount() == 2) {
-							int mousex = (int)(Math.round(e.getX()/10)*10);
-							int mousey = (int)(Math.round(e.getY()/10)*10);
+							int mousex = (int)(Math.round((int)(e.getX()/scaleFactor)/10)*10);
+							int mousey = (int)(Math.round((int)(e.getY()/scaleFactor)/10)*10);
 							addState(mousex,mousey);
 						}
 					}
@@ -231,11 +240,11 @@ public class Board extends JComponent implements Printable{
 				for (int i=0 ; i<states.size() ; i++) {
 					State state = (State)states.elementAt(i);
 				
-					if (state.isArea(e.getX(),e.getY())) {
+					if (state.isArea((int)(e.getX()/scaleFactor),(int)(e.getY()/scaleFactor))) {
 						
 						if (!e.isControlDown()) {
 							stateTarget = state;
-							stateTarget.setMouseDiference(e.getX(),e.getY());
+							stateTarget.setMouseDiference((int)(e.getX()/scaleFactor),(int)(e.getY()/scaleFactor));
 						}
 						else {
 							controled	= true;
@@ -256,7 +265,7 @@ public class Board extends JComponent implements Printable{
 					if (settings.allowFirsState || stateTarget.getNumber() > 0) {
 						for (int i=0 ; i<states.size() ; i++) {
 							State state = (State)states.elementAt(i);
-							if (state.isArea(e.getX(),e.getY())) {
+							if (state.isArea((int)(e.getX()/scaleFactor),(int)(e.getY()/scaleFactor))) {
 								stateSource.addConnection(stateTarget);
 								session.setModified(true);
 								repaint();
@@ -273,8 +282,8 @@ public class Board extends JComponent implements Printable{
 		
 		addMouseMotionListener(new MouseMotionListener() { 
 			public void mouseDragged(MouseEvent e) {
-				mousex = e.getX();
-				mousey = e.getY();
+				mousex = (int)(e.getX()/scaleFactor);
+				mousey = (int)(e.getY()/scaleFactor);
 				if (!e.isControlDown()) {
 					if (!controled && stateTarget!=null) {
 						mousex = (int)(Math.round(mousex/10)*10);
@@ -309,7 +318,7 @@ public class Board extends JComponent implements Printable{
 				currentConnection = null;
 				for (int i=0 ; i<states.size() ; i++) {
 					State state = (State)states.elementAt(i);
-					if (state.isArea(e.getX(),e.getY())) {
+					if (state.isArea((int)(e.getX()/scaleFactor),(int)(e.getY()/scaleFactor))) {
 						stateTarget	= state;
 						if (state != stateSource) {
 							state.setStatus(State.FOCUSED);
@@ -322,7 +331,7 @@ public class Board extends JComponent implements Printable{
 					Vector<Connection> connections = state.getConnections();
 					for (int j=0 ; j<connections.size() ; j++) {
 						Connection connection = (Connection)connections.elementAt(j); 
-						if (connection.isArea(e.getX(),e.getY())) {
+						if (connection.isArea((int)(e.getX()/scaleFactor),(int)(e.getY()/scaleFactor))) {
 							currentConnection = connection;
 							connection.setStatus(Connection.FOCUSED);
 						}
@@ -972,26 +981,5 @@ public class Board extends JComponent implements Printable{
         }		
 	}
 
-	public void createJurdzinsky(int levels, int blocks) {
-		// int nvertices	= ((blocks*3)+1)*(levels-1) + ((blocks*2)+1);
-		// int nedges		= (blocks*6)*(levels-1) + (blocks*4) + (blocks*2*(levels-1));
-
-		int left = 50;
-		int top = 50;
-		int delta = 70;
-		for (int l=0; l<levels-1; l++) {
-			for (int b=0; b<blocks; b++) {
-				State s1 = addState(left+(b*delta*2)           , top+(l*delta*3/2)+delta*3/4);
-				State s2 = addState(left+(b*delta*2)+delta*1/2 , top+(l*delta*3/2));
-				State s3 = addState(left+(b*delta*2)+delta     , top+(l*delta*3/2)+delta*3/4);
-				s1.addConnection(s2);
-				s2.addConnection(s3);
-				s3.addConnection(s1);
-				s1.addConnection(s3);
-				if (b>0) {
-					
-				}
-			}
-		}
-	}
+	
 }

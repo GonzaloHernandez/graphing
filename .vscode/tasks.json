@@ -1,0 +1,20 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Build Java Project",
+        "type": "shell",
+        "command": "javac",
+        "args": [
+          "-d",
+          "build",
+          "${workspaceFolder}/src/**/*.java"
+        ],
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        },
+        // "problemMatcher": ["$javac"]
+      }
+    ]
+  }

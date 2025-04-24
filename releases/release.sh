@@ -3,7 +3,7 @@
 # Define versioning variables
 FAMILY=1
 VERSION=1
-CONSTRUCTION=15  # Update as needed
+CONSTRUCTION=16  # Update as needed
 
 # File paths
 JAVA_FILE="src/main/GrapherMain.java"
@@ -24,10 +24,10 @@ sed -i "s/\(final int\s*construcction\s*=\s*\)[0-9]\+;/\1$CONSTRUCTION;/" "$JAVA
 echo "::Updated $JAVA_FILE with family=$FAMILY, version=$VERSION, and construcction=$CONSTRUCTION"
 
 # Step 3: Build process
-rm -r bin 2>/dev/null
-javac --source-path src/ -d bin src/main/GrapherMain.java --release 9
-cp -r icons/ bin/main/
-cd bin || exit
+rm -r build 2>/dev/null
+javac --source-path src/ -d build src/main/GrapherMain.java --release 9
+cp -r icons/ build/main/
+cd build || exit
 jar cfm "../$OUTPUT_FILE" ../releases/Manifest.txt main/*
 cd ..
 

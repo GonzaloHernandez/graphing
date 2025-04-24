@@ -1,10 +1,12 @@
 package main;
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Stroke;
 import java.awt.geom.QuadCurve2D;
 
 public class Connection {
@@ -25,6 +27,7 @@ public class Connection {
 	private	int					distance;
 	private	double				rotation;
 	private int					value;
+	private boolean				active;
 	
 	//-------------------------------------------------------------------------------------
 
@@ -44,6 +47,7 @@ public class Connection {
 		this.arrow		= new Point();
 		this.rotation	= 0;
 		this.value		= 0;
+		this.active		= true;
 		if (source.equals(target))	this.distance =30; else this.distance = 0; 
 	}
 	
@@ -66,12 +70,24 @@ public class Connection {
 		this.distance	= distance;
 		this.rotation	= rotation;
 		this.value		= value;
+		this.active		= true;
 	}
 	
 	//-------------------------------------------------------------------------------------
 
 	public int draw(Graphics2D g,GrapherSettings settings,int connectionSequence) {
 		
+		float[] dashPattern = {6, 4}; // 10 pixels on, 5 pixels off
+		Stroke dashed = new BasicStroke(
+				1,                      // Line width
+				BasicStroke.CAP_BUTT,  // End-cap style
+				BasicStroke.JOIN_MITER,// Line join style
+				10,                    // Miter limit
+				dashPattern,           // Dash pattern
+				0                      // Dash phase (offset)
+		);
+		Stroke originalStroke = g.getStroke();
+
 		double	angle,hypotenuse,alpha,theta,grandHypotenuse,beta,gamma,dx,dy;
 		
 		if (source.equals(target)){
@@ -84,7 +100,9 @@ public class Connection {
 			control.x	= (int)(source.getX() + Math.cos(rotation) * distance);
 			control.y	= (int)(source.getY() - Math.sin(rotation) * distance);
 			
+			if (!active) g.setStroke(dashed);
 			g.drawArc(control.x-distance,control.y-distance,distance*2,distance*2,0,360);
+			g.setStroke(originalStroke);
 			
 			text.x	= (int)(source.getX() + Math.cos(rotation) * distance*2);
 			text.y	= (int)(source.getY() - Math.sin(rotation) * distance*2);
@@ -186,7 +204,10 @@ public class Connection {
 			
 			Graphics2D g2 = (Graphics2D)g;
 			curve.setCurve(start,control,end);
+
+			if (!active) g.setStroke(dashed);
 			g2.draw(curve);
+			g.setStroke(originalStroke);
 			
 			arrow.x	= control.x;
 			arrow.y	= control.y;
@@ -343,6 +364,10 @@ public class Connection {
 		this.value = value;
 	}
 
+	public void setActive(boolean act){
+		this.active = act;
+	}
+
 	public void setAmountRotation(double dif){
 		rotation	+=	dif;
 		if (rotation>2*Math.PI){
@@ -388,12 +413,18 @@ public class Connection {
 	
 	//-------------------------------------------------------------
 
+	public boolean isActive() {
+		return active;
+	}
+
+	//-------------------------------------------------------------
+
 	static public void drawCenterString(Graphics g,String s,Point p){
 		FontMetrics metrics			= g.getFontMetrics();
 		int			widthString		= metrics.stringWidth(s);//charsWidth(s.toCharArray(),0,s.length());
 		int			heightString	= metrics.getAscent();
 		
-		g.setFont(new Font("Arial",Font.ITALIC,12));
+		g.setFont(new Font("Arial",Font.ITALIC,11));
 		g.drawString(s,p.x-widthString/2,p.y+heightString/2);		
 	}
 	

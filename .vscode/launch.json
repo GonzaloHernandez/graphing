@@ -3,10 +3,12 @@
     "configurations": [
         {
             "type": "java",
-            "name": "Launch GrapherMain",
+            "name": "Run GrapherMain",
             "request": "launch",
-            "mainClass": "src.main.GrapherMain",
-            "projectName": "graphing"
-        }
+            "mainClass": "main.GrapherMain",
+            "classPaths": [
+              "${workspaceFolder}/build"
+            ]
+          }
     ]
 }

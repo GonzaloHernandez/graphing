@@ -24,6 +24,7 @@ public class State {
 
 	private int		value;
 	private int		owner;
+	private boolean active;
 
 	//-------------------------------------------------------------------------------------
 	
@@ -35,6 +36,7 @@ public class State {
 		this.accepted	= false;
 		this.value		= 0;
 		this.owner		= 0;
+		this.active		= true;
 		connections		= new Vector<Connection>();
 	}
 	
@@ -48,6 +50,7 @@ public class State {
 		this.accepted	= accepted;
 		this.value		= 0;
 		this.owner		= 0;
+		this.active		= true;
 		connections		= new Vector<Connection>();
 	}
 	
@@ -61,6 +64,7 @@ public class State {
 		this.accepted	= accepted;
 		this.value		= value;
 		this.owner		= owner;
+		this.active		= true;
 		connections		= new Vector<Connection>();
 	}
 
@@ -75,17 +79,22 @@ public class State {
 		switch (status) {
 			case FOCUSED:	g.setColor(Color.RED);		break;
 			case MARKED:	g.setColor(Color.YELLOW);	break;
-			case STILL:		g.setColor(new Color(220,220,255));	break;
+			case STILL:		
+				if (!active)
+					g.setColor(Color.WHITE);
+				else
+					g.setColor(new Color(220,220,255));
+			break;
 		}
 		
 		if (owner % 2 == 0) {
 			g.fillOval(x-RADIUS,y-RADIUS,RADIUS*2,RADIUS*2);
-			g.setColor(Color.BLACK);
+			if (!active) g.setColor(Color.GRAY); else g.setColor(Color.BLACK);
 			g.drawOval(x-RADIUS,y-RADIUS,RADIUS*2,RADIUS*2);
 		}
 		else {
 			g.fillRect(x-RADIUS,y-RADIUS,RADIUS*2,RADIUS*2);
-			g.setColor(Color.BLACK);
+			if (!active) g.setColor(Color.GRAY); else g.setColor(Color.BLACK);
 			g.drawRect(x-RADIUS,y-RADIUS,RADIUS*2,RADIUS*2);
 		}
 
@@ -143,6 +152,12 @@ public class State {
 
 	//-------------------------------------------------------------------------------------
 
+	public void setActive(boolean act){
+		this.active = act;
+	}
+
+	//-------------------------------------------------------------------------------------
+
 	public void setOwner(int owner){
 		this.owner = owner;
 	}
@@ -188,7 +203,13 @@ public class State {
 	public int getY() {
 		return y;
 	}
-	
+
+	//-------------------------------------------------------------------------------------
+
+	public boolean isActive() {
+		return active;
+	}
+
 	//-------------------------------------------------------------------------------------
 
 	public boolean isAccepted(){
