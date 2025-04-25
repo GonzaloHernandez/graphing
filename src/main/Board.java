@@ -187,10 +187,10 @@ public class Board extends JComponent implements Printable{
 					if (e.getKeyCode() == KeyEvent.VK_S) {
 						save(false);
 					}
-					else if (e.getKeyCode() == KeyEvent.VK_EQUALS) {
+					else if (e.getKeyChar() == '+') {
 						scaleFactor += 0.1;
 					}
-					else if (e.getKeyCode() == KeyEvent.VK_MINUS) {
+					else if (e.getKeyChar() == '-') {
 						scaleFactor -= 0.1;
 					}
 				}
