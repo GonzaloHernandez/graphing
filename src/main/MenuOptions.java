@@ -134,7 +134,7 @@ public class MenuOptions extends JPopupMenu{
 				}
 			});
 			connectionTypes.add(typeItems[i]);
-			if (i==0) ((JMenu)connectionTypes).addSeparator();
+			// if (i==0) ((JMenu)connectionTypes).addSeparator();
 		}
 	}
 	
@@ -202,7 +202,10 @@ public class MenuOptions extends JPopupMenu{
 			grapherMenu.setEnabled(false);
 		}
 		//----------------------------------------------------------------------
-		show(main.currentSession.board,(int)main.currentSession.board.getMousePosition().getX(),(int)main.currentSession.board.getMousePosition().getY());
+		show(	main.currentSession.board,
+				(int)main.currentSession.board.getMousePosition().getX(),
+				(int)main.currentSession.board.getMousePosition().getY()
+		);
 	}
 	
 	//-------------------------------------------------------------------------------------

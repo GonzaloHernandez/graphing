@@ -30,9 +30,9 @@ public class GrapherSettings {
 		this.types					= types;
 		this.measure				= 1; // 0=Centimeters  1=Inch
 		this.showStatePriorities	= false;
-		this.allowFirsState			= false;
-		this.firstZero				= false;
-		this.saveDzn				= false;
+		this.allowFirsState			= true;
+		this.firstZero				= true;
+		this.saveDzn				= true;
 		this.programmingView		= 0;
 	}
 

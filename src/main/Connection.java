@@ -48,7 +48,7 @@ public class Connection {
 		this.rotation	= 0;
 		this.value		= 0;
 		this.active		= true;
-		if (source.equals(target))	this.distance =30; else this.distance = 0; 
+		if (source.equals(target))	this.distance =25; else this.distance = 0; 
 	}
 	
 	//-------------------------------------------------------------------------------------

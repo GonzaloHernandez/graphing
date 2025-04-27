@@ -209,9 +209,23 @@ public class Board extends JComponent implements Printable{
 		});
 		addMouseListener(new MouseListener() {
 			public void mouseClicked(MouseEvent e) {
-				if (currentConnection!=null && e.getModifiersEx()== InputEvent.SHIFT_DOWN_MASK) { //Shift + Click 
-					session.main.menuOptions.showTypes(false);
-				}
+				if (e.getModifiersEx()== InputEvent.SHIFT_DOWN_MASK) {
+					if (e.getButton() == MouseEvent.BUTTON1){
+						if (stateTarget!=null) {
+							stateTarget.setActive(!stateTarget.isActive());
+							session.setModified(true);
+						}
+						if (currentConnection!=null) {
+							currentConnection.setActive(!currentConnection.isActive());
+							session.setModified(true);
+						}
+					}
+					else if (e.getButton() == MouseEvent.BUTTON3) {
+						if (currentConnection!=null) {
+							session.main.menuOptions.showTypes(false);
+						}
+					}
+					repaint();	}
 				if (e.getButton() == MouseEvent.BUTTON1) {
 					if (!e.isControlDown()) {
 						if (e.getButton()==MouseEvent.BUTTON1 && e.getClickCount() == 2) {
@@ -220,8 +234,9 @@ public class Board extends JComponent implements Printable{
 							addState(mousex,mousey);
 						}
 					}
+
 				}
-				else if (e.getButton() == MouseEvent.BUTTON3) {
+				else if (e.getButton() == MouseEvent.BUTTON3  && !e.isShiftDown()) {
 					if (stateTarget!=null && currentConnection!=null) {
 						session.main.menuOptions.show(true,true,true);
 					}
