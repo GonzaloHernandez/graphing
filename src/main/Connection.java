@@ -280,10 +280,10 @@ public class Connection {
 		double	angle,otherangle,hypotenuse;
 		
 		if (source.equals(target)){
-			hypotenuse	= (int)Math.sqrt(Math.pow(Math.abs(control.x-x),2)+Math.pow(Math.abs(control.y-y),2));
+			hypotenuse			= (int)Math.sqrt(Math.pow(Math.abs(control.x-x),2)+Math.pow(Math.abs(control.y-y),2));
+			double hypostate	= (int)Math.sqrt(Math.pow(Math.abs(source.getX()-x),2)+Math.pow(Math.abs(source.getY()-y),2));
 			
-			if (hypotenuse <= distance) return true;
-			else						return false;
+			return (hypotenuse <= distance && hypostate >= State.RADIUS);
 		}
 		
 		if (curve.contains(x,y)) return true;
@@ -323,7 +323,7 @@ public class Connection {
 		else
 			otherangle	= Math.acos(Math.abs(x-source.getX())/hypotenuse);
 		
-		if (Math.abs(angle - otherangle) > 0.02) return false;
+		if (Math.abs(angle - otherangle) > 0.1) return false;
 		return true;
 	}
 	
