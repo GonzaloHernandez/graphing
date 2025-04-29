@@ -180,7 +180,11 @@ public class Board extends JComponent implements Printable{
 					else if (e.getKeyCode() == KeyEvent.VK_O) {
 						stateTarget.setOwner(1-stateTarget.getOwner());
 						session.setModified(true);
-					} 
+					}
+					else  if (e.getKeyChar() >= '0' && e.getKeyChar() <= '9') {
+						stateTarget.setValue(e.getKeyChar()-'0');
+						session.setModified(true);
+					}
 				}
 
 				if (e.isControlDown()){
@@ -214,6 +218,7 @@ public class Board extends JComponent implements Printable{
 						if (stateTarget!=null) {
 							stateTarget.setActive(!stateTarget.isActive());
 							session.setModified(true);
+							stateTarget.setStatus(State.STILL);
 						}
 						if (currentConnection!=null) {
 							currentConnection.setActive(!currentConnection.isActive());
