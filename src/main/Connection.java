@@ -368,6 +368,11 @@ public class Connection {
 		this.active = act;
 	}
 
+	public void setActive(boolean act,boolean propagate){
+		if (act == this.active) return;
+		this.active = act;
+	}
+
 	public void setAmountRotation(double dif){
 		rotation	+=	dif;
 		if (rotation>2*Math.PI){

@@ -20,6 +20,7 @@ public class State {
 	private	int		status;
 	private	int		diferencex,diferencey;
 	private	Vector	<Connection>connections;
+	private	Vector	<Connection>arrivals;
 	private	boolean	accepted;
 
 	private int		value;
@@ -38,6 +39,7 @@ public class State {
 		this.owner		= 0;
 		this.active		= true;
 		connections		= new Vector<Connection>();
+		arrivals		= new Vector<Connection>();
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -52,6 +54,7 @@ public class State {
 		this.owner		= 0;
 		this.active		= true;
 		connections		= new Vector<Connection>();
+		arrivals		= new Vector<Connection>();
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -66,16 +69,25 @@ public class State {
 		this.owner		= owner;
 		this.active		= true;
 		connections		= new Vector<Connection>();
+		arrivals		= new Vector<Connection>();
 	}
 
 	//-------------------------------------------------------------------------------------
 	
-	public int draw(Graphics2D g,GrapherSettings settings,int connectionSequence) {
+	public int draw(Graphics2D g,GrapherSettings settings,int connectionSequence,boolean hidden) {
 		
+		if (hidden && !active) return connectionSequence + connections.size();
+
 		for (int i=0 ; i<connections.size() ; i++) {
 			Connection connection = (Connection)connections.elementAt(i);
-			connectionSequence = connection.draw(g,settings,connectionSequence);
+			if (hidden && !connection.getTarget().isActive()) {
+				connectionSequence++;
+			}
+			else {
+				connectionSequence = connection.draw(g,settings,connectionSequence);
+			}
 		}
+		
 		switch (status) {
 			case FOCUSED:	g.setColor(Color.RED);		break;
 			case MARKED:	g.setColor(Color.YELLOW);	break;
@@ -158,6 +170,23 @@ public class State {
 
 	//-------------------------------------------------------------------------------------
 
+	public void setActive(boolean act, boolean propagate){
+		if (act == this.active) return;
+		this.active = act;
+		if (propagate) {
+			for (int i=0 ; i<connections.size() ; i++) {
+				Connection connection = (Connection)connections.elementAt(i);
+				connection.setActive(act, propagate);
+			}
+			for (int i=0 ; i<arrivals.size() ; i++) {
+				Connection connection = (Connection)arrivals.elementAt(i);
+				connection.setActive(act, propagate);
+			}
+		}
+	}
+
+	//-------------------------------------------------------------------------------------
+
 	public void setOwner(int owner){
 		this.owner = owner;
 	}
@@ -226,25 +255,36 @@ public class State {
 	
 	//-------------------------------------------------------------------------------------
 	
+	public void addConnection(Connection c) {
+		connections.add(c);
+		c.getTarget().arrivals.add(c);
+	}
+
+	//-------------------------------------------------------------------------------------
+	
 	public void addConnection(State target) {
 		for (int c=0;c<getConnections().size();c++){
 			if (getConnections().elementAt(c).getTarget().equals(target)) { 
 				return;
 			}
 		}
-		connections.add(new Connection(this,target,null));
+		Connection c = new Connection(this,target,null);
+		connections.add(c);
+		target.arrivals.add(c);
 		arrangeConnections(target);
 	}
 	
 	//-------------------------------------------------------------------------------------
 	
-	public void addConnection(State target,ConnectionType type,int distance,double rotation,int value) {
+	public void addConnection(State target,ConnectionType type,int distance,double rotation,int value,boolean active) {
 		for (int c=0;c<getConnections().size();c++){
 			if (getConnections().elementAt(c).getTarget().equals(target)) { 
 				return;
 			}
 		}
-		connections.add(new Connection(this,target,type,Connection.STILL,distance,rotation,value));
+		Connection c = new Connection(this,target,type,Connection.STILL,distance,rotation,value);
+		c.setActive(active);
+		connections.add(c);
 	}
 	
 	//-------------------------------------------------------------------------------------

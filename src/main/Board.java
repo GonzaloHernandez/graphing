@@ -46,6 +46,7 @@ public class Board extends JComponent implements Printable{
 	protected	Compiler		compiler;
 	protected	PageFormat		pageFormat;
 	protected	double			scaleFactor;
+	protected	boolean			hidden;
 		
 	//-------------------------------------------------------------------------------------
 	
@@ -54,6 +55,7 @@ public class Board extends JComponent implements Printable{
 		this.menuBlock		= false;
 		this.compiler		= null;
 		this.scaleFactor	= 1.0;
+		this.hidden			= false;
 		getInputMap().put(KeyStroke.getKeyStroke("A"), "actionName");
 		initElements();
 		progListeners();
@@ -115,7 +117,7 @@ public class Board extends JComponent implements Printable{
 		}
 		int connectionSequence = settings.firstZero?0:1;
 		for (int i=0 ; i<states.size() ; i++) {
-			connectionSequence = states.elementAt(i).draw(g,settings,connectionSequence);
+			connectionSequence = states.elementAt(i).draw(g,settings,connectionSequence,hidden);
 		}
 
 		export();
@@ -199,11 +201,18 @@ public class Board extends JComponent implements Printable{
 					}
 				}
 
+				if (e.getKeyChar() == 'h') {
+					hidden = true;
+				}
+
 				repaint();
 			}
 
-			public void keyReleased(KeyEvent arg0) {
-				
+			public void keyReleased(KeyEvent e) {
+				if (e.getKeyChar() == 'h') {
+					hidden = false;
+					repaint();
+				}
 			}
 
 			public void keyTyped(KeyEvent e) {
@@ -212,50 +221,112 @@ public class Board extends JComponent implements Printable{
 			
 		});
 		addMouseListener(new MouseListener() {
-			public void mouseClicked(MouseEvent e) {
-				if (e.getModifiersEx()== InputEvent.SHIFT_DOWN_MASK) {
-					if (e.getButton() == MouseEvent.BUTTON1){
-						if (stateTarget!=null) {
-							stateTarget.setActive(!stateTarget.isActive());
-							session.setModified(true);
-							stateTarget.setStatus(State.STILL);
-						}
-						if (currentConnection!=null) {
-							currentConnection.setActive(!currentConnection.isActive());
-							session.setModified(true);
-						}
-					}
-					else if (e.getButton() == MouseEvent.BUTTON3) {
-						if (currentConnection!=null) {
-							session.main.menuOptions.showTypes(false);
-						}
-					}
-					repaint();	}
-				if (e.getButton() == MouseEvent.BUTTON1) {
-					if (!e.isControlDown()) {
-						if (e.getButton()==MouseEvent.BUTTON1 && e.getClickCount() == 2) {
-							int mousex = (int)(Math.round((int)(e.getX()/scaleFactor)/10)*10);
-							int mousey = (int)(Math.round((int)(e.getY()/scaleFactor)/10)*10);
-							addState(mousex,mousey);
-						}
-					}
+			// public void mouseClicked(MouseEvent e) {
+				
+			// 	if (e.getModifiersEx()== InputEvent.SHIFT_DOWN_MASK) {
+			// 		if (e.getButton() == MouseEvent.BUTTON1){
+			// 			if (stateTarget!=null) {
+			// 				stateTarget.setActive(!stateTarget.isActive());
+			// 				session.setModified(true);
+			// 				stateTarget.setStatus(State.STILL);
+			// 			}
+			// 			if (currentConnection!=null) {
+			// 				currentConnection.setActive(!currentConnection.isActive());
+			// 				session.setModified(true);
+			// 			}
+			// 		}
+			// 		else if (e.getButton() == MouseEvent.BUTTON3) {
+			// 			if (currentConnection!=null) {
+			// 				session.main.menuOptions.showTypes(false);
+			// 			}
+			// 		}
+			// 		repaint();	
+			// 	}
+			// 	if (e.getButton() == MouseEvent.BUTTON1) {
+			// 		if (!e.isControlDown()) {
+			// 			if (e.getButton()==MouseEvent.BUTTON1 && e.getClickCount() == 2) {
+			// 				int mousex = (int)(Math.round((int)(e.getX()/scaleFactor)/10)*10);
+			// 				int mousey = (int)(Math.round((int)(e.getY()/scaleFactor)/10)*10);
+			// 				addState(mousex,mousey);
+			// 			}
+			// 		}
 
+			// 	}
+			// 	else if (e.getButton() == MouseEvent.BUTTON3  && !e.isShiftDown()) {
+			// 		if (stateTarget!=null && currentConnection!=null) {
+			// 			session.main.menuOptions.show(true,true,true);
+			// 		}
+			// 		else if (stateTarget!=null) {
+			// 			session.main.menuOptions.show(true,false,true);
+			// 		}
+			// 		else if (currentConnection!=null) {
+			// 			session.main.menuOptions.show(false,true,true);				
+			// 		} 
+			// 		else {
+			// 			session.main.menuOptions.show(false,false,true);
+			// 		}
+			// 	}
+			// }
+
+			public void mouseClicked(MouseEvent e) {
+				int modifiers = e.getModifiersEx();
+				int button = e.getButton();
+
+				boolean shiftDown = (modifiers & InputEvent.SHIFT_DOWN_MASK) != 0;
+				boolean ctrlDown = (modifiers & InputEvent.CTRL_DOWN_MASK) != 0;
+				
+				// SHIFT + BUTTON1
+				if (shiftDown && button == MouseEvent.BUTTON1) {
+					if (stateTarget != null) {
+						stateTarget.setActive(!stateTarget.isActive());
+						session.setModified(true);
+						stateTarget.setStatus(State.STILL);
+					}
+					if (currentConnection != null) {
+						currentConnection.setActive(!currentConnection.isActive());
+						session.setModified(true);
+					}
+					repaint();
+					return;
 				}
-				else if (e.getButton() == MouseEvent.BUTTON3  && !e.isShiftDown()) {
-					if (stateTarget!=null && currentConnection!=null) {
-						session.main.menuOptions.show(true,true,true);
+
+				// SHIFT + BUTTON3
+				if (shiftDown && button == MouseEvent.BUTTON3) {
+					if (stateTarget != null) {
+						stateTarget.setActive(!stateTarget.isActive(), true);
+						session.setModified(true);
+						stateTarget.setStatus(State.STILL);
 					}
-					else if (stateTarget!=null) {
-						session.main.menuOptions.show(true,false,true);
+					if (currentConnection != null) {
+						session.main.menuOptions.showTypes(false);
 					}
-					else if (currentConnection!=null) {
-						session.main.menuOptions.show(false,true,true);				
-					} 
-					else {
-						session.main.menuOptions.show(false,false,true);
+					repaint();
+					return;
+				}
+
+				// BUTTON1 + Double-click (No CTRL)
+				if (button == MouseEvent.BUTTON1 && e.getClickCount() == 2 && !ctrlDown) {
+					int mousex = (int) (Math.round((int) (e.getX() / scaleFactor) / 10) * 10);
+					int mousey = (int) (Math.round((int) (e.getY() / scaleFactor) / 10) * 10);
+					addState(mousex, mousey);
+					return;
+				}
+
+				// BUTTON3 without SHIFT
+				if (button == MouseEvent.BUTTON3 && !shiftDown) {
+					if (stateTarget != null && currentConnection != null) {
+						session.main.menuOptions.show(true, true, true);
+					} else if (stateTarget != null) {
+						session.main.menuOptions.show(true, false, true);
+					} else if (currentConnection != null) {
+						session.main.menuOptions.show(false, true, true);
+					} else {
+						session.main.menuOptions.show(false, false, true);
 					}
 				}
 			}
+
+
 			public void mousePressed(MouseEvent e) {
 				for (int i=0 ; i<states.size() ; i++) {
 					State state = (State)states.elementAt(i);
@@ -427,11 +498,11 @@ public class Board extends JComponent implements Printable{
 		try {
 	        RandomAccessFile file = new RandomAccessFile(new File(fileName), "r");
 	        this.fileName = fileName;
-	        session.setTitle(fileName);
-	        
+	        session.setName(fileName);
+
 	        short	n,number,x,y, value,owner, numberSource,numberTarget,numberType,distance;
 	        double	rotation;
-	        boolean	accepted;
+	        boolean	accepted,active;
 	        State	source=null,target=null;
 	        ConnectionType	type=null;
 	        String	name,symbols;
@@ -448,8 +519,8 @@ public class Board extends JComponent implements Printable{
 	        	return false;
 	        }
 	        
-	        file.readShort();
-	        file.readShort();
+	        int family	= file.readShort();
+	        int version	= file.readShort();
 	        
 	        n = file.readShort();
 	        for (int i=0;i<n;i++){
@@ -469,7 +540,15 @@ public class Board extends JComponent implements Printable{
 	        	value		= file.readShort();
 				owner		= file.readShort();
 
-				states.add(new State(number,x,y,State.STILL,accepted,value,owner));
+				if (family==1 && version<=1)
+					active	= true;
+				else
+					active	= file.readBoolean();
+
+				State s = new State(number,x,y,State.STILL,accepted,value,owner);
+				s.setActive(active);
+
+				states.add(s);
 	        }
 	        
 	        n = file.readShort();
@@ -480,6 +559,10 @@ public class Board extends JComponent implements Printable{
 	        	distance		= file.readShort();
 	        	rotation		= file.readDouble();
 				value			= file.readShort();
+				if (family==1 && version<=1)
+					active	= true;
+				else
+					active	= file.readBoolean();
 	        	
 	        	for (int s=0;s<states.size();s++){
 	        		if (states.elementAt(s).getNumber()==numberSource){
@@ -501,10 +584,14 @@ public class Board extends JComponent implements Printable{
 		        			break;
 		        		}
 		        	}
-		        	source.addConnection(target,type,distance,rotation,value);
+					Connection c = new Connection(source,target,type,Connection.STILL,distance,rotation,value);
+					c.setActive(active);
+					source.addConnection(c);
 	        	}
 	        	else {
-	        		source.addConnection(target,null,distance,rotation,value);
+					Connection c = new Connection(source,target,null,Connection.STILL,distance,rotation,value);
+					c.setActive(active);
+					source.addConnection(c);
 	        	}
 	        }
 	        
@@ -527,7 +614,10 @@ public class Board extends JComponent implements Printable{
 	        session.setModified(false);
 	        
 	        session.main.addRecentSession(fileName);
-	        return true;	        
+
+			session.setTitle(fileName.substring(session.main.curdir.length()));
+			return true;
+
 	    } catch (IOException e) {
 	    	session.main.messageBox("The file ["+fileName+"] does not exists","File error","Accept");
 	    	return false;
@@ -561,7 +651,7 @@ public class Board extends JComponent implements Printable{
 				if (iframes[i].getClass().getName().equals("GrapherSession")){
 					GrapherSession	session = (GrapherSession)iframes[i];
 					if (session.equals(this.session)) continue;
-					if (session.getTitle().equals(fileName)){
+					if (session.getName().equals(fileName)){
 						session.main.messageBox("Name invalid.|There exists a session opened with the same indentifier","Warning","Accept");
 						fileName = "";
 						return false;
@@ -571,7 +661,7 @@ public class Board extends JComponent implements Printable{
 			
 			RandomAccessFile file = new RandomAccessFile(new File(fileName), "rw");
 	        
-	        session.setTitle(fileName);
+	        session.setName(fileName);
 	        
 	        file.writeShort(7);
 	        file.writeShort(4);
@@ -597,6 +687,7 @@ public class Board extends JComponent implements Printable{
 
 	        	file.writeShort(states.elementAt(i).getValue());
 	        	file.writeShort(states.elementAt(i).getOwner());
+	        	file.writeBoolean(states.elementAt(i).isActive());
 
 				connectionsCount += states.elementAt(i).getConnections().size();
 	        }
@@ -615,6 +706,7 @@ public class Board extends JComponent implements Printable{
 		        	file.writeShort (states.elementAt(s).getConnections().elementAt(i).getDistance());
 		        	file.writeDouble(states.elementAt(s).getConnections().elementAt(i).getRotation());
 		        	file.writeShort (states.elementAt(s).getConnections().elementAt(i).getValue());
+					file.writeBoolean(states.elementAt(s).getConnections().elementAt(i).isActive());
 		        }
 	        }
 	        
@@ -687,6 +779,8 @@ public class Board extends JComponent implements Printable{
 				dznFile.close();
 			}
 
+			session.setTitle(fileName.substring(session.main.curdir.length()));
+			
 			//----------------------------------------------------------
 
 	    } catch (IOException e) {
@@ -941,7 +1035,7 @@ public class Board extends JComponent implements Printable{
 		printJob.setPrintable(this,pageFormat);
         if (printJob.printDialog()) {
             try {
-            	printJob.setJobName("Grapher "+session.getTitle());
+            	printJob.setJobName("Grapher "+session.getName());
             	printJob.print();  
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -975,7 +1069,7 @@ public class Board extends JComponent implements Printable{
 		}
 		int connectionSequence = settings.firstZero?0:1;
 		for (int i=0 ; i<states.size() ; i++) {
-			states.elementAt(i).draw(g,settings,connectionSequence);
+			states.elementAt(i).draw(g,settings,connectionSequence,hidden);
 		}
 		return 0;
 	}

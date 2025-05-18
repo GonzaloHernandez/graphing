@@ -41,6 +41,7 @@ public class GrapherSession extends JInternalFrame{
 		addInternalFrameListener(new InternalFrameListener(){
 
 			public void internalFrameOpened(InternalFrameEvent arg0) {
+				return;
 			}
 
 			public void internalFrameClosing(InternalFrameEvent arg0) {
@@ -61,6 +62,12 @@ public class GrapherSession extends JInternalFrame{
 				boolean aux = modified;
 				main.properties.refresh();
 				setModified(aux);
+				if (getName() == null) return;
+				if (getName().startsWith(main.curdir)) {
+					setTitle(getName().substring(main.curdir.length()));
+				} else {
+					setTitle(getName());
+				}				
 			}
 
 			public void internalFrameDeactivated(InternalFrameEvent arg0) {
