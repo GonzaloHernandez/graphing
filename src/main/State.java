@@ -179,6 +179,9 @@ public class State {
 				connection.setActive(act, propagate);
 			}
 			for (int i=0 ; i<arrivals.size() ; i++) {
+				if (act == true && !arrivals.elementAt(i).getSource().isActive()) {
+					continue;
+				}
 				Connection connection = (Connection)arrivals.elementAt(i);
 				connection.setActive(act, propagate);
 			}
