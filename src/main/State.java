@@ -175,15 +175,14 @@ public class State {
 		this.active = act;
 		if (propagate) {
 			for (int i=0 ; i<connections.size() ; i++) {
-				Connection connection = (Connection)connections.elementAt(i);
-				connection.setActive(act, propagate);
+				Connection c = (Connection)connections.elementAt(i);
+				if (act == true && !c.getTarget().isActive()) continue;
+				c.setActive(act, propagate);
 			}
 			for (int i=0 ; i<arrivals.size() ; i++) {
-				if (act == true && !arrivals.elementAt(i).getSource().isActive()) {
-					continue;
-				}
-				Connection connection = (Connection)arrivals.elementAt(i);
-				connection.setActive(act, propagate);
+				Connection c = (Connection)arrivals.elementAt(i);
+				if (act == true && !c.getSource().isActive()) continue;
+				c.setActive(act, propagate);
 			}
 		}
 	}
