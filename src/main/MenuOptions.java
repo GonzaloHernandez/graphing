@@ -10,6 +10,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
@@ -128,7 +129,22 @@ public class MenuOptions extends JPopupMenu{
 			
 			typeItems[i].addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					main.currentSession.board.currentConnection.setType(((TypeMenuItem)e.getSource()).getType());
+					ConnectionType t = ((TypeMenuItem)e.getSource()).getType();
+					if (t.getNumber() == 0) {
+						int currentval = main.currentSession.board.currentConnection.getValue();
+						String val = JOptionPane.showInputDialog("Value:",""+currentval);
+						if (val != null) {
+							try {
+								main.currentSession.board.currentConnection.setValue(Integer.parseInt(val));
+							}
+							catch (NumberFormatException ex) {
+								return;
+							}
+						} else {
+							return;
+						}						
+					}
+					main.currentSession.board.currentConnection.setType(t);
 					main.currentSession.board.repaint();
 					main.currentSession.setModified(true);
 				}

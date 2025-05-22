@@ -41,10 +41,10 @@ public class GeneralView extends JPanel {
 	//-------------------------------------------------------------------------------------
 
 	private void initElements(){
-		showTypeNames			= new JCheckBox("View type names");
 		showStateNumbers		= new JCheckBox("View state sequence");
-		showConnectionNumbers	= new JCheckBox("View connection sequence");
 		showStateValues			= new JCheckBox("View state priorities");
+		showTypeNames			= new JCheckBox("View connection values");
+		showConnectionNumbers	= new JCheckBox("View connection sequence");
 		allowFirstState			= new JCheckBox("Allow first state");
 		firstZero				= new JCheckBox("Start at Zero (0)");
 		saveDzn					= new JCheckBox("Save dzn file");
@@ -59,10 +59,10 @@ public class GeneralView extends JPanel {
 		comment.setLineWrap(true);
 
 		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
-		add(showTypeNames);
 		add(showStateNumbers);
-		add(showConnectionNumbers);
 		add(showStateValues);
+		add(showTypeNames);
+		add(showConnectionNumbers);
 		add(allowFirstState);
 		add(firstZero);
 		add(saveDzn);

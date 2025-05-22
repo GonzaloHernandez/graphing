@@ -260,9 +260,9 @@ public class Connection {
 			String label = settings.showConnectionSequence?""+connectionSequence+" ":"";
 			if (type!=null && settings.showTypeNames) {
 				if (type.getNumber()==0) {
-					label += getValue();
+					label += ":"+getValue();
 				} else {
-					label += type.getName();
+					label += ":"+type.getName();
 				}
 			}
 			drawCenterString(g,label,text);

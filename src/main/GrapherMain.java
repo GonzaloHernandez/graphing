@@ -33,7 +33,7 @@ public class GrapherMain extends JFrame{
 	//-------------------------------------------------------------------------------------
 	final int	family			= 1;
 	final int	version			= 2;
-	final int	construcction	= 2;
+	final int	construcction	= 3;
 	
 	//-------------------------------------------------------------------------------------
 
@@ -269,7 +269,7 @@ public class GrapherMain extends JFrame{
 		for (int i=0;i<iframes.length;i++){
 			if (iframes[i].getClass().getName().equals("main.GrapherSession")){
 				GrapherSession	session = (GrapherSession)iframes[i];
-				if (session.getName().equals(fileName)){
+				if (session.getName() != null && session.getName().equals(fileName)){
 					messageBox("This session is opened|It is no possible to open again.","Warning","Accept");
 					try {
 						session.setSelected(true);

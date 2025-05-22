@@ -180,7 +180,12 @@ public class Board extends JComponent implements Printable{
 						session.setModified(true);
 					}
 					else if (e.getKeyCode() == KeyEvent.VK_O) {
-						stateTarget.setOwner(1-stateTarget.getOwner());
+						if (stateTarget.getOwner()==2) {
+							stateTarget.setOwner(0);
+						}
+						else {
+							stateTarget.setOwner(stateTarget.getOwner()+1);
+						}
 						session.setModified(true);
 					}
 					else  if (e.getKeyChar() >= '0' && e.getKeyChar() <= '9') {
@@ -221,53 +226,6 @@ public class Board extends JComponent implements Printable{
 			
 		});
 		addMouseListener(new MouseListener() {
-			// public void mouseClicked(MouseEvent e) {
-				
-			// 	if (e.getModifiersEx()== InputEvent.SHIFT_DOWN_MASK) {
-			// 		if (e.getButton() == MouseEvent.BUTTON1){
-			// 			if (stateTarget!=null) {
-			// 				stateTarget.setActive(!stateTarget.isActive());
-			// 				session.setModified(true);
-			// 				stateTarget.setStatus(State.STILL);
-			// 			}
-			// 			if (currentConnection!=null) {
-			// 				currentConnection.setActive(!currentConnection.isActive());
-			// 				session.setModified(true);
-			// 			}
-			// 		}
-			// 		else if (e.getButton() == MouseEvent.BUTTON3) {
-			// 			if (currentConnection!=null) {
-			// 				session.main.menuOptions.showTypes(false);
-			// 			}
-			// 		}
-			// 		repaint();	
-			// 	}
-			// 	if (e.getButton() == MouseEvent.BUTTON1) {
-			// 		if (!e.isControlDown()) {
-			// 			if (e.getButton()==MouseEvent.BUTTON1 && e.getClickCount() == 2) {
-			// 				int mousex = (int)(Math.round((int)(e.getX()/scaleFactor)/10)*10);
-			// 				int mousey = (int)(Math.round((int)(e.getY()/scaleFactor)/10)*10);
-			// 				addState(mousex,mousey);
-			// 			}
-			// 		}
-
-			// 	}
-			// 	else if (e.getButton() == MouseEvent.BUTTON3  && !e.isShiftDown()) {
-			// 		if (stateTarget!=null && currentConnection!=null) {
-			// 			session.main.menuOptions.show(true,true,true);
-			// 		}
-			// 		else if (stateTarget!=null) {
-			// 			session.main.menuOptions.show(true,false,true);
-			// 		}
-			// 		else if (currentConnection!=null) {
-			// 			session.main.menuOptions.show(false,true,true);				
-			// 		} 
-			// 		else {
-			// 			session.main.menuOptions.show(false,false,true);
-			// 		}
-			// 	}
-			// }
-
 			public void mouseClicked(MouseEvent e) {
 				int modifiers = e.getModifiersEx();
 				int button = e.getButton();

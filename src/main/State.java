@@ -99,15 +99,24 @@ public class State {
 			break;
 		}
 		
-		if (owner % 2 == 0) {
-			g.fillOval(x-RADIUS,y-RADIUS,RADIUS*2,RADIUS*2);
-			if (!active) g.setColor(Color.GRAY); else g.setColor(Color.BLACK);
-			g.drawOval(x-RADIUS,y-RADIUS,RADIUS*2,RADIUS*2);
-		}
-		else {
-			g.fillRect(x-RADIUS,y-RADIUS,RADIUS*2,RADIUS*2);
-			if (!active) g.setColor(Color.GRAY); else g.setColor(Color.BLACK);
-			g.drawRect(x-RADIUS,y-RADIUS,RADIUS*2,RADIUS*2);
+		switch(owner) {
+			case 0:	
+				g.fillOval(x-RADIUS,y-RADIUS,RADIUS*2,RADIUS*2);
+				if (!active) g.setColor(Color.GRAY); else g.setColor(Color.BLACK);
+				g.drawOval(x-RADIUS,y-RADIUS,RADIUS*2,RADIUS*2);
+				break;
+			case 1:	
+				g.fillRect(x-RADIUS,y-RADIUS,RADIUS*2,RADIUS*2);
+				if (!active) g.setColor(Color.GRAY); else g.setColor(Color.BLACK);
+				g.drawRect(x-RADIUS,y-RADIUS,RADIUS*2,RADIUS*2);
+				break;
+			case 2:	
+				int[] xs = {x-RADIUS/2,x+RADIUS/2,x+RADIUS,x+RADIUS,x+RADIUS/2,x-RADIUS/2,x-RADIUS,x-RADIUS};
+				int[] ys = {y-RADIUS,y-RADIUS,y-RADIUS/2,y+RADIUS/2,y+RADIUS,y+RADIUS,y+RADIUS/2,y-RADIUS/2};
+				g.fillPolygon(xs,ys,8);
+				if (!active) g.setColor(Color.GRAY); else g.setColor(Color.BLACK);
+				g.drawPolygon(xs,ys,8);
+				break;
 		}
 
 		if (accepted) g.drawOval(x-RADIUS+3,y-RADIUS+3,(RADIUS-3)*2,(RADIUS-3)*2);
