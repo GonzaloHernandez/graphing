@@ -3,12 +3,14 @@
 # Define versioning variables
 FAMILY=1
 VERSION=2
-CONSTRUCTION=3  # Update as needed
+CONSTRUCTION=4  # Update as needed
 
 # File paths
 JAVA_FILE="src/main/GrapherMain.java"
 RELEASES_DIR="releases"
 README_FILE="README.md"
+LIB_DIR="libraries"
+FLATLAF_JAR="$LIB_DIR/flatlaf-3.4.jar"
 OUTPUT_FILE="$RELEASES_DIR/Graphing-v$FAMILY.$VERSION.$CONSTRUCTION.jar"
 JAR_NAME="Graphing-v$FAMILY.$VERSION.$CONSTRUCTION.jar"
 
@@ -25,10 +27,17 @@ echo "::Updated $JAVA_FILE with family=$FAMILY, version=$VERSION, and construcct
 
 # Step 3: Build process
 rm -r build 2>/dev/null
-javac --source-path src/ -d build src/main/GrapherMain.java --release 9
+
+# javac -cp "$FLATLAF_JAR" --source-path src/ -d build src/main/*.java --release 9
+javac -cp "$FLATLAF_JAR" -d build src/**/*.java --release 9
 cp -r icons/ build/main/
+
+cd build
+jar xf /home/chalo/Software/graphing/libraries/flatlaf-3.4.jar
+cd ../
+
 cd build || exit
-jar cfm "../$OUTPUT_FILE" ../releases/Manifest.txt main/*
+jar cfm "../$OUTPUT_FILE" ../releases/Manifest.txt *
 cd ..
 
 echo "::Build complete: $OUTPUT_FILE"

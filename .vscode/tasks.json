@@ -6,6 +6,7 @@
         "type": "shell",
         "command": "javac",
         "args": [
+          "-cp","${workspaceFolder}/libraries/flatlaf-3.4.jar",
           "-d",
           "build",
           "${workspaceFolder}/src/**/*.java"

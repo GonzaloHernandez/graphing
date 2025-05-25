@@ -28,12 +28,14 @@ import javax.swing.JMenuItem;
 import javax.swing.JSplitPane;
 import javax.swing.UIManager;
 
+import com.formdev.flatlaf.FlatLightLaf;
+
 public class GrapherMain extends JFrame{
 
 	//-------------------------------------------------------------------------------------
 	final int	family			= 1;
 	final int	version			= 2;
-	final int	construcction	= 3;
+	final int	construcction	= 4;
 	
 	//-------------------------------------------------------------------------------------
 
@@ -129,6 +131,11 @@ public class GrapherMain extends JFrame{
 	//-------------------------------------------------------------------------------------
 	
 	public static void main(String[] args) {
+		try {
+            UIManager.setLookAndFeel(new FlatLightLaf());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
 		new  GrapherMain();
 	}
 	
