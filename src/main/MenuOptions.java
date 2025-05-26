@@ -56,7 +56,7 @@ public class MenuOptions extends JPopupMenu{
 	private GrapherMenu		connectionTypes;
 	private	GrapherItem		stateDelete,stateDeleteAllOutgoings,stateAccepted,stateOnwer;
 	private	GrapherItem		connectionDelete,connectionTune,connectionNoType;
-	private	GrapherItem		restart,load,save,saveAs,print,simulate,help;
+	private	GrapherItem		restart,load,loadImport,save,saveAs,print,simulate,help;
 	private	TypeMenuItem	typeItems[];
 	
 	//-------------------------------------------------------------------------------------
@@ -87,13 +87,14 @@ public class MenuOptions extends JPopupMenu{
 		connectionTune			= new GrapherItem("Tune arc",defaultFont,"tune_connection.png");
 		
 		restart					= new GrapherItem("Restar session",defaultFont,"new.png");
-		load					= new GrapherItem("Load automata",defaultFont,"open.png");
-		save					= new GrapherItem("Save automata",defaultFont,"save.png");
-		saveAs					= new GrapherItem("Save automata as ...",defaultFont,"saveas.png");
+		load					= new GrapherItem("Load automaton",defaultFont,"open.png");
+		loadImport				= new GrapherItem("Import automaton",defaultFont,"open.png");
+		save					= new GrapherItem("Save automaton",defaultFont,"save.png");
+		saveAs					= new GrapherItem("Save automaton as ...",defaultFont,"saveas.png");
 		print					= new GrapherItem("Export as PNG",defaultFont,"print.png");
 		simulate				= new GrapherItem("Simulate",defaultFont,"simulate.png");
 		help					= new GrapherItem("Help",defaultFont,"help.png");
-				
+		
 		add(stateMenu);
 		add(connectionMenu);
 		add(grapherMenu);
@@ -109,6 +110,7 @@ public class MenuOptions extends JPopupMenu{
 		
 		grapherMenu.add(restart);
 		grapherMenu.add(load);
+		grapherMenu.add(loadImport);
 		grapherMenu.add(save);
 		grapherMenu.add(saveAs);
 		grapherMenu.addSeparator();
@@ -320,6 +322,12 @@ public class MenuOptions extends JPopupMenu{
 		load.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
 				main.currentSession.board.load();
+			}
+		});
+
+		loadImport.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				main.currentSession.board.loadImport();
 			}
 		});
 

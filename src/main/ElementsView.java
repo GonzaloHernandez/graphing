@@ -1,8 +1,6 @@
 package main;
 
 import java.awt.BorderLayout;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Vector;
 
 import javax.swing.JPanel;

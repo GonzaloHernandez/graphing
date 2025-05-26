@@ -22,6 +22,8 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 import javax.imageio.ImageIO;
@@ -565,6 +567,101 @@ public class Board extends JComponent implements Printable{
 	        session.setSize(file.readShort(),file.readShort());
 
 			settings.saveDzn				= file.readBoolean();
+	        
+	        file.close(); 
+	        repaint();
+	        session.main.properties.refresh();
+	        session.setModified(false);
+	        
+	        session.main.addRecentSession(fileName);
+
+			session.setTitle(fileName.substring(session.main.curdir.length()));
+			return true;
+
+	    } catch (IOException e) {
+	    	session.main.messageBox("The file ["+fileName+"] does not exists","File error","Accept");
+	    	return false;
+	    }
+	}
+	
+	//-------------------------------------------------------------------------------------
+
+	public void loadImport(){
+		if (session.isModified()) {
+			String messageReturn = session.main.messageBox("This session was no saved.|Do you want to close anyway?","Warning","Yes|No");
+			if (messageReturn.equals("No")||messageReturn.equals("")) return;
+		}
+		FileDialog dialog = new FileDialog(session.main,"Select a file",FileDialog.LOAD);
+        
+		dialog.setFilenameFilter(new FilenameFilter() {
+            @Override
+            public boolean accept(java.io.File dir, String name) {
+                return name.toLowerCase().endsWith(".gm");
+            }
+        });
+
+		dialog.setDirectory(session.main.curdir);
+		dialog.setFile("*.gm");
+		dialog.setVisible(true);
+		
+		if (dialog.getFile()==null) return;
+		session.main.curdir = dialog.getDirectory();
+
+		loadImport(session.main.curdir+dialog.getFile());
+	}
+
+	//-------------------------------------------------------------------------------------
+
+	public boolean loadImport(String fileName){
+		try {
+	        RandomAccessFile file = new RandomAccessFile(new File(fileName), "r");
+	        this.fileName = fileName;
+	        session.setName(fileName);
+	        
+	        states.removeAllElements();
+	        types.removeAllElements();
+	        
+			int nvertices;
+			int x=40,y=40;
+
+			String line;
+			while ((line = file.readLine()) != null) {
+				line = line.trim();
+
+				if (line.isEmpty()) continue;
+
+				// Parse header
+				if (line.startsWith("parity")) {
+					String[] parts = line.split("\\s+|;");
+					nvertices = Integer.parseInt(parts[1]);
+					for(int v=0; v<nvertices; v++) {
+						State s = new State(v,x,y,State.STILL,false,0,0);
+						if (x==400) {
+							x = 40;
+							y += 80;
+						}
+						else {
+							x += 80;
+						}
+						states.add(s);
+					}
+					continue;
+				}
+
+				String[] parts = line.split("\\s+");
+                int id = Integer.parseInt(parts[0]);
+                int value = Integer.parseInt(parts[1]);
+                int owner = Integer.parseInt(parts[2]);
+				State source = session.board.states.elementAt(id);
+				source.setOwner(owner);
+				source.setValue(value);
+                String successorsStr = parts[3].replace(";", "");
+                // List<Integer> successors = new ArrayList<>();
+                for (String tar : successorsStr.split(",")) {
+					State target = session.board.states.elementAt(Integer.parseInt(tar));
+                    source.addConnection(new Connection(source, target, null));
+                }
+	        }
 	        
 	        file.close(); 
 	        repaint();
