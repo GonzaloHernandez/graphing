@@ -84,7 +84,7 @@ public class State {
 				connectionSequence++;
 			}
 			else {
-				connectionSequence = connection.draw(g,settings,connectionSequence);
+				connectionSequence = connection.draw(g,settings,connectionSequence,hidden);
 			}
 		}
 		

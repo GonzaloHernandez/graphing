@@ -3,7 +3,7 @@
 # Define versioning variables
 FAMILY=1
 VERSION=2
-CONSTRUCTION=4  # Update as needed
+CONSTRUCTION=5  # Update as needed
 
 # File paths
 JAVA_FILE="src/main/GrapherMain.java"
@@ -29,11 +29,11 @@ echo "::Updated $JAVA_FILE with family=$FAMILY, version=$VERSION, and construcct
 rm -r build 2>/dev/null
 
 # javac -cp "$FLATLAF_JAR" --source-path src/ -d build src/main/*.java --release 9
-javac -cp "$FLATLAF_JAR" -d build src/**/*.java --release 9
+javac -cp "$FLATLAF_JAR" -d build src/main/*.java --release 9
 cp -r icons/ build/main/
 
 cd build
-jar xf /home/chalo/Software/graphing/libraries/flatlaf-3.4.jar
+jar xf ../libraries/flatlaf-3.4.jar
 cd ../
 
 cd build || exit

@@ -75,7 +75,9 @@ public class Connection {
 	
 	//-------------------------------------------------------------------------------------
 
-	public int draw(Graphics2D g,GrapherSettings settings,int connectionSequence) {
+	public int draw(Graphics2D g,GrapherSettings settings,int connectionSequence,boolean hidden) {
+
+		if (hidden && !active) return connectionSequence+1;
 		
 		float[] dashPattern = {6, 4}; // 10 pixels on, 5 pixels off
 		Stroke dashed = new BasicStroke(
@@ -109,16 +111,16 @@ public class Connection {
 			
 			//--- arrow ---
 			
-			alpha	= Math.asin(((double)State.RADIUS/2)/distance) * 2 - rotation;
+			alpha	= Math.asin(((double)State.RADIUS/2)/distance) * 2 + rotation;
 			end.x	= (int)(control.x - (Math.cos(alpha)*distance));
-			end.y	= (int)(control.y - (Math.sin(alpha)*distance));
+			end.y	= (int)(control.y + (Math.sin(alpha)*distance));
 			
 			hypotenuse	= Math.sqrt(distance*distance*2);
 			
 			beta	= alpha + Math.PI/4;
 			
 			arrow.x	= control.x - (int)(Math.cos(beta) * hypotenuse);
-			arrow.y	= control.y - (int)(Math.sin(beta) * hypotenuse);	
+			arrow.y	= control.y + (int)(Math.sin(beta) * hypotenuse);	
 		}
 		else {
 		
