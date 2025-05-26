@@ -605,7 +605,7 @@ public class Board extends JComponent implements Printable{
 		dialog.setVisible(true);
 		
 		if (dialog.getFile()==null) return;
-		session.main.curdir = dialog.getDirectory();
+		// session.main.curdir = dialog.getDirectory();
 
 		loadImport(session.main.curdir+dialog.getFile());
 	}
@@ -615,14 +615,15 @@ public class Board extends JComponent implements Printable{
 	public boolean loadImport(String fileName){
 		try {
 	        RandomAccessFile file = new RandomAccessFile(new File(fileName), "r");
-	        this.fileName = fileName;
-	        session.setName(fileName);
+	        // this.fileName = fileName;
+	        // session.setName(fileName);
 	        
 	        states.removeAllElements();
 	        types.removeAllElements();
 	        
 			int nvertices;
 			int x=40,y=40;
+			int index = 0;
 
 			String line;
 			while ((line = file.readLine()) != null) {
@@ -636,7 +637,7 @@ public class Board extends JComponent implements Printable{
 					nvertices = Integer.parseInt(parts[1]);
 					for(int v=0; v<nvertices; v++) {
 						State s = new State(v,x,y,State.STILL,false,0,0);
-						if (x==400) {
+						if (x>=250) {
 							x = 40;
 							y += 80;
 						}
@@ -650,6 +651,11 @@ public class Board extends JComponent implements Printable{
 
 				String[] parts = line.split("\\s+");
                 int id = Integer.parseInt(parts[0]);
+				if (id!=index) {
+					session.main.messageBox("Indices of states no consecutives","Importation error","Accept");
+	    			return false;
+				}
+				index++;
                 int value = Integer.parseInt(parts[1]);
                 int owner = Integer.parseInt(parts[2]);
 				State source = session.board.states.elementAt(id);
@@ -660,17 +666,18 @@ public class Board extends JComponent implements Printable{
                 for (String tar : successorsStr.split(",")) {
 					State target = session.board.states.elementAt(Integer.parseInt(tar));
                     source.addConnection(new Connection(source, target, null));
+					source.arrangeConnections(target);
                 }
 	        }
+			file.close(); 
 	        
-	        file.close(); 
 	        repaint();
 	        session.main.properties.refresh();
 	        session.setModified(false);
 	        
-	        session.main.addRecentSession(fileName);
+	        // session.main.addRecentSession(fileName);
 
-			session.setTitle(fileName.substring(session.main.curdir.length()));
+			// session.setTitle(fileName.substring(session.main.curdir.length()));
 			return true;
 
 	    } catch (IOException e) {

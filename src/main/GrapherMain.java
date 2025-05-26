@@ -44,7 +44,7 @@ public class GrapherMain extends JFrame{
 	private	JSplitPane		split;
 	private	JMenuBar		menuBar;
 	private	JMenu			system,help,relatedTopics,samples;
-	private	JMenuItem		newSession,open,exit,contents,about,credits;
+	private	JMenuItem		newSession,open,importSession,exit,contents,about,credits;
 	
 	protected	String			messageReturn;
 	protected	MenuOptions		menuOptions;
@@ -84,6 +84,7 @@ public class GrapherMain extends JFrame{
 		system			= new GrapherMenu("System",defaultFont,"system.png");
 		newSession		= new GrapherItem("New session",defaultFont,"new.png");
 		open			= new GrapherItem("Open session",defaultFont,"open.png");
+		importSession	= new GrapherItem("Import session",defaultFont,"open.png");
 		recent			= new GrapherMenu("Resent session",defaultFont,"recent.png");
 		exit			= new GrapherItem("Exit",defaultFont,"exit.png");
 		
@@ -103,6 +104,7 @@ public class GrapherMain extends JFrame{
 		menuBar.add(system);
 		system.add(newSession);
 		system.add(open);
+		system.add(importSession);
 		system.addSeparator();
 		system.add(recent);
 		system.addSeparator();
@@ -181,6 +183,12 @@ public class GrapherMain extends JFrame{
 		open.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
 				openSession(null);
+			}
+		});
+		
+		importSession.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				importSession(null);
 			}
 		});
 		
@@ -289,6 +297,48 @@ public class GrapherMain extends JFrame{
 		
 		addSession();
 		currentSession.board.load(fileName);
+	}
+	
+	//-------------------------------------------------------------------------------------
+
+	private void importSession(String fileName){
+		// if (fileName == null) {
+		// 	FileDialog dialog = new FileDialog(this,"Select a file",FileDialog.LOAD);
+
+		// 	dialog.setFilenameFilter(new FilenameFilter() {
+		// 		@Override
+		// 		public boolean accept(java.io.File dir, String name) {
+		// 			return name.toLowerCase().endsWith(".gm");
+		// 		}
+		// 	});
+
+		// 	dialog.setDirectory(curdir);
+		// 	dialog.setFile("*.gm");
+		// 	dialog.setVisible(true);
+		
+		// 	if (dialog.getFile()==null) return;
+		// 	curdir = dialog.getDirectory();
+		// 	fileName = curdir+dialog.getFile(); 
+		// }
+		
+
+		// JInternalFrame iframes[] = desktop.getAllFrames();
+		// for (int i=0;i<iframes.length;i++){
+		// 	if (iframes[i].getClass().getName().equals("main.GrapherSession")){
+		// 		GrapherSession	session = (GrapherSession)iframes[i];
+		// 		if (session.getName() != null && session.getName().equals(fileName)){
+		// 			messageBox("This session is opened|It is no possible to open again.","Warning","Accept");
+		// 			try {
+		// 				session.setSelected(true);
+		// 			} catch (PropertyVetoException e) {
+		// 			}
+		// 			return;
+		// 		}
+		// 	}
+		// }
+		
+		addSession();
+		currentSession.board.loadImport();
 	}
 	
 	//-------------------------------------------------------------------------------------
