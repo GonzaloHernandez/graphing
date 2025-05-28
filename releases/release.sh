@@ -3,7 +3,7 @@
 # Define versioning variables
 FAMILY=1
 VERSION=2
-CONSTRUCTION=5  # Update as needed
+CONSTRUCTION=6  # Update as needed
 
 # File paths
 JAVA_FILE="src/main/GrapherMain.java"

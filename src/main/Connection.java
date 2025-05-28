@@ -36,7 +36,7 @@ public class Connection {
 		this.target		= target;
 		this.type		= type;
 		this.curve		= new QuadCurve2D.Double();
-		this.status		= FOCUSED;
+		this.status		= STILL;
 		this.start		= new Point();
 		this.end		= new Point();
 		this.middle		= new Point();

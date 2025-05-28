@@ -150,6 +150,10 @@ public class Board extends JComponent implements Printable{
 						else if (e.getKeyCode() == KeyEvent.VK_Z){
 							currentConnection.setAmountDistance(-2);
 						}
+						else if (e.getKeyCode() == KeyEvent.VK_DELETE) {
+							State source = currentConnection.getSource();
+							source.deleteConnecion(currentConnection);
+						}
 					}
 					else {
 						if (e.getKeyCode() == KeyEvent.VK_A) {
@@ -158,20 +162,14 @@ public class Board extends JComponent implements Printable{
 						else if (e.getKeyCode() == KeyEvent.VK_Z){
 							currentConnection.setAmountRotation((Math.PI/16));
 						}
-						else if (e.getKeyCode() == KeyEvent.VK_DELETE || e.getKeyCode() == KeyEvent.VK_X ) {
-							State source = currentConnection.getSource();
-							source.deleteConnecion(currentConnection);
-						}
 					}
 					session.setModified(true);
 				}
 
 				if (stateTarget != null) {
-					if (e.isControlDown()) {
-						if (e.getKeyCode() == KeyEvent.VK_DELETE || e.getKeyCode() == KeyEvent.VK_X ) {
-							deleteState(stateTarget);
-							session.setModified(true);
-						}
+					if (e.getKeyCode() == KeyEvent.VK_DELETE) {
+						deleteState(stateTarget);
+						session.setModified(true);
 					}
 					else if (e.getKeyCode() == KeyEvent.VK_A) {
 						stateTarget.setValue(stateTarget.getValue()+1);
@@ -240,7 +238,6 @@ public class Board extends JComponent implements Printable{
 					if (stateTarget != null) {
 						stateTarget.setActive(!stateTarget.isActive());
 						session.setModified(true);
-						stateTarget.setStatus(State.STILL);
 					}
 					if (currentConnection != null) {
 						currentConnection.setActive(!currentConnection.isActive());
@@ -255,7 +252,6 @@ public class Board extends JComponent implements Printable{
 					if (stateTarget != null) {
 						stateTarget.setActive(!stateTarget.isActive(), true);
 						session.setModified(true);
-						stateTarget.setStatus(State.STILL);
 					}
 					if (currentConnection != null) {
 						session.main.menuOptions.showTypes(false);
@@ -268,7 +264,10 @@ public class Board extends JComponent implements Printable{
 				if (button == MouseEvent.BUTTON1 && e.getClickCount() == 2 && !ctrlDown) {
 					int mousex = (int) (Math.round((int) (e.getX() / scaleFactor) / 10) * 10);
 					int mousey = (int) (Math.round((int) (e.getY() / scaleFactor) / 10) * 10);
-					addState(mousex, mousey);
+					if (stateTarget != null) {
+						stateTarget.setStatus(State.STILL);
+					}
+					stateTarget = addState(mousex, mousey);
 					return;
 				}
 
@@ -283,47 +282,63 @@ public class Board extends JComponent implements Printable{
 					} else {
 						session.main.menuOptions.show(false, false, true);
 					}
+					return;
 				}
+
 			}
 
+			public void mousePressed(MouseEvent e) {				
+				if (stateTarget != null) {
+					stateTarget.setStatus(State.STILL);
+					stateTarget = null;
+				}
+				if (currentConnection != null) {
+					currentConnection.setStatus(Connection.STILL);
+					currentConnection = null;
+				}
 
-			public void mousePressed(MouseEvent e) {
 				for (int i=0 ; i<states.size() ; i++) {
 					State state = (State)states.elementAt(i);
-				
 					if (state.isArea((int)(e.getX()/scaleFactor),(int)(e.getY()/scaleFactor))) {
-						
-						if (!e.isControlDown()) {
-							stateTarget = state;
-							stateTarget.setMouseDiference((int)(e.getX()/scaleFactor),(int)(e.getY()/scaleFactor));
-						}
-						else {
+						if (e.isControlDown()) {
 							controled	= true;
 							stateSource	= state;
-							stateSource.setStatus(State.MARKED);
+							mousex = (int)(e.getX()/scaleFactor);
+							mousey = (int)(e.getY()/scaleFactor);
 						}
-						break;						
+						else {
+							if (stateTarget!=null) stateTarget.setStatus(State.STILL);
+							stateTarget = state;
+							stateTarget.setMouseDiference((int)(e.getX()/scaleFactor),(int)(e.getY()/scaleFactor));
+							stateTarget.setStatus(State.FOCUSED);
+						}
 					}
-					repaint();
+					else {
+						Vector<Connection> connections = state.getConnections();
+						for (int j=0 ; j<connections.size() ; j++) {
+							Connection connection = (Connection)connections.elementAt(j); 
+							if (connection.isArea((int)(e.getX()/scaleFactor),(int)(e.getY()/scaleFactor))) {
+								if (currentConnection != null) currentConnection.setStatus(State.STILL);
+								currentConnection = connection;
+								connection.setStatus(Connection.FOCUSED);
+								break;
+							}
+						}						
+					}
 				}
+				repaint();
 			}
 			public void mouseReleased(MouseEvent e) {
 				if (controled) {
-					if (stateTarget==null) {
-						controled = false;
-						return;
-					}
-					if (settings.allowFirsState || stateTarget.getNumber() > 0) {
-						for (int i=0 ; i<states.size() ; i++) {
-							State state = (State)states.elementAt(i);
-							if (state.isArea((int)(e.getX()/scaleFactor),(int)(e.getY()/scaleFactor))) {
-								stateSource.addConnection(stateTarget);
-								session.setModified(true);
-								repaint();
-							}
+					if (stateTarget!=null) {
+						if (settings.allowFirsState || stateTarget.getNumber() > 0) {
+							stateSource.addConnection(stateTarget);
+							stateSource.setStatus(State.STILL);
+							session.setModified(true);
 						}
 					}
 					controled = false;
+					repaint();
 				}
 				stateSource = null;
 			}
@@ -352,47 +367,21 @@ public class Board extends JComponent implements Printable{
 							if (state != stateSource) {
 								state.setStatus(State.FOCUSED);
 							}
+							repaint();
+							return;
 						}
-						else if (state != stateSource) {
-							state.setStatus(State.STILL);
+						else {
+							if (state != stateSource) {
+								state.setStatus(State.STILL);
+							}
+							stateTarget = null;
 						}
 					}
 				}
 				repaint();
 			}
 			
-			public void mouseMoved(MouseEvent e) {
-				if (menuBlock) return;
-				if (!e.isControlDown()) stateSource = null;
-				
-				stateTarget = null;
-				currentConnection = null;
-				for (int i=0 ; i<states.size() ; i++) {
-					State state = (State)states.elementAt(i);
-					if (state.isArea((int)(e.getX()/scaleFactor),(int)(e.getY()/scaleFactor))) {
-						stateTarget	= state;
-						if (state != stateSource) {
-							state.setStatus(State.FOCUSED);
-						}
-					}
-					else if (state != stateSource) {
-						state.setStatus(State.STILL);
-					}
-					
-					Vector<Connection> connections = state.getConnections();
-					for (int j=0 ; j<connections.size() ; j++) {
-						Connection connection = (Connection)connections.elementAt(j); 
-						if (connection.isArea((int)(e.getX()/scaleFactor),(int)(e.getY()/scaleFactor))) {
-							currentConnection = connection;
-							connection.setStatus(Connection.FOCUSED);
-						}
-						else {
-							connection.setStatus(Connection.STILL);
-						}
-					}
-				}
-				repaint();
-			}
+			public void mouseMoved(MouseEvent arg0) {}
 		});
 
 		addMouseWheelListener(new MouseWheelListener(){
@@ -430,7 +419,9 @@ public class Board extends JComponent implements Printable{
 
 	public void load(){
 		if (session.isModified()) {
-			String messageReturn = session.main.messageBox("This session was no saved.|Do you want to close anyway?","Warning","Yes|No");
+			String messageReturn = session.main.messageBox(
+						"This session was no saved.|Do you want to close anyway?",
+						"Warning","Yes|No");
 			if (messageReturn.equals("No")||messageReturn.equals("")) return;
 		}
 		FileDialog dialog = new FileDialog(session.main,"Select a file",FileDialog.LOAD);

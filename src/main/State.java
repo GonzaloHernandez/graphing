@@ -87,39 +87,42 @@ public class State {
 				connectionSequence = connection.draw(g,settings,connectionSequence,hidden);
 			}
 		}
-		
-		switch (status) {
-			case FOCUSED:	g.setColor(Color.RED);		break;
-			case MARKED:	g.setColor(Color.YELLOW);	break;
-			case STILL:		
-				if (!active)
-					g.setColor(Color.WHITE);
-				else
-					g.setColor(new Color(220,220,255));
-			break;
-		}
+
+		Color foreColor = Color.GRAY;;
+		Color backColor = new Color(220,220,255);
+
+		if (status==FOCUSED)	foreColor = new Color(200,0,0);
+		else if (active)		foreColor = Color.BLACK;
+
+		if (!active)			backColor = Color.WHITE;
 		
 		switch(owner) {
 			case 0:	
+				g.setColor(backColor);
 				g.fillOval(x-RADIUS,y-RADIUS,RADIUS*2,RADIUS*2);
-				if (!active) g.setColor(Color.GRAY); else g.setColor(Color.BLACK);
+				g.setColor(foreColor);
 				g.drawOval(x-RADIUS,y-RADIUS,RADIUS*2,RADIUS*2);
 				break;
 			case 1:	
+				g.setColor(backColor);
 				g.fillRect(x-RADIUS,y-RADIUS,RADIUS*2,RADIUS*2);
-				if (!active) g.setColor(Color.GRAY); else g.setColor(Color.BLACK);
+				g.setColor(foreColor);
 				g.drawRect(x-RADIUS,y-RADIUS,RADIUS*2,RADIUS*2);
 				break;
 			case 2:	
 				int[] xs = {x-RADIUS/2,x+RADIUS/2,x+RADIUS,x+RADIUS,x+RADIUS/2,x-RADIUS/2,x-RADIUS,x-RADIUS};
 				int[] ys = {y-RADIUS,y-RADIUS,y-RADIUS/2,y+RADIUS/2,y+RADIUS,y+RADIUS,y+RADIUS/2,y-RADIUS/2};
+				g.setColor(backColor);
 				g.fillPolygon(xs,ys,8);
-				if (!active) g.setColor(Color.GRAY); else g.setColor(Color.BLACK);
+				g.setColor(foreColor);
 				g.drawPolygon(xs,ys,8);
 				break;
 		}
 
-		if (accepted) g.drawOval(x-RADIUS+3,y-RADIUS+3,(RADIUS-3)*2,(RADIUS-3)*2);
+		if (accepted) {
+			g.setColor(foreColor);
+			g.drawOval(x-RADIUS+3,y-RADIUS+3,(RADIUS-3)*2,(RADIUS-3)*2);
+		}
 		if (settings.showStateSequence) {
 			int first = settings.firstZero?0:1;
 			g.setColor(Color.GRAY);
