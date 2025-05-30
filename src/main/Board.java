@@ -198,15 +198,17 @@ public class Board extends JComponent implements Printable{
 					if (e.getKeyCode() == KeyEvent.VK_S) {
 						save(false);
 					}
-					else if (e.getKeyChar() == '+' || e.getKeyChar() == '=') {
+					else if (e.getKeyChar() == '+' || e.getKeyChar() == '=' || 
+							e.getKeyChar() == '*' || e.getKeyCode() == KeyEvent.VK_PLUS) {
 						scaleFactor += 0.1;
 					}
-					else if (e.getKeyChar() == '-') {
+					else if (e.getKeyChar() == '-' || e.getKeyChar() == '_' ||
+							e.getKeyCode() == KeyEvent.VK_MINUS) {
 						scaleFactor -= 0.1;
 					}
 				}
 
-				if (e.getKeyChar() == 'h') {
+				if (e.getKeyCode() == KeyEvent.VK_H) {
 					hidden = true;
 				}
 
@@ -214,7 +216,7 @@ public class Board extends JComponent implements Printable{
 			}
 
 			public void keyReleased(KeyEvent e) {
-				if (e.getKeyChar() == 'h') {
+				if (e.getKeyCode() == KeyEvent.VK_H) {
 					hidden = false;
 					repaint();
 				}
@@ -596,9 +598,8 @@ public class Board extends JComponent implements Printable{
 		dialog.setVisible(true);
 		
 		if (dialog.getFile()==null) return;
-		// session.main.curdir = dialog.getDirectory();
 
-		loadImport(session.main.curdir+dialog.getFile());
+		loadImport(dialog.getDirectory()+dialog.getFile());
 	}
 
 	//-------------------------------------------------------------------------------------

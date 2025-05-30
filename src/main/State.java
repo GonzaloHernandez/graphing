@@ -88,13 +88,28 @@ public class State {
 			}
 		}
 
-		Color foreColor = Color.GRAY;;
-		Color backColor = new Color(220,220,255);
+		Color LIGHT_BLUE	= new Color(220,220,255);
+		Color LIGHT_RED		= new Color(235,168,168);
 
-		if (status==FOCUSED)	foreColor = new Color(200,0,0);
-		else if (active)		foreColor = Color.BLACK;
+		Color foreColor = null;
+		Color backColor = null;
 
-		if (!active)			backColor = Color.WHITE;
+		if (status==FOCUSED && active) {
+			foreColor = Color.BLACK;
+			backColor = LIGHT_RED;
+		}
+		else if (status==FOCUSED && !active)	{
+			foreColor = Color.RED;
+			backColor = Color.WHITE;
+		}
+		else if (status!=FOCUSED && active) {
+			foreColor = Color.BLACK;
+			backColor = LIGHT_BLUE;
+		}
+		else if (status!=FOCUSED && !active) {
+			foreColor = Color.GRAY;
+			backColor = Color.WHITE;
+		}
 		
 		switch(owner) {
 			case 0:	
