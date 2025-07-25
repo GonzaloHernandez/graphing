@@ -138,22 +138,7 @@ public class Connection {
 			else								middle.y	= (int)(source.getY() - Math.sin(angle) * (hypotenuse /2));
 	
 			grandHypotenuse	= hypotenuse;
-			
-			//--- text point ---
-			
-			hypotenuse	= (int)Math.sqrt(Math.pow((distance/2),2)+Math.pow(grandHypotenuse/2,2));
-			if ((source.getX()<=target.getX() && source.getY()<=target.getY()) || (source.getX()>target.getX() && source.getY()>target.getY()) )
-				alpha	= Math.asin((distance/2)/hypotenuse);
-			else
-				alpha	= Math.asin(((distance*-1)/2)/hypotenuse);
-			theta	= angle - alpha;
 					
-			if (source.getX() <= middle.x)	text.x		= (int)(source.getX() + Math.cos(theta) * (hypotenuse));
-			else							text.x		= (int)(source.getX() - Math.cos(theta) * (hypotenuse));
-	
-			if (source.getY() <= middle.y)	text.y		= (int)(source.getY() + Math.sin(theta) * (hypotenuse));
-			else							text.y		= (int)(source.getY() - Math.sin(theta) * (hypotenuse));
-			
 			//--- control point ---
 			
 			hypotenuse	= (int)Math.sqrt(Math.pow(distance,2)+Math.pow(grandHypotenuse/2,2));
@@ -196,23 +181,29 @@ public class Connection {
 			if (control.y<target.getY())	end.y		= (int)(control.y + Math.sin(angle) * (hypotenuse - State.RADIUS-1));
 			else							end.y		= (int)(control.y - Math.sin(angle) * (hypotenuse - State.RADIUS-1));
 	
+			//--- text point ---
+
+			text.x = (int)(0.25 * start.getX() + 0.5 * control.getX() + 0.25 * end.getX());
+		    text.y = (int)(0.25 * start.getY() + 0.5 * control.getY() + 0.25 * end.getY());
+
 			//--- draw arc ---
 			
 			switch (status) {
+				case STILL:		if (active) g.setColor(Color.GRAY); else g.setColor(Color.lightGray); break;
 				case MARKED:	g.setColor(Color.YELLOW);	break;
-				case STILL:		if (type!=null) g.setColor(Color.BLACK); else g.setColor(Color.GRAY); break;
 				case FOCUSED:	g.setColor(Color.RED);		break;
 			}
 			
 			Graphics2D g2 = (Graphics2D)g;
 			curve.setCurve(start,control,end);
 
-			if (!active) g.setStroke(dashed);
+			if (!active)g.setStroke(dashed);
 			g2.draw(curve);
 			g.setStroke(originalStroke);
 			
 			arrow.x	= control.x;
 			arrow.y	= control.y;
+
 		}
 
 		//--- draw arrow ---
@@ -247,10 +238,6 @@ public class Connection {
 		if (arrow.y<end.y)	arrowright.y = end.y - (int)(dy);
 		else				arrowright.y = end.y + (int)(dy);
 		
-		// g.drawLine(arrowleft.x,arrowleft.y,end.x,end.y);
-		// g.drawLine(arrowright.x,arrowright.y,end.x,end.y);
-		// g.drawLine(arrowright.x,arrowright.y,arrowleft.x,arrowleft.y);
-
 		int xs [] = {end.x,arrowleft.x,arrowright.x};
 		int ys [] = {end.y,arrowleft.y,arrowright.y};
 		g.fillPolygon(xs,ys,3);
@@ -427,12 +414,11 @@ public class Connection {
 	//-------------------------------------------------------------
 
 	static public void drawCenterString(Graphics g,String s,Point p){
-		FontMetrics metrics			= g.getFontMetrics();
-		int			widthString		= metrics.stringWidth(s);//charsWidth(s.toCharArray(),0,s.length());
-		int			heightString	= metrics.getAscent();
-		
-		g.setFont(new Font("Arial",Font.ITALIC,11));
-		g.drawString(s,p.x-widthString/2,p.y+heightString/2);		
+		if (s.isEmpty()) return;
+		g.setFont(new Font("Arial",Font.ITALIC,9));
+		g.drawString("E",p.x-(2*s.length()),p.y+5);		
+		g.setFont(new Font("Arial",Font.ITALIC,7));
+		g.drawString(s,p.x+5-(2*s.length()),p.y+7);		
 	}
 	
 }

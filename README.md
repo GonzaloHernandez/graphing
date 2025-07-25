@@ -24,8 +24,8 @@ Meanwhile, the compiled output files will be generated in the `bin` folder by de
 
 ## JAR file ready to use
 
-Graphing-v1.2.7.jar 
-[Direct download](https://github.com/GonzaloHernandez/graphing/raw/refs/heads/master/releases/Graphing-v1.2.7.jar)
+Graphing-v1.2.8.jar 
+[Direct download](https://github.com/GonzaloHernandez/graphing/raw/refs/heads/master/releases/Graphing-v1.2.8.jar)
 
 ## Dependency Management
 

@@ -140,14 +140,18 @@ public class State {
 		}
 		if (settings.showStateSequence) {
 			int first = settings.firstZero?0:1;
-			g.setColor(Color.GRAY);
+			g.setColor(Color.darkGray);
 			if (settings.showStatePriorities) {
 				g.setFont(new Font("Arial",Font.ITALIC,9));
-				g.drawString(""+(number+first),x-(3*(new String(""+number)).length()),y+RADIUS-1);
+				g.drawString("V",x-1-(3*(new String(""+number)).length()),y+RADIUS+9);
+				g.setFont(new Font("Arial",Font.ITALIC,7));
+				g.drawString(""+(number+first),x+3-(3*(new String(""+number)).length()),y+RADIUS+11);
 			}
 			else {
 				g.setFont(new Font("Arial",Font.ITALIC,13));
-				g.drawString(""+(number+first),x-(3*(new String(""+number)).length()),y+4);
+				g.drawString("V",x-2-(3*(new String(""+number)).length()),y+4);
+				g.setFont(new Font("Arial",Font.ITALIC,8));
+				g.drawString(""+(number+first),x+3-(3*(new String(""+number)).length()),y+8);
 			}
 		}
 		if (settings.showStatePriorities) {

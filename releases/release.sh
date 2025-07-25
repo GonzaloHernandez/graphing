@@ -3,7 +3,7 @@
 # Define versioning variables
 FAMILY=1
 VERSION=2
-CONSTRUCTION=7  # Update as needed
+CONSTRUCTION=8
 
 # File paths
 JAVA_FILE="src/main/GrapherMain.java"
@@ -46,3 +46,9 @@ echo "::Build complete: $OUTPUT_FILE"
 sed -i "s/Graphing-v[0-9]*\.[0-9]*\.[0-9]*\.jar/$JAR_NAME/" "$README_FILE"
 
 echo "::Updated $README_FILE with the new JAR file name: $JAR_NAME"
+
+# ===============================================================================
+# (DONE) Avoid shaking of edge labels when hiding
+# (DONE) Export using the current zoom factor
+# (DONE) Change rotation direction from A–Z
+# (DONE) Ask for folder and file destination when exporting to PNG

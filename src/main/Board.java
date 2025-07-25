@@ -22,8 +22,6 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Vector;
 
 import javax.imageio.ImageIO;
@@ -157,10 +155,10 @@ public class Board extends JComponent implements Printable{
 					}
 					else {
 						if (e.getKeyCode() == KeyEvent.VK_A) {
-							currentConnection.setAmountRotation(-(Math.PI/16));
+							currentConnection.setAmountRotation((Math.PI/16));
 						}
 						else if (e.getKeyCode() == KeyEvent.VK_Z){
-							currentConnection.setAmountRotation((Math.PI/16));
+							currentConnection.setAmountRotation(-(Math.PI/16));
 						}
 					}
 					session.setModified(true);
@@ -1129,20 +1127,34 @@ public class Board extends JComponent implements Printable{
 	}
 
 	public void screenshot(Graphics g1) {
-        // Create an image with the component's dimensions
-        int width = getWidth() * 2;
-        int height = getHeight() * 2;
+        int width	= (int)(getWidth() * scaleFactor);
+        int height	= (int)(getHeight() * scaleFactor);
 
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         
         Graphics2D g2 = image.createGraphics();
-		g2.scale(2,2);
+		g2.scale(scaleFactor,scaleFactor);
         paint(g2);
         g2.dispose();
 
-		String pngFileName = fileName.substring(0, fileName.length()-4)+".png";
         try {
-            ImageIO.write(image, "png", new File(pngFileName));
+			FileDialog dialog = new FileDialog(session.main,"Select a file name",FileDialog.SAVE);
+
+			dialog.setFilenameFilter(new FilenameFilter() {
+				@Override
+				public boolean accept(java.io.File dir, String name) {
+					return name.endsWith(".png");
+				}
+			});
+
+			dialog.setDirectory(session.main.curdir);
+			dialog.setFile(fileName.substring(0, fileName.length()-4)+".png");
+			dialog.setVisible(true);
+			if (dialog.getFile()==null) return;
+			String pngFileName = dialog.getDirectory()+dialog.getFile();
+
+
+			ImageIO.write(image, "png", new File(pngFileName));
             System.out.println("Image saved: " + pngFileName);
         } catch (Exception e) {
             e.printStackTrace();
