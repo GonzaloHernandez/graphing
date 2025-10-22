@@ -1,5 +1,5 @@
 package main;
-public class ConnectionType {
+public class EdgeType {
 	
 	//-------------------------------------------------------------------------------------
 
@@ -8,7 +8,7 @@ public class ConnectionType {
 	
 	//-------------------------------------------------------------------------------------
 
-	public ConnectionType(int number,String name,String symbols) {
+	public EdgeType(int number,String name,String symbols) {
 		this.number		= number;
 		this.name		= name;
 		this.symbols	= symbols;

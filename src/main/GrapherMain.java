@@ -35,7 +35,7 @@ public class GrapherMain extends JFrame{
 	//-------------------------------------------------------------------------------------
 	final int	family			= 1;
 	final int	version			= 2;
-	final int	construcction	= 8;
+	final int	construcction	= 9;
 	
 	//-------------------------------------------------------------------------------------
 
@@ -49,7 +49,7 @@ public class GrapherMain extends JFrame{
 	protected	String			messageReturn;
 	protected	MenuOptions		menuOptions;
 	protected	GrapherSession	currentSession;
-	protected	PropertiesView	properties;
+	protected	ViewProperties	properties;
 	protected	JMenu			recent;
 	
 	protected	boolean			showAbout;
@@ -71,7 +71,8 @@ public class GrapherMain extends JFrame{
 	//-------------------------------------------------------------------------------------
 
 	private void initElements(){
-		Font defaultFont	= new Font("Cantarell",Font.PLAIN,11);
+		Font currentFont	= UIManager.getFont("Label.font");
+		Font defaultFont	= new Font(currentFont.getName(),Font.PLAIN,currentFont.getSize());
 		messageReturn		= null;
 						
 		Image icon = Toolkit.getDefaultToolkit().getImage("icons/grapher.png");
@@ -95,7 +96,7 @@ public class GrapherMain extends JFrame{
 		about			= new GrapherItem("About of Graphing'",defaultFont,"about.png");
 		credits			= new GrapherItem("Copyright",defaultFont,"credits.png");
 		
-		properties		= new PropertiesView(this);
+		properties		= new ViewProperties(this);
 		split			= new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,desktop,properties); 
 		
 		currentSession	= null;
@@ -421,7 +422,8 @@ public class GrapherMain extends JFrame{
 			recent.remove(0);
 		}
 
-		Font defaultFont	= new Font("Cantarell",Font.PLAIN,11);
+		Font currentFont	= UIManager.getFont("Label.font");
+		Font defaultFont	= new Font(currentFont.getName(),Font.PLAIN,currentFont.getSize());
 
 		final JMenuItem item = new GrapherItem(fileName, defaultFont,"session.png");
 		recent.add(item);
@@ -470,7 +472,9 @@ public class GrapherMain extends JFrame{
 		};
 		
 		for (int i=0;i<links.length;i++){
-			JMenuItem item = new GrapherItem(links[i][1],new Font("Arial",Font.PLAIN,10),"link.png");
+			Font currentFont	= UIManager.getFont("Label.font");
+			Font defaultFont	= new Font(currentFont.getName(),Font.PLAIN,currentFont.getSize());
+			JMenuItem item = new GrapherItem(links[i][1],defaultFont,"link.png");
 			item.setActionCommand(links[i][0]);
 			relatedTopics.add(item);
 			item.addActionListener(new ActionListener(){
@@ -492,9 +496,11 @@ public class GrapherMain extends JFrame{
 	
 	public void addSamples(){
 		final String links[] = {"name","polynomial",};
+		Font currentFont	= UIManager.getFont("Label.font");
+		Font defaultFont	= new Font(currentFont.getName(),Font.PLAIN,currentFont.getSize());
 
 		for (int i=0;i<links.length;i++){
-			JMenuItem item = new GrapherItem(links[i],new Font("Arial",Font.PLAIN,10),"sample.png");
+			JMenuItem item = new GrapherItem(links[i],defaultFont,"sample.png");
 			samples.add(item);
 			item.addActionListener(new ActionListener(){
 				public void actionPerformed(ActionEvent e) {

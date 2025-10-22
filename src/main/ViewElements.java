@@ -10,7 +10,7 @@ import javax.swing.JTable;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 
-public class ElementsView extends JPanel{
+public class ViewElements extends JPanel{
 
     protected JTable        tableStates;
     protected JTable        tableConnections;
@@ -18,7 +18,7 @@ public class ElementsView extends JPanel{
     
     //--------------------------------------------------------------------------
 
-    public ElementsView(GrapherMain main) {
+    public ViewElements(GrapherMain main) {
         this.main = main;
         initElements();
         progListeners();
@@ -118,7 +118,7 @@ public class ElementsView extends JPanel{
                     switch (columnIndex) {
                         case 0: return getStates().elementAt(rowIndex).isActive();
                         case 1: return "V"+(rowIndex+first);
-                        case 2: return main.currentSession.board.states.elementAt(rowIndex).getValue();
+                        case 2: return main.currentSession.board.vertices.elementAt(rowIndex).getValue();
                         case 3: return "Label";
                     }
                 }
@@ -155,15 +155,15 @@ public class ElementsView extends JPanel{
         table.setModel(model);
     }
 
-    Vector<State> getStates() {
-        return main.currentSession.board.states;
+    Vector<Vertex> getStates() {
+        return main.currentSession.board.vertices;
     }
 
-    Vector<Connection> getConnections() {
-        Vector<Connection> connections = new Vector<Connection>();
-        for (int i=0; i<main.currentSession.board.states.size(); i++) {
-            for (int j=0; j<main.currentSession.board.states.elementAt(i).getConnections().size(); j++) {
-                connections.add(main.currentSession.board.states.elementAt(i).getConnections().elementAt(j));
+    Vector<Edge> getConnections() {
+        Vector<Edge> connections = new Vector<Edge>();
+        for (int i=0; i<main.currentSession.board.vertices.size(); i++) {
+            for (int j=0; j<main.currentSession.board.vertices.elementAt(i).getConnections().size(); j++) {
+                connections.add(main.currentSession.board.vertices.elementAt(i).getConnections().elementAt(j));
             }
         }
         return connections;

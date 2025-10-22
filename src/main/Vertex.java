@@ -4,7 +4,7 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.util.Vector;
 
-public class State {
+public class Vertex {
 	
 	//-------------------------------------------------------------------------------------
 
@@ -19,8 +19,8 @@ public class State {
 	private	int		x,y,number;
 	private	int		status;
 	private	int		diferencex,diferencey;
-	private	Vector	<Connection>connections;
-	private	Vector	<Connection>arrivals;
+	private	Vector	<Edge>connections;
+	private	Vector	<Edge>arrivals;
 	private	boolean	accepted;
 
 	private int		value;
@@ -29,7 +29,7 @@ public class State {
 
 	//-------------------------------------------------------------------------------------
 	
-	public State(int number,int x,int y) {
+	public Vertex(int number,int x,int y) {
 		this.number		= number;
 		this.x			= x;
 		this.y			= y;
@@ -38,13 +38,13 @@ public class State {
 		this.value		= 0;
 		this.owner		= 0;
 		this.active		= true;
-		connections		= new Vector<Connection>();
-		arrivals		= new Vector<Connection>();
+		connections		= new Vector<Edge>();
+		arrivals		= new Vector<Edge>();
 	}
 	
 	//-------------------------------------------------------------------------------------
 	
-	public State(int number,int x,int y,int status,boolean accepted) {
+	public Vertex(int number,int x,int y,int status,boolean accepted) {
 		this.number		= number;
 		this.x			= x;
 		this.y			= y;
@@ -53,13 +53,13 @@ public class State {
 		this.value		= 0;
 		this.owner		= 0;
 		this.active		= true;
-		connections		= new Vector<Connection>();
-		arrivals		= new Vector<Connection>();
+		connections		= new Vector<Edge>();
+		arrivals		= new Vector<Edge>();
 	}
 	
 	//-------------------------------------------------------------------------------------
 	
-	public State(int number,int x,int y,int status,boolean accepted,int value,int owner) {
+	public Vertex(int number,int x,int y,int status,boolean accepted,int value,int owner) {
 		this.number		= number;
 		this.x			= x;
 		this.y			= y;
@@ -68,8 +68,8 @@ public class State {
 		this.value		= value;
 		this.owner		= owner;
 		this.active		= true;
-		connections		= new Vector<Connection>();
-		arrivals		= new Vector<Connection>();
+		connections		= new Vector<Edge>();
+		arrivals		= new Vector<Edge>();
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -79,7 +79,7 @@ public class State {
 		if (hidden && !active) return connectionSequence + connections.size();
 
 		for (int i=0 ; i<connections.size() ; i++) {
-			Connection connection = (Connection)connections.elementAt(i);
+			Edge connection = (Edge)connections.elementAt(i);
 			if (hidden && !connection.getTarget().isActive()) {
 				connectionSequence++;
 			}
@@ -138,23 +138,26 @@ public class State {
 			g.setColor(foreColor);
 			g.drawOval(x-RADIUS+3,y-RADIUS+3,(RADIUS-3)*2,(RADIUS-3)*2);
 		}
-		if (settings.showStateSequence) {
+		if (settings.showVertexSequence) {
+
+			Dictionary dict = settings.dictionary;
+
 			int first = settings.firstZero?0:1;
 			g.setColor(Color.darkGray);
-			if (settings.showStatePriorities) {
+			if (settings.showVertexPriorities) {
 				g.setFont(new Font("Arial",Font.ITALIC,9));
-				g.drawString("V",x-1-(3*(new String(""+number)).length()),y+RADIUS+9);
+				g.drawString(dict.vertex1,x-1-(3*(new String(""+number)).length()),y+RADIUS+9);
 				g.setFont(new Font("Arial",Font.ITALIC,7));
 				g.drawString(""+(number+first),x+3-(3*(new String(""+number)).length()),y+RADIUS+11);
 			}
 			else {
 				g.setFont(new Font("Arial",Font.ITALIC,13));
-				g.drawString("V",x-2-(3*(new String(""+number)).length()),y+4);
+				g.drawString(dict.vertex1,x-2-(3*(new String(""+number)).length()),y+4);
 				g.setFont(new Font("Arial",Font.ITALIC,8));
 				g.drawString(""+(number+first),x+3-(3*(new String(""+number)).length()),y+8);
 			}
 		}
-		if (settings.showStatePriorities) {
+		if (settings.showVertexPriorities) {
 			g.setColor(Color.BLACK);
 			g.setFont(new Font("Arial",Font.PLAIN,13));
 			g.drawString(""+value,x-(3*(new String(""+value)).length()),y+4);
@@ -206,12 +209,12 @@ public class State {
 		this.active = act;
 		if (propagate) {
 			for (int i=0 ; i<connections.size() ; i++) {
-				Connection c = (Connection)connections.elementAt(i);
+				Edge c = (Edge)connections.elementAt(i);
 				if (act == true && !c.getTarget().isActive()) continue;
 				c.setActive(act, propagate);
 			}
 			for (int i=0 ; i<arrivals.size() ; i++) {
-				Connection c = (Connection)arrivals.elementAt(i);
+				Edge c = (Edge)arrivals.elementAt(i);
 				if (act == true && !c.getSource().isActive()) continue;
 				c.setActive(act, propagate);
 			}
@@ -288,20 +291,20 @@ public class State {
 	
 	//-------------------------------------------------------------------------------------
 	
-	public void addConnection(Connection c) {
+	public void addConnection(Edge c) {
 		connections.add(c);
 		c.getTarget().arrivals.add(c);
 	}
 
 	//-------------------------------------------------------------------------------------
 	
-	public void addConnection(State target) {
+	public void addConnection(Vertex target) {
 		for (int c=0;c<getConnections().size();c++){
 			if (getConnections().elementAt(c).getTarget().equals(target)) { 
 				return;
 			}
 		}
-		Connection c = new Connection(this,target,null);
+		Edge c = new Edge(this,target,null);
 		connections.add(c);
 		target.arrivals.add(c);
 		arrangeConnections(target);
@@ -309,26 +312,26 @@ public class State {
 	
 	//-------------------------------------------------------------------------------------
 	
-	public void addConnection(State target,ConnectionType type,int distance,double rotation,int value,boolean active) {
+	public void addConnection(Vertex target,EdgeType type,int distance,double rotation,int value,boolean active) {
 		for (int c=0;c<getConnections().size();c++){
 			if (getConnections().elementAt(c).getTarget().equals(target)) { 
 				return;
 			}
 		}
-		Connection c = new Connection(this,target,type,Connection.STILL,distance,rotation,value);
+		Edge c = new Edge(this,target,type,Edge.STILL,distance,rotation,value);
 		c.setActive(active);
 		connections.add(c);
 	}
 	
 	//-------------------------------------------------------------------------------------
 
-	public Vector <Connection>getConnections() {
+	public Vector <Edge>getConnections() {
 		return connections;
 	}
 	
 	//-------------------------------------------------------------
 
-	public void deleteConnecion(Connection connection){
+	public void deleteConnecion(Edge connection){
 		connections.remove(connection);
 	}
 
@@ -340,11 +343,11 @@ public class State {
 	
 	//-------------------------------------------------------------
 
-	public void arrangeConnections (State target){
+	public void arrangeConnections (Vertex target){
 		if (target.equals(this)) return;
 		
-		Connection directedConnection	= null;
-		Connection backConnection		=null;
+		Edge directedConnection	= null;
+		Edge backConnection		=null;
 		
 		for (int c=0;c<getConnections().size();c++){
 			if (getConnections().elementAt(c).getTarget().equals(target)) { 

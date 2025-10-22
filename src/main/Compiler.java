@@ -203,7 +203,7 @@ class Compiler extends JInternalFrame {
 	}
 	//---------------------------------------------------------------------------
 	public void updateAutomata(){
-		automata.setMatrix(board.getMatrix(),board.getVocabulary(),board.getAcceptedStates());
+		automata.setMatrix(board.getMatrix(),board.getVocabulary(),board.getAcceptedVertex());
 	}
 	//---------------------------------------------------------------------------
 	private void adiControls() {

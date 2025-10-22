@@ -37,11 +37,11 @@ public class Board extends JComponent implements Printable{
 	protected	boolean			controled;
 	protected	String			fileName;
 	protected	GrapherSettings	settings;
-	protected	Vector			<State>states;
+	protected	Vector			<Vertex>vertices;
 	protected	GrapherSession	session;
-	protected	Vector			<ConnectionType>types;
-	protected	Connection		currentConnection;
-	protected	State			stateSource,stateTarget;
+	protected	Vector			<EdgeType>types;
+	protected	Edge		currentConnection;
+	protected	Vertex			vertexSource,vertexTarget;
 	protected	boolean			menuBlock;
 	protected	Compiler		compiler;
 	protected	PageFormat		pageFormat;
@@ -54,7 +54,7 @@ public class Board extends JComponent implements Printable{
 		this.session		= session;
 		this.menuBlock		= false;
 		this.compiler		= null;
-		this.scaleFactor	= 1.0;
+		this.scaleFactor	= 1;
 		this.hidden			= false;
 		getInputMap().put(KeyStroke.getKeyStroke("A"), "actionName");
 		initElements();
@@ -67,18 +67,18 @@ public class Board extends JComponent implements Printable{
 		this.fileName	= "";
 		this.compiler	= null;
 		
-		types	= new Vector<ConnectionType>();
+		types	= new Vector<EdgeType>();
 
-		types.add(new ConnectionType(0,"Free Value", "0"));
-		types.add(new ConnectionType(1,"number","0123456789"));
-		types.add(new ConnectionType(2,"point","."));
-		types.add(new ConnectionType(3,"uppercase","ABCDEFGHIJKLMNOPQRSTUVWXYZ"));
-		types.add(new ConnectionType(4,"lowercase","abcdefghijklmnopqrstuvwxyz"));
+		types.add(new EdgeType(0,"Free Value", "0"));
+		types.add(new EdgeType(1,"number","0123456789"));
+		types.add(new EdgeType(2,"point","."));
+		types.add(new EdgeType(3,"uppercase","ABCDEFGHIJKLMNOPQRSTUVWXYZ"));
+		types.add(new EdgeType(4,"lowercase","abcdefghijklmnopqrstuvwxyz"));
 		
 		settings	= new GrapherSettings(true,true,"",types);
-		states		= new Vector<State>();
-		stateSource	= null;
-		stateTarget	= null;
+		vertices		= new Vector<Vertex>();
+		vertexSource	= null;
+		vertexTarget	= null;
 		controled	= false;		
 		pageFormat	= new PageFormat();
 		Paper		paper	= new Paper();
@@ -108,16 +108,16 @@ public class Board extends JComponent implements Printable{
 		g.fillRect(0,0,getWidth(),getHeight());
 		if (controled) {
 			g.setColor(Color.BLACK);
-			if (stateTarget!=null) {
-				g.drawLine(stateSource.getX(),stateSource.getY(),stateTarget.getX(),stateTarget.getY());
+			if (vertexTarget!=null) {
+				g.drawLine(vertexSource.getX(),vertexSource.getY(),vertexTarget.getX(),vertexTarget.getY());
 			}
 			else {
-				g.drawLine(stateSource.getX(),stateSource.getY(),mousex,mousey);
+				g.drawLine(vertexSource.getX(),vertexSource.getY(),mousex,mousey);
 			}
 		}
 		int connectionSequence = settings.firstZero?0:1;
-		for (int i=0 ; i<states.size() ; i++) {
-			connectionSequence = states.elementAt(i).draw(g,settings,connectionSequence,hidden);
+		for (int i=0 ; i<vertices.size() ; i++) {
+			connectionSequence = vertices.elementAt(i).draw(g,settings,connectionSequence,hidden);
 		}
 
 		export();
@@ -126,9 +126,9 @@ public class Board extends JComponent implements Printable{
 	
 	//-------------------------------------------------------------------------------------
 	
-	public State addState(int x,int y){
-		State n = new State(states.size(),x,y);
-		states.add(n);
+	public Vertex addVertex(int x,int y){
+		Vertex n = new Vertex(vertices.size(),x,y);
+		vertices.add(n);
 		repaint();
 		session.setModified(true);
 		return n;
@@ -149,7 +149,7 @@ public class Board extends JComponent implements Printable{
 							currentConnection.setAmountDistance(-2);
 						}
 						else if (e.getKeyCode() == KeyEvent.VK_DELETE) {
-							State source = currentConnection.getSource();
+							Vertex source = currentConnection.getSource();
 							source.deleteConnecion(currentConnection);
 						}
 					}
@@ -164,30 +164,30 @@ public class Board extends JComponent implements Printable{
 					session.setModified(true);
 				}
 
-				if (stateTarget != null) {
+				if (vertexTarget != null) {
 					if (e.getKeyCode() == KeyEvent.VK_DELETE) {
-						deleteState(stateTarget);
+						deleteVertex(vertexTarget);
 						session.setModified(true);
 					}
 					else if (e.getKeyCode() == KeyEvent.VK_A) {
-						stateTarget.setValue(stateTarget.getValue()+1);
+						vertexTarget.setValue(vertexTarget.getValue()+1);
 						session.setModified(true);
 					} 
 					else if (e.getKeyCode() == KeyEvent.VK_Z) {
-						stateTarget.setValue(stateTarget.getValue()-1);
+						vertexTarget.setValue(vertexTarget.getValue()-1);
 						session.setModified(true);
 					}
 					else if (e.getKeyCode() == KeyEvent.VK_O) {
-						if (stateTarget.getOwner()==2) {
-							stateTarget.setOwner(0);
+						if (vertexTarget.getOwner()==2) {
+							vertexTarget.setOwner(0);
 						}
 						else {
-							stateTarget.setOwner(stateTarget.getOwner()+1);
+							vertexTarget.setOwner(vertexTarget.getOwner()+1);
 						}
 						session.setModified(true);
 					}
 					else  if (e.getKeyChar() >= '0' && e.getKeyChar() <= '9') {
-						stateTarget.setValue(e.getKeyChar()-'0');
+						vertexTarget.setValue(e.getKeyChar()-'0');
 						session.setModified(true);
 					}
 				}
@@ -235,8 +235,8 @@ public class Board extends JComponent implements Printable{
 				
 				// SHIFT + BUTTON1
 				if (shiftDown && button == MouseEvent.BUTTON1) {
-					if (stateTarget != null) {
-						stateTarget.setActive(!stateTarget.isActive());
+					if (vertexTarget != null) {
+						vertexTarget.setActive(!vertexTarget.isActive());
 						session.setModified(true);
 					}
 					if (currentConnection != null) {
@@ -249,8 +249,8 @@ public class Board extends JComponent implements Printable{
 
 				// SHIFT + BUTTON3
 				if (shiftDown && button == MouseEvent.BUTTON3) {
-					if (stateTarget != null) {
-						stateTarget.setActive(!stateTarget.isActive(), true);
+					if (vertexTarget != null) {
+						vertexTarget.setActive(!vertexTarget.isActive(), true);
 						session.setModified(true);
 					}
 					if (currentConnection != null) {
@@ -264,18 +264,18 @@ public class Board extends JComponent implements Printable{
 				if (button == MouseEvent.BUTTON1 && e.getClickCount() == 2 && !ctrlDown) {
 					int mousex = (int) (Math.round((int) (e.getX() / scaleFactor) / 10) * 10);
 					int mousey = (int) (Math.round((int) (e.getY() / scaleFactor) / 10) * 10);
-					if (stateTarget != null) {
-						stateTarget.setStatus(State.STILL);
+					if (vertexTarget != null) {
+						vertexTarget.setStatus(Vertex.STILL);
 					}
-					stateTarget = addState(mousex, mousey);
+					vertexTarget = addVertex(mousex, mousey);
 					return;
 				}
 
 				// BUTTON3 without SHIFT
 				if (button == MouseEvent.BUTTON3 && !shiftDown) {
-					if (stateTarget != null && currentConnection != null) {
+					if (vertexTarget != null && currentConnection != null) {
 						session.main.menuOptions.show(true, true, true);
-					} else if (stateTarget != null) {
+					} else if (vertexTarget != null) {
 						session.main.menuOptions.show(true, false, true);
 					} else if (currentConnection != null) {
 						session.main.menuOptions.show(false, true, true);
@@ -288,39 +288,39 @@ public class Board extends JComponent implements Printable{
 			}
 
 			public void mousePressed(MouseEvent e) {				
-				if (stateTarget != null) {
-					stateTarget.setStatus(State.STILL);
-					stateTarget = null;
+				if (vertexTarget != null) {
+					vertexTarget.setStatus(Vertex.STILL);
+					vertexTarget = null;
 				}
 				if (currentConnection != null) {
-					currentConnection.setStatus(Connection.STILL);
+					currentConnection.setStatus(Edge.STILL);
 					currentConnection = null;
 				}
 
-				for (int i=0 ; i<states.size() ; i++) {
-					State state = (State)states.elementAt(i);
-					if (state.isArea((int)(e.getX()/scaleFactor),(int)(e.getY()/scaleFactor))) {
+				for (int i=0 ; i<vertices.size() ; i++) {
+					Vertex vertex = (Vertex)vertices.elementAt(i);
+					if (vertex.isArea((int)(e.getX()/scaleFactor),(int)(e.getY()/scaleFactor))) {
 						if (e.isControlDown()) {
 							controled	= true;
-							stateSource	= state;
+							vertexSource	= vertex;
 							mousex = (int)(e.getX()/scaleFactor);
 							mousey = (int)(e.getY()/scaleFactor);
 						}
 						else {
-							if (stateTarget!=null) stateTarget.setStatus(State.STILL);
-							stateTarget = state;
-							stateTarget.setMouseDiference((int)(e.getX()/scaleFactor),(int)(e.getY()/scaleFactor));
-							stateTarget.setStatus(State.FOCUSED);
+							if (vertexTarget!=null) vertexTarget.setStatus(Vertex.STILL);
+							vertexTarget = vertex;
+							vertexTarget.setMouseDiference((int)(e.getX()/scaleFactor),(int)(e.getY()/scaleFactor));
+							vertexTarget.setStatus(Vertex.FOCUSED);
 						}
 					}
 					else {
-						Vector<Connection> connections = state.getConnections();
+						Vector<Edge> connections = vertex.getConnections();
 						for (int j=0 ; j<connections.size() ; j++) {
-							Connection connection = (Connection)connections.elementAt(j); 
+							Edge connection = (Edge)connections.elementAt(j); 
 							if (connection.isArea((int)(e.getX()/scaleFactor),(int)(e.getY()/scaleFactor))) {
-								if (currentConnection != null) currentConnection.setStatus(State.STILL);
+								if (currentConnection != null) currentConnection.setStatus(Vertex.STILL);
 								currentConnection = connection;
-								connection.setStatus(Connection.FOCUSED);
+								connection.setStatus(Edge.FOCUSED);
 								break;
 							}
 						}						
@@ -330,17 +330,17 @@ public class Board extends JComponent implements Printable{
 			}
 			public void mouseReleased(MouseEvent e) {
 				if (controled) {
-					if (stateTarget!=null) {
-						if (settings.allowFirsState || stateTarget.getNumber() > 0) {
-							stateSource.addConnection(stateTarget);
-							stateSource.setStatus(State.STILL);
+					if (vertexTarget!=null) {
+						if (settings.allowFirsVertex || vertexTarget.getNumber() > 0) {
+							vertexSource.addConnection(vertexTarget);
+							vertexSource.setStatus(Vertex.STILL);
 							session.setModified(true);
 						}
 					}
 					controled = false;
 					repaint();
 				}
-				stateSource = null;
+				vertexSource = null;
 			}
 			public void mouseEntered(MouseEvent arg0) {}
 			public void mouseExited(MouseEvent arg0) {}
@@ -351,30 +351,30 @@ public class Board extends JComponent implements Printable{
 				mousex = (int)(e.getX()/scaleFactor);
 				mousey = (int)(e.getY()/scaleFactor);
 				if (!e.isControlDown()) {
-					if (!controled && stateTarget!=null) {
+					if (!controled && vertexTarget!=null) {
 						mousex = (int)(Math.round(mousex/10)*10);
 						mousey = (int)(Math.round(mousey/10)*10);
-						stateTarget.setLocation(mousex,mousey);
+						vertexTarget.setLocation(mousex,mousey);
 						session.setModified(true);
 					}
 				}
 				else {
-					stateTarget = null;
-					for (int i=0 ; i<states.size() ; i++) {
-						State state = (State)states.elementAt(i);
-						if (state.isArea(mousex,mousey)) {
-							stateTarget = state;
-							if (state != stateSource) {
-								state.setStatus(State.FOCUSED);
+					vertexTarget = null;
+					for (int i=0 ; i<vertices.size() ; i++) {
+						Vertex vertex = (Vertex)vertices.elementAt(i);
+						if (vertex.isArea(mousex,mousey)) {
+							vertexTarget = vertex;
+							if (vertex != vertexSource) {
+								vertex.setStatus(Vertex.FOCUSED);
 							}
 							repaint();
 							return;
 						}
 						else {
-							if (state != stateSource) {
-								state.setStatus(State.STILL);
+							if (vertex != vertexSource) {
+								vertex.setStatus(Vertex.STILL);
 							}
-							stateTarget = null;
+							vertexTarget = null;
 						}
 					}
 				}
@@ -387,8 +387,8 @@ public class Board extends JComponent implements Printable{
 		addMouseWheelListener(new MouseWheelListener(){
 
 			public void mouseWheelMoved(MouseWheelEvent e) {
-				if (stateTarget!=null && e.isShiftDown()) {
-					stateTarget.setValue(stateTarget.getValue()-e.getWheelRotation());
+				if (vertexTarget!=null && e.isShiftDown()) {
+					vertexTarget.setValue(vertexTarget.getValue()-e.getWheelRotation());
 				} 
 				else if (currentConnection != null){
 					if (e.isShiftDown() && currentConnection.getType()!=null && currentConnection.getType().getNumber() == 0){
@@ -411,7 +411,7 @@ public class Board extends JComponent implements Printable{
 	//-------------------------------------------------------------------------------------
 	
 	public void restart(){
-		states.removeAllElements();
+		vertices.removeAllElements();
 		repaint();
 	}
 
@@ -454,11 +454,11 @@ public class Board extends JComponent implements Printable{
 	        short	n,number,x,y, value,owner, numberSource,numberTarget,numberType,distance;
 	        double	rotation;
 	        boolean	accepted,active;
-	        State	source=null,target=null;
-	        ConnectionType	type=null;
+	        Vertex	source=null,target=null;
+	        EdgeType	type=null;
 	        String	name,symbols;
 	        
-	        states.removeAllElements();
+	        vertices.removeAllElements();
 	        types.removeAllElements();
 	        
 	        if (	file.readShort()	!= 7 ||
@@ -478,7 +478,7 @@ public class Board extends JComponent implements Printable{
 	        	number	= file.readShort();
 	        	name 	= file.readUTF();
 	        	symbols	= file.readUTF();
-	        	types.add(new ConnectionType(number,name,symbols));
+	        	types.add(new EdgeType(number,name,symbols));
 	        }
 	        
 	        n = file.readShort();
@@ -496,10 +496,10 @@ public class Board extends JComponent implements Printable{
 				else
 					active	= file.readBoolean();
 
-				State s = new State(number,x,y,State.STILL,accepted,value,owner);
+				Vertex s = new Vertex(number,x,y,Vertex.STILL,accepted,value,owner);
 				s.setActive(active);
 
-				states.add(s);
+				vertices.add(s);
 	        }
 	        
 	        n = file.readShort();
@@ -515,15 +515,15 @@ public class Board extends JComponent implements Printable{
 				else
 					active	= file.readBoolean();
 	        	
-	        	for (int s=0;s<states.size();s++){
-	        		if (states.elementAt(s).getNumber()==numberSource){
-	        			source = states.elementAt(s);
+	        	for (int s=0;s<vertices.size();s++){
+	        		if (vertices.elementAt(s).getNumber()==numberSource){
+	        			source = vertices.elementAt(s);
 	        			break;
 	        		}
 	        	}
-	        	for (int t=0;t<states.size();t++){
-	        		if (states.elementAt(t).getNumber()==numberTarget){
-	        			target = states.elementAt(t);
+	        	for (int t=0;t<vertices.size();t++){
+	        		if (vertices.elementAt(t).getNumber()==numberTarget){
+	        			target = vertices.elementAt(t);
 	        			break;
 	        		}
 	        	}
@@ -535,30 +535,43 @@ public class Board extends JComponent implements Printable{
 		        			break;
 		        		}
 		        	}
-					Connection c = new Connection(source,target,type,Connection.STILL,distance,rotation,value);
+					Edge c = new Edge(source,target,type,Edge.STILL,distance,rotation,value);
 					c.setActive(active);
 					source.addConnection(c);
 	        	}
 	        	else {
-					Connection c = new Connection(source,target,null,Connection.STILL,distance,rotation,value);
+					Edge c = new Edge(source,target,null,Edge.STILL,distance,rotation,value);
 					c.setActive(active);
 					source.addConnection(c);
 	        	}
 	        }
 	        
 	        settings.showTypeNames			= file.readBoolean();
-	        settings.showStateSequence		= file.readBoolean();
+	        settings.showVertexSequence		= file.readBoolean();
 	        settings.showConnectionSequence	= file.readBoolean();
-	        settings.showStatePriorities	= file.readBoolean();
-	        settings.allowFirsState			= file.readBoolean();
+	        settings.showVertexPriorities	= file.readBoolean();
+	        settings.allowFirsVertex			= file.readBoolean();
 	        settings.firstZero				= file.readBoolean();
 
 			settings.comment				= file.readUTF();
 	        
 	        session.setSize(file.readShort(),file.readShort());
 
-			settings.saveDzn				= file.readBoolean();
-	        
+			settings.exportAuto				= file.readBoolean();
+			settings.exportType				= file.readShort();
+
+			Dictionary dict = settings.dictionary;
+			dict.graph			= file.readUTF();
+			dict.graph1			= file.readUTF();
+			dict.vertex			= file.readUTF();
+			dict.vertex1		= file.readUTF();
+			dict.vertexValue	= file.readUTF();
+			dict.vertexValue1	= file.readUTF();
+			dict.edge			= file.readUTF();
+			dict.edge1			= file.readUTF();
+			dict.edgeValue		= file.readUTF();
+			dict.edgeValue1		= file.readUTF();
+
 	        file.close(); 
 	        repaint();
 	        session.main.properties.refresh();
@@ -608,7 +621,7 @@ public class Board extends JComponent implements Printable{
 	        // this.fileName = fileName;
 	        // session.setName(fileName);
 	        
-	        states.removeAllElements();
+	        vertices.removeAllElements();
 	        types.removeAllElements();
 	        
 			int nvertices;
@@ -626,7 +639,7 @@ public class Board extends JComponent implements Printable{
 					String[] parts = line.split("\\s+|;");
 					nvertices = Integer.parseInt(parts[1]);
 					for(int v=0; v<nvertices; v++) {
-						State s = new State(v,x,y,State.STILL,false,0,0);
+						Vertex s = new Vertex(v,x,y,Vertex.STILL,false,0,0);
 						if (x>=250) {
 							x = 40;
 							y += 80;
@@ -634,7 +647,7 @@ public class Board extends JComponent implements Printable{
 						else {
 							x += 80;
 						}
-						states.add(s);
+						vertices.add(s);
 					}
 					continue;
 				}
@@ -648,14 +661,14 @@ public class Board extends JComponent implements Printable{
 				index++;
                 int value = Integer.parseInt(parts[1]);
                 int owner = Integer.parseInt(parts[2]);
-				State source = session.board.states.elementAt(id);
+				Vertex source = session.board.vertices.elementAt(id);
 				source.setOwner(owner);
 				source.setValue(value);
                 String successorsStr = parts[3].replace(";", "");
                 // List<Integer> successors = new ArrayList<>();
                 for (String tar : successorsStr.split(",")) {
-					State target = session.board.states.elementAt(Integer.parseInt(tar));
-                    source.addConnection(new Connection(source, target, null));
+					Vertex target = session.board.vertices.elementAt(Integer.parseInt(tar));
+                    source.addConnection(new Edge(source, target, null));
 					source.arrangeConnections(target);
                 }
 	        }
@@ -730,43 +743,43 @@ public class Board extends JComponent implements Printable{
 	        	file.writeUTF(types.elementAt(i).getSymbols());
 	        }
 	        
-	        file.writeShort(states.size());
-	        for (int i=0;i<states.size();i++){
-	        	file.writeShort(states.elementAt(i).getNumber());
-	        	file.writeShort(states.elementAt(i).getX());
-	        	file.writeShort(states.elementAt(i).getY());
-	        	file.writeBoolean(states.elementAt(i).isAccepted());
+	        file.writeShort(vertices.size());
+	        for (int i=0;i<vertices.size();i++){
+	        	file.writeShort(vertices.elementAt(i).getNumber());
+	        	file.writeShort(vertices.elementAt(i).getX());
+	        	file.writeShort(vertices.elementAt(i).getY());
+	        	file.writeBoolean(vertices.elementAt(i).isAccepted());
 
-	        	file.writeShort(states.elementAt(i).getValue());
-	        	file.writeShort(states.elementAt(i).getOwner());
-	        	file.writeBoolean(states.elementAt(i).isActive());
+	        	file.writeShort(vertices.elementAt(i).getValue());
+	        	file.writeShort(vertices.elementAt(i).getOwner());
+	        	file.writeBoolean(vertices.elementAt(i).isActive());
 
-				connectionsCount += states.elementAt(i).getConnections().size();
+				connectionsCount += vertices.elementAt(i).getConnections().size();
 	        }
 	        
 	        file.writeShort(connectionsCount);
-	        for (int s=0;s<states.size();s++){
-	        	for (int i=0;i<states.elementAt(s).getConnections().size();i++){
-		        	file.writeShort(states.elementAt(s).getConnections().elementAt(i).getSource().getNumber());
-		        	file.writeShort(states.elementAt(s).getConnections().elementAt(i).getTarget().getNumber());
-		        	if (states.elementAt(s).getConnections().elementAt(i).getType()!=null) {
-		        		file.writeShort(states.elementAt(s).getConnections().elementAt(i).getType().getNumber());
+	        for (int s=0;s<vertices.size();s++){
+	        	for (int i=0;i<vertices.elementAt(s).getConnections().size();i++){
+		        	file.writeShort(vertices.elementAt(s).getConnections().elementAt(i).getSource().getNumber());
+		        	file.writeShort(vertices.elementAt(s).getConnections().elementAt(i).getTarget().getNumber());
+		        	if (vertices.elementAt(s).getConnections().elementAt(i).getType()!=null) {
+		        		file.writeShort(vertices.elementAt(s).getConnections().elementAt(i).getType().getNumber());
 		        	}
 		        	else {
 		        		file.writeShort(-1);
 		        	}
-		        	file.writeShort (states.elementAt(s).getConnections().elementAt(i).getDistance());
-		        	file.writeDouble(states.elementAt(s).getConnections().elementAt(i).getRotation());
-		        	file.writeShort (states.elementAt(s).getConnections().elementAt(i).getValue());
-					file.writeBoolean(states.elementAt(s).getConnections().elementAt(i).isActive());
+		        	file.writeShort (vertices.elementAt(s).getConnections().elementAt(i).getDistance());
+		        	file.writeDouble(vertices.elementAt(s).getConnections().elementAt(i).getRotation());
+		        	file.writeShort (vertices.elementAt(s).getConnections().elementAt(i).getValue());
+					file.writeBoolean(vertices.elementAt(s).getConnections().elementAt(i).isActive());
 		        }
 	        }
 	        
 	        file.writeBoolean(settings.showTypeNames);
-	        file.writeBoolean(settings.showStateSequence);
+	        file.writeBoolean(settings.showVertexSequence);
 	        file.writeBoolean(settings.showConnectionSequence);
-			file.writeBoolean(settings.showStatePriorities);
-			file.writeBoolean(settings.allowFirsState);
+			file.writeBoolean(settings.showVertexPriorities);
+			file.writeBoolean(settings.allowFirsVertex);
 			file.writeBoolean(settings.firstZero);
 
 			file.writeUTF(settings.comment);	        
@@ -774,60 +787,44 @@ public class Board extends JComponent implements Printable{
 	        file.writeShort(session.getWidth());
 	        file.writeShort(session.getHeight());
 
-			file.writeBoolean(settings.saveDzn);
+			file.writeBoolean(settings.exportAuto);
+			file.writeShort(settings.exportType);
+
+			Dictionary dict = settings.dictionary;
+			
+			file.writeUTF(dict.graph);
+			file.writeUTF(dict.graph1);
+			file.writeUTF(dict.vertex);
+			file.writeUTF(dict.vertex1);
+			file.writeUTF(dict.vertexValue);
+			file.writeUTF(dict.vertexValue1);
+			file.writeUTF(dict.edge);
+			file.writeUTF(dict.edge1);
+			file.writeUTF(dict.edgeValue);
+			file.writeUTF(dict.edgeValue1);
 
 	        file.setLength(file.getFilePointer());
 	        file.close();
+
 	        session.setModified(false);
 
 			//----------------------------------------------------------
 
-			if (settings.saveDzn) {
-				int size = states.size();
-			
-				String values = "";
-				String owners = "";
-	
-				for (int i=0;i<states.size();i++){
-					values += states.elementAt(i).getValue() + ",";
-					owners += states.elementAt(i).getOwner() + ",";
-				}
-	
-				if (values.length()>0) {
-					values = values.substring(0, values.length()-1);
-					owners = owners.substring(0, owners.length()-1);	
-				}
-	
-	
-				String sources = "";
-				String targets = "";
-				int nConections = 0;
-				
-				for (State s : states) {
-					for (Connection c : s.getConnections()) {
-						sources	+= c.getSource().getNumber()+1 + ",";
-						targets	+= c.getTarget().getNumber()+1 + ",";
-						nConections ++;
-					}
-				}
-	
-				if (sources.length()>0) {
-					sources	= sources.substring(0, sources.length()-1);
-					targets	= targets.substring(0, targets.length()-1);	
-				}
+			if (settings.exportAuto) {
 		
-				String dzn = 	"nvertices = " + size + ";\n" +
-								"owners    = [" + owners + "];\n" +
-								"colors    = [" + values + "];\n" +
-								"nedges    = " + nConections + ";\n" +
-								"sources   = [" + sources + "];\n" +
-								"targets   = [" + targets + "];\n";
-	
-				String dznFileName = fileName.substring(0, fileName.length()-4)+".dzn";
+				String fileContent = session.main.properties.generalView.export.getText();
+				String extension = "";
+				switch (settings.exportType) {
+					case  0: extension = ".json";	break;
+					case  1: extension = ".dzn";	break;
+					default: extension = ".txt";	break;
+				}
+
+				String dznFileName = fileName.substring(0, fileName.length()-4)+extension;
 	
 				RandomAccessFile dznFile = new RandomAccessFile(new File(dznFileName), "rw");
 				dznFile.setLength(0);
-				dznFile.writeBytes(dzn);
+				dznFile.writeBytes(fileContent);
 				dznFile.close();
 			}
 
@@ -838,132 +835,138 @@ public class Board extends JComponent implements Printable{
 	    } catch (IOException e) {
 	    	e.printStackTrace();
 	    }
-
-
+		
 	    return true;
 	}
 
 	//-------------------------------------------------------------------------------------
 
 	public boolean export() {
-		if (session.main.currentSession == null) return false;
+		if (session.main.currentSession == null) {
+			session.main.properties.generalView.export.setText(
+					"\n"
+				);
+			return false;
+		}
 
-		int v		= session.main.currentSession.board.settings.programmingView;
+		int size 	= vertices.size();
 		int first	= session.main.currentSession.board.settings.firstZero?0:1;
 
-		//----------------------------------------------------------
+		switch (session.main.currentSession.board.settings.exportType) {
+		case 0: // Json
+			StringBuilder json = new StringBuilder();
+			json.append("{\n");
 
-		int size = states.size();
-
-		// String matrix = "[";
-		// for (int s=0;s<states.size();s++){
-		// 	matrix += v==1?"[":"|";
-		// 	for (int t=0;t<states.size();t++){
-		// 		boolean found = false;
-		// 		for (int i=0;i<states.elementAt(s).getConnections().size();i++){
-		// 			if (states.elementAt(s).getConnections().elementAt(i).getTarget().getNumber()==t) {
-		// 				found = true;
-		// 			}
-		//         }
-		// 		matrix += found?s:"0";
-		// 		if (t<states.size()-1) matrix += ","; 
-		// 		else 
-		// 			matrix += v==1?"]":"";
-	    //     }
-		// 	if (s<states.size()-1) matrix += "\n"; 
-		// 	else 
-		// 		matrix += v==1?"]\n":"|]\n";
-		// }
-
-		String labels = "{";
-		for (int i=1; i< types.size() ; i++) {
-			labels += types.elementAt(i).getName() + (i<types.size()-1?",":"");
-		}
-		labels += "};";
-		
-		String matrix = "[";
-		for (int s=0;s<states.size();s++){
-			matrix += v==1?"[":"|";
-			for (int t=1;t<states.size();t++){
-				boolean found = false;
-				for (int i=0;i<states.elementAt(s).getConnections().size();i++){
-					if (states.elementAt(s).getConnections().elementAt(i).getTarget().getNumber()==t) {
-						found = true;
-					}
-		        }
-				matrix += found?(t+1):"0";
-				if (t<states.size()-1) matrix += ","; 
-				else 
-					matrix += v==1?"]":"";
-	        }
-			if (s<states.size()-1) matrix += "\n"; 
-			else 
-				matrix += v==1?"];\n":"|];\n";
-		}
-
-		//----------------------------------------------------------
-
-		String from = "";
-		String to	= "";
-		int nConections = 0;
-
-		for (State s : states) {
-			for (Connection c : s.getConnections()) {
-				from	+= c.getSource().getNumber()+first + ",";
-				to		+= c.getTarget().getNumber()+first + ",";
-				nConections ++;
+			json.append("  \"vertices\": [\n");
+			for (int i = 0; i < vertices.size(); i++) {
+				Vertex s = vertices.elementAt(i);
+				json.append("    { \"id\": ").append(i + first)
+					.append(", \"value\": ").append(s.getValue())
+					.append(", \"owner\": ").append(s.getOwner())
+					.append(" }");
+				if (i < vertices.size() - 1) json.append(",");
+				json.append("\n");
 			}
+			json.append("  ],\n");
+
+			json.append("  \"edges\": [\n");
+			boolean firstEdge = true;
+			for (Vertex s : vertices) {
+				for (Edge c : s.getConnections()) {
+					if (!firstEdge) json.append(",\n");
+					json.append("    { \"source\": ")
+						.append(c.getSource().getNumber() + first)
+						.append(", \"target\": ")
+						.append(c.getTarget().getNumber() + first)
+						.append(" }");
+					firstEdge = false;
+				}
+			}
+			json.append("\n  ]\n");
+
+			json.append("}\n");
+
+			session.main.properties.generalView.export.setText(json.toString());
+        return true;
+					
+		case 1: // Dzn
+			String from = "";
+			String to	= "";
+			int nConections = 0;
+
+			for (Vertex s : vertices) {
+				for (Edge c : s.getConnections()) {
+					from	+= c.getSource().getNumber()+first + ",";
+					to		+= c.getTarget().getNumber()+first + ",";
+					nConections ++;
+				}
+			}
+
+			if (from.length()>0) {
+				from	= from	.substring(0, from.length()-1);
+				to		= to	.substring(0, to.length()-1);	
+			}
+
+			String values = "";
+			String owners = "";
+
+			for (int i=0;i<vertices.size();i++){
+				values += vertices.elementAt(i).getValue() + ",";
+				owners += vertices.elementAt(i).getOwner() + ",";
+			}
+
+			if (values.length()>0) {
+				values = values.substring(0, values.length()-1);
+				owners = owners.substring(0, owners.length()-1);	
+			}
+
+			//----------------------------------------------------------
+
+			session.main.properties.generalView.export.setText(
+				"nvertices = " + size + ";\n" +
+				"owners    = [" + owners + "];\n" +
+				"colors    = [" + values + "];\n" +
+				"nedges    = " + nConections + ";\n" +
+				"sources   = [" + from + "];\n" +
+				"targets   = [" + to + "];\n" +
+				"\n"
+			);
+			return true;
+
+		case 2: // Adjacency Matrix (Minizinc)
+		
+			String matrix = "[";
+			for (int v=0;v<size;v++){
+				matrix += v==0?"|":" |";
+				for (int t=0;t<size;t++){
+					boolean found = false;
+					for (int i=0;i<vertices.elementAt(v).getConnections().size();i++){
+						if (vertices.elementAt(v).getConnections().elementAt(i).getTarget().getNumber()==t) {
+							found = true;
+						}
+					}
+					matrix += found?"1":"0";
+					if (t<vertices.size()-1) matrix += ","; 
+					else 
+						matrix += "";
+				}
+				if (v<vertices.size()-1) matrix += "\n"; 
+				else 
+					matrix += "|];\n";
+			}
+			session.main.properties.generalView.export.setText(
+				matrix +
+				"\n"
+			);
+			return true;
+
+		default:
+			session.main.properties.generalView.export.setText(
+				"\n"
+			);
+			return true;
 		}
 
-		if (from.length()>0) {
-			from	= from	.substring(0, from.length()-1);
-			to		= to	.substring(0, to.length()-1);	
-		}
-
-		//----------------------------------------------------------
-
-		String values = "";
-		String owners = "";
-
-		for (int i=0;i<states.size();i++){
-			values += states.elementAt(i).getValue() + ",";
-			owners += states.elementAt(i).getOwner() + ",";
-		}
-
-		if (values.length()>0) {
-			values = values.substring(0, values.length()-1);
-			owners = owners.substring(0, owners.length()-1);	
-		}
-
-		//----------------------------------------------------------
-
-		session.main.properties.generalView.exportView.info.setText(
-			"\n" +
-			"nvertices = " + size + ";\n" +
-			"owners    = [" + owners + "];\n" +
-			"colors    = [" + values + "];\n" +
-			"nedges    = " + nConections + ";\n" +
-			"sources   = [" + from + "];\n" +
-			"targets   = [" + to + "];\n" +
-			"\n" +
-			"-------------------------------------\n" +
-			"\n" +			
-			"int nvertices = " + size + ";\n" +
-			"int owners[]  = {" + owners + "};\n" +
-			"int colors[]  = {" + values + "};\n" +
-			"int nedges    = " + nConections + ";\n" +
-			"int sources[] = {" + from + "};\n" +
-			"int targets[] = {" + to + "};\n" +
-			"\n" +
-			"-------------------------------------\n" +
-			"\n" +
-			labels + "\n" +
-			"\n" +
-			matrix +
-			"-------------------------------------\n" +
-			"\n"
-		);
-		return true;
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -973,27 +976,27 @@ public class Board extends JComponent implements Printable{
 	
 	//-------------------------------------------------------------------------------------
 
-	public void deleteState(State state){
-		for (int s=0;s<states.size();s++) {
-			for (int c=0;c<states.elementAt(s).getConnections().size();c++){
-				Connection connection = states.elementAt(s).getConnections().elementAt(c);
-				if (connection.getTarget().equals(state)){
-					states.elementAt(s).getConnections().remove(connection);
+	public void deleteVertex(Vertex vertex){
+		for (int s=0;s<vertices.size();s++) {
+			for (int c=0;c<vertices.elementAt(s).getConnections().size();c++){
+				Edge connection = vertices.elementAt(s).getConnections().elementAt(c);
+				if (connection.getTarget().equals(vertex)){
+					vertices.elementAt(s).getConnections().remove(connection);
 				}
 			}
 		}
-		for (int i=state.getNumber()+1;i<states.size();i++){
-			states.elementAt(i).setNumber(states.elementAt(i).getNumber()-1);
+		for (int i=vertex.getNumber()+1;i<vertices.size();i++){
+			vertices.elementAt(i).setNumber(vertices.elementAt(i).getNumber()-1);
 		}
 		
-		states.removeElement(state);
+		vertices.removeElement(vertex);
 	}
 
 	//-------------------------------------------------------------------------------------
 	
-	public State getState(int number){
-		if (number>=states.size()) return null;
-		return states.elementAt(number);
+	public Vertex getVertex(int number){
+		if (number>=vertices.size()) return null;
+		return vertices.elementAt(number);
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -1006,14 +1009,14 @@ public class Board extends JComponent implements Printable{
 
 	public int[][] getMatrix(){
 		
-		int gra[][] = new int[states.size()][types.size()];
+		int gra[][] = new int[vertices.size()][types.size()];
 		
-		for (int s=0;s<states.size();s++){
+		for (int s=0;s<vertices.size();s++){
 			for (int t=0;t<types.size();t++){
 				gra[s][t] = 0;
-				ConnectionType type = types.elementAt(t);
-				for (int c=0;c<states.elementAt(s).getConnections().size();c++){
-					Connection connection = states.elementAt(s).getConnections().elementAt(c);
+				EdgeType type = types.elementAt(t);
+				for (int c=0;c<vertices.elementAt(s).getConnections().size();c++){
+					Edge connection = vertices.elementAt(s).getConnections().elementAt(c);
 					if (connection.getType().equals(type)){
 						gra[s][t] = connection.getTarget().getNumber();
 						break;
@@ -1037,13 +1040,13 @@ public class Board extends JComponent implements Printable{
 	
 	//-------------------------------------------------------------------------------------
 
-	public int[] getAcceptedStates(){
+	public int[] getAcceptedVertex(){
 		int count = 0,i=0;
-		for (int s=0;s<states.size();s++) if (states.elementAt(s).isAccepted()) count++;
+		for (int s=0;s<vertices.size();s++) if (vertices.elementAt(s).isAccepted()) count++;
 		int ace[] = new int[count];
-		for (int s=0;s<states.size();s++) {
-			if (states.elementAt(s).isAccepted()) {
-				ace[i]= states.elementAt(s).getNumber();
+		for (int s=0;s<vertices.size();s++) {
+			if (vertices.elementAt(s).isAccepted()) {
+				ace[i]= vertices.elementAt(s).getNumber();
 				i++;
 			}
 		}
@@ -1052,13 +1055,13 @@ public class Board extends JComponent implements Printable{
 
 	//-------------------------------------------------------------------------------------
 
-	public State isDFD(){
+	public Vertex isDFD(){
 		
-		for (int t=0;t<states.size();t++){
-			State target = states.elementAt(t);
+		for (int t=0;t<vertices.size();t++){
+			Vertex target = vertices.elementAt(t);
 			String type=null;
-			for (int s=0;s<states.size();s++){
-				State source = states.elementAt(s);
+			for (int s=0;s<vertices.size();s++){
+				Vertex source = vertices.elementAt(s);
 				for (int c=0;c<source.getConnections().size();c++){
 					if (source.getConnections().elementAt(c).getType()==null) return source;
 					if (source.getConnections().elementAt(c).getTarget().equals(target)){
@@ -1112,16 +1115,16 @@ public class Board extends JComponent implements Printable{
 		g.fillRect(0,0,getWidth(),getHeight());
 		if (controled) {
 			g.setColor(Color.BLACK);
-			if (stateTarget!=null) {
-				g.drawLine(stateSource.getX(),stateSource.getY(),stateTarget.getX(),stateTarget.getY());
+			if (vertexTarget!=null) {
+				g.drawLine(vertexSource.getX(),vertexSource.getY(),vertexTarget.getX(),vertexTarget.getY());
 			}
 			else {
-				g.drawLine(stateSource.getX(),stateSource.getY(),mousex,mousey);
+				g.drawLine(vertexSource.getX(),vertexSource.getY(),mousex,mousey);
 			}
 		}
 		int connectionSequence = settings.firstZero?0:1;
-		for (int i=0 ; i<states.size() ; i++) {
-			states.elementAt(i).draw(g,settings,connectionSequence,hidden);
+		for (int i=0 ; i<vertices.size() ; i++) {
+			vertices.elementAt(i).draw(g,settings,connectionSequence,hidden);
 		}
 		return 0;
 	}

@@ -12,18 +12,21 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.UIManager;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
 class TypeMenuItem extends JMenuItem {
-	private ConnectionType	type;
-	public TypeMenuItem(String label,ConnectionType type) {
+	private EdgeType	type;
+	public TypeMenuItem(String label,EdgeType type) {
 		super(label);
 		this.type	= type;
-		setFont(new Font("Arial",Font.ITALIC,10));
+		Font currentFont	= UIManager.getFont("Label.font");
+		Font defaultFont	= new Font(currentFont.getName(),Font.PLAIN,currentFont.getSize());
+		setFont(defaultFont);
 		setIcon(new ImageIcon("icons/type.png"));
 	}
-	public ConnectionType getType() {
+	public EdgeType getType() {
 		return type;
 	}
 }
@@ -50,12 +53,12 @@ public class MenuOptions extends JPopupMenu{
 
 	//-------------------------------------------------------------------------------------
 
-	protected	GrapherMenu		stateMenu,connectionMenu,grapherMenu;
+	protected	GrapherMenu		vertexMenu,edgeMenu,grapherMenu;
 	
 	private	GrapherMain		main;
-	private GrapherMenu		connectionTypes;
-	private	GrapherItem		stateDelete,stateDeleteAllOutgoings,stateAccepted,stateOnwer;
-	private	GrapherItem		connectionDelete,connectionTune,connectionNoType;
+	private GrapherMenu		edgeTypes;
+	private	GrapherItem		vertexDelete,vertexDeleteAllOutgoings,vertexAccepted,vertexOnwer;
+	private	GrapherItem		edgeDelete,edgeTune,edgeNoType;
 	private	GrapherItem		restart,load,loadImport,save,saveAs,print,simulate,help;
 	private	TypeMenuItem	typeItems[];
 	
@@ -70,21 +73,22 @@ public class MenuOptions extends JPopupMenu{
 	//-------------------------------------------------------------------------------------
 
 	private void initElements(){
-		Font defaultFont		= new Font("Cantarell",Font.PLAIN,11);
-		
-		stateMenu				= new GrapherMenu("State",defaultFont,"state.png");
-		connectionMenu			= new GrapherMenu("Connection",defaultFont,"connection.png");
+		Font currentFont		= UIManager.getFont("Label.font");
+		Font defaultFont		= new Font(currentFont.getName(),Font.PLAIN,currentFont.getSize());
+
+		vertexMenu				= new GrapherMenu("State",defaultFont,"state.png");
+		edgeMenu			= new GrapherMenu("Connection",defaultFont,"connection.png");
 		grapherMenu				= new GrapherMenu("Grapher",defaultFont,"application.png");
 				
-		stateDelete				= new GrapherItem("Delete state",defaultFont,"delete_state.png");
-		stateDeleteAllOutgoings	= new GrapherItem("Delete all outgoing connections",defaultFont,"delete_connection.png");
-		stateAccepted			= new GrapherItem("Set final state",defaultFont,"accepted_state.png");
-		stateOnwer				= new GrapherItem("Switch owner",defaultFont,"owner.png");
+		vertexDelete				= new GrapherItem("Delete state",defaultFont,"delete_state.png");
+		vertexDeleteAllOutgoings	= new GrapherItem("Delete all outgoing connections",defaultFont,"delete_connection.png");
+		vertexAccepted			= new GrapherItem("Set final state",defaultFont,"accepted_state.png");
+		vertexOnwer				= new GrapherItem("Switch owner",defaultFont,"owner.png");
 		
-		connectionTypes			= new GrapherMenu("Set state",defaultFont,"type_connection.png");
-		connectionNoType		= new GrapherItem("Unset state",defaultFont,"no_type_connection.png");
-		connectionDelete		= new GrapherItem("Delete connection",defaultFont,"delete_connection.png");
-		connectionTune			= new GrapherItem("Tune arc",defaultFont,"tune_connection.png");
+		edgeTypes			= new GrapherMenu("Set state",defaultFont,"type_connection.png");
+		edgeNoType		= new GrapherItem("Unset state",defaultFont,"no_type_connection.png");
+		edgeDelete		= new GrapherItem("Delete connection",defaultFont,"delete_connection.png");
+		edgeTune			= new GrapherItem("Tune arc",defaultFont,"tune_connection.png");
 		
 		restart					= new GrapherItem("Restar session",defaultFont,"new.png");
 		load					= new GrapherItem("Load automaton",defaultFont,"open.png");
@@ -95,18 +99,18 @@ public class MenuOptions extends JPopupMenu{
 		simulate				= new GrapherItem("Simulate",defaultFont,"simulate.png");
 		help					= new GrapherItem("Help",defaultFont,"help.png");
 		
-		add(stateMenu);
-		add(connectionMenu);
+		add(vertexMenu);
+		add(edgeMenu);
 		add(grapherMenu);
 		
-		stateMenu.add(stateDelete);
-		stateMenu.add(stateDeleteAllOutgoings);
-		stateMenu.add(stateAccepted);
-		stateMenu.add(stateOnwer);
-		connectionMenu.add(connectionTypes);
-		connectionMenu.add(connectionNoType);
-		connectionMenu.add(connectionDelete);
-		connectionMenu.add(connectionTune);
+		vertexMenu.add(vertexDelete);
+		vertexMenu.add(vertexDeleteAllOutgoings);
+		vertexMenu.add(vertexAccepted);
+		vertexMenu.add(vertexOnwer);
+		edgeMenu.add(edgeTypes);
+		edgeMenu.add(edgeNoType);
+		edgeMenu.add(edgeDelete);
+		edgeMenu.add(edgeTune);
 		
 		grapherMenu.add(restart);
 		grapherMenu.add(load);
@@ -126,12 +130,12 @@ public class MenuOptions extends JPopupMenu{
 		connectionTypes.removeAll();
 		typeItems	= new TypeMenuItem[main.currentSession.board.types.size()];
 		for (int i=0 ; i<main.currentSession.board.types.size() ; i++) {
-			ConnectionType type = (ConnectionType)main.currentSession.board.types.elementAt(i); 
+			EdgeType type = (EdgeType)main.currentSession.board.types.elementAt(i); 
 			typeItems[i]= new TypeMenuItem(type.getName(),type);
 			
 			typeItems[i].addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					ConnectionType t = ((TypeMenuItem)e.getSource()).getType();
+					EdgeType t = ((TypeMenuItem)e.getSource()).getType();
 					if (t.getNumber() == 0) {
 						int currentval = main.currentSession.board.currentConnection.getValue();
 						String val = JOptionPane.showInputDialog("Value:",""+currentval);
@@ -160,37 +164,37 @@ public class MenuOptions extends JPopupMenu{
 
 	public void show(boolean state,boolean connection,boolean grapher){
 		if (state){
-			if (main.currentSession.board.stateTarget.isAccepted()) { 
-				stateAccepted.setText("Unset as a final state");
+			if (main.currentSession.board.vertexTarget.isAccepted()) { 
+				vertexAccepted.setText("Unset as a final state");
 			}
 			else {
-				stateAccepted.setText("Set as a final state");
+				vertexAccepted.setText("Set as a final state");
 			}
-			stateMenu.setEnabled(true);
+			vertexMenu.setEnabled(true);
 		}
 		else{
-			stateMenu.setEnabled(false);
+			vertexMenu.setEnabled(false);
 		}
 		//----------------------------------------------------------------------
 		if (connection){
 			if (!main.currentSession.board.currentConnection.getSource().equals(main.currentSession.board.currentConnection.getTarget()) && main.currentSession.board.currentConnection.getDistance()!=0) {
-				connectionTune.setEnabled(true);
+				edgeTune.setEnabled(true);
 			}
 			else {
-				connectionTune.setEnabled(false);
+				edgeTune.setEnabled(false);
 			}
 			
 			if (main.currentSession.board.currentConnection.getType()!=null){
-				connectionNoType.setEnabled(true);
+				edgeNoType.setEnabled(true);
 			}
 			else{
-				connectionNoType.setEnabled(false);
+				edgeNoType.setEnabled(false);
 			}
 			
-			connectionMenu.setEnabled(true);
+			edgeMenu.setEnabled(true);
 		}
 		else{
-			connectionMenu.setEnabled(false);
+			edgeMenu.setEnabled(false);
 		}
 		//----------------------------------------------------------------------		
 		if (grapher){
@@ -254,49 +258,49 @@ public class MenuOptions extends JPopupMenu{
 	
 	private void progListeners(){
 		
-		stateDelete.addActionListener(new ActionListener(){
+		vertexDelete.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
-				State source = main.currentSession.board.stateTarget;
-				main.currentSession.board.deleteState(source);
+				Vertex source = main.currentSession.board.vertexTarget;
+				main.currentSession.board.deleteVertex(source);
 				main.currentSession.setModified(true);
 				main.currentSession.board.repaint();
 			}
 		});
 		
-		stateDeleteAllOutgoings.addActionListener(new ActionListener(){
+		vertexDeleteAllOutgoings.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
-				main.currentSession.board.stateTarget.deleteAllConnecion();
+				main.currentSession.board.vertexTarget.deleteAllConnecion();
 				main.currentSession.setModified(true);
 				main.currentSession.board.repaint();
 			}
 		});
 		
-		stateAccepted.addActionListener(new ActionListener(){
+		vertexAccepted.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
-				main.currentSession.board.stateTarget.setAccepted(!main.currentSession.board.stateTarget.isAccepted());
+				main.currentSession.board.vertexTarget.setAccepted(!main.currentSession.board.vertexTarget.isAccepted());
 				main.currentSession.setModified(true);
 				main.currentSession.board.repaint();
 			}
 		});		
 		
-		stateOnwer.addActionListener(new ActionListener(){
+		vertexOnwer.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
-				main.currentSession.board.stateTarget.setOwner(1-main.currentSession.board.stateTarget.getOwner());
+				main.currentSession.board.vertexTarget.setOwner(1-main.currentSession.board.vertexTarget.getOwner());
 				main.currentSession.setModified(true);
 				main.currentSession.board.repaint();
 			}
 		});		
 
-		connectionDelete.addActionListener(new ActionListener(){
+		edgeDelete.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
-				State source = main.currentSession.board.currentConnection.getSource();
+				Vertex source = main.currentSession.board.currentConnection.getSource();
 				source.deleteConnecion(main.currentSession.board.currentConnection);
 				main.currentSession.setModified(true);
 				main.currentSession.board.repaint();
 			}
 		});
 		
-		connectionTune.addActionListener(new ActionListener(){
+		edgeTune.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
 				main.currentSession.board.currentConnection.setDistance(0);
 				main.currentSession.setModified(true);
@@ -304,7 +308,7 @@ public class MenuOptions extends JPopupMenu{
 			}
 		});	
 		
-		connectionNoType.addActionListener(new ActionListener(){
+		edgeNoType.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
 				main.currentSession.board.currentConnection.setType(null);
 				main.currentSession.setModified(true);
@@ -373,7 +377,7 @@ public class MenuOptions extends JPopupMenu{
 
 			public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
 				main.currentSession.board.menuBlock = true;
-				setMenuTypes(connectionTypes,false);
+				setMenuTypes(edgeTypes,false);
 			}
 
 			public void popupMenuWillBecomeInvisible(PopupMenuEvent arg0) {

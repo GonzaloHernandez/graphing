@@ -5,23 +5,24 @@ import java.awt.Font;
 
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-public class PropertiesView extends JPanel{
+public class ViewProperties extends JPanel{
 	
 	protected	JTabbedPane		tab;
 	protected	GrapherMain		main;
-	protected	GeneralView		generalView;
-	protected	TypesView		typesView;
-	protected	PrintView		printView;
-	protected	ExportView		exportView;
-	protected	ElementsView	elementsView;
+	protected	ViewGeneral		generalView;
+	protected	ViewTypes		typesView;
+	// protected	ViewPrint		printView;
+	protected	ViewElements	elementsView;
+	protected	ViewDictionary	dictionaryView;
 	protected	int				selectedTab;
 	
 	//--------------------------------------------------------------------------
 
-	public PropertiesView(GrapherMain main) {
+	public ViewProperties(GrapherMain main) {
 		this.main	= main;
 		initElements();
 		progListeners();
@@ -31,15 +32,16 @@ public class PropertiesView extends JPanel{
 
 	private void initElements(){
 		setLayout(new BorderLayout());
-		tab			= new JTabbedPane();
-		generalView	= new GeneralView(main);
-		typesView	= new TypesView(main);
-		printView	= new PrintView(main);
-		elementsView= new ElementsView(main);
-		// exportView	= new ExportView(main);
+		tab				= new JTabbedPane();
+		generalView		= new ViewGeneral(main);
+		typesView		= new ViewTypes(main);
+		// printView		= new ViewPrint(main);
+		elementsView	= new ViewElements(main);
+		dictionaryView	= new ViewDictionary(main);
 		add(tab,"Center");
 		
-		Font defaultFont	= new Font("Cantarell",Font.PLAIN,11);
+		Font currentFont	= UIManager.getFont("Label.font");
+		Font defaultFont	= new Font(currentFont.getName(),Font.PLAIN,currentFont.getSize());
 		for (Component component : getComponents()) {
 			component.setFont(defaultFont);			
 		}
@@ -52,15 +54,15 @@ public class PropertiesView extends JPanel{
 			int aux = selectedTab;
 			tab.addTab("General",generalView);
 			tab.addTab("Types",typesView);
-			tab.addTab("Printing",printView);
+			// tab.addTab("Printing",printView);
 			tab.addTab("Elements",elementsView);
-			// tab.addTab("Export",exportView);
+			tab.addTab("Dictionary",dictionaryView);
 			selectedTab = aux;
 			generalView.refresh();
 			typesView.refresh();
-			printView.refresh();
+			// printView.refresh();
 			elementsView.refresh();
-			generalView.exportView.refresh();
+			dictionaryView.refresh();
 			tab.setSelectedIndex(selectedTab);
 		}
 		else {

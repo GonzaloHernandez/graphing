@@ -2,14 +2,12 @@ package main;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Stroke;
 import java.awt.geom.QuadCurve2D;
 
-public class Connection {
+public class Edge {
 
 	//-------------------------------------------------------------------------------------
 
@@ -19,9 +17,9 @@ public class Connection {
 	
 	//-------------------------------------------------------------------------------------
 
-	private	State				source,target;
+	private	Vertex				source,target;
 	private	int					status;
-	private	ConnectionType		type;
+	private	EdgeType		type;
 	private	QuadCurve2D.Double	curve;
 	private	Point				start,end,middle,control,text,arrowleft,arrowright,arrow;
 	private	int					distance;
@@ -31,7 +29,7 @@ public class Connection {
 	
 	//-------------------------------------------------------------------------------------
 
-	public Connection(State source,State target,ConnectionType type) {
+	public Edge(Vertex source,Vertex target,EdgeType type) {
 		this.source		= source;
 		this.target		= target;
 		this.type		= type;
@@ -53,7 +51,7 @@ public class Connection {
 	
 	//-------------------------------------------------------------------------------------
 
-	public Connection(State source,State target,ConnectionType type,int status,int distance,double rotation,int value) {
+	public Edge(Vertex source,Vertex target,EdgeType type,int status,int distance,double rotation,int value) {
 		this.source		= source;
 		this.target		= target;
 		this.type		= type;
@@ -111,7 +109,7 @@ public class Connection {
 			
 			//--- arrow ---
 			
-			alpha	= Math.asin(((double)State.RADIUS/2)/distance) * 2 + rotation;
+			alpha	= Math.asin(((double)Vertex.RADIUS/2)/distance) * 2 + rotation;
 			end.x	= (int)(control.x - (Math.cos(alpha)*distance));
 			end.y	= (int)(control.y + (Math.sin(alpha)*distance));
 			
@@ -162,11 +160,11 @@ public class Connection {
 			else
 				angle	= Math.acos(Math.abs(control.x-source.getX())/hypotenuse);
 					
-			if (source.getX()<control.x)	start.x		= (int)(source.getX() + Math.cos(angle) * State.RADIUS);
-			else							start.x		= (int)(source.getX() - Math.cos(angle) * State.RADIUS);
+			if (source.getX()<control.x)	start.x		= (int)(source.getX() + Math.cos(angle) * Vertex.RADIUS);
+			else							start.x		= (int)(source.getX() - Math.cos(angle) * Vertex.RADIUS);
 			
-			if (source.getY()<control.y)	start.y		= (int)(source.getY() + Math.sin(angle) * State.RADIUS);
-			else							start.y		= (int)(source.getY() - Math.sin(angle) * State.RADIUS);
+			if (source.getY()<control.y)	start.y		= (int)(source.getY() + Math.sin(angle) * Vertex.RADIUS);
+			else							start.y		= (int)(source.getY() - Math.sin(angle) * Vertex.RADIUS);
 			
 			//--- end point ---
 			
@@ -175,11 +173,11 @@ public class Connection {
 			else
 				angle	= Math.acos(Math.abs(target.getX()-control.x)/hypotenuse);
 					
-			if (control.x<target.getX())	end.x		= (int)(control.x + Math.cos(angle) * (hypotenuse - State.RADIUS-1));
-			else							end.x		= (int)(control.x - Math.cos(angle) * (hypotenuse - State.RADIUS-1));
+			if (control.x<target.getX())	end.x		= (int)(control.x + Math.cos(angle) * (hypotenuse - Vertex.RADIUS-1));
+			else							end.x		= (int)(control.x - Math.cos(angle) * (hypotenuse - Vertex.RADIUS-1));
 			
-			if (control.y<target.getY())	end.y		= (int)(control.y + Math.sin(angle) * (hypotenuse - State.RADIUS-1));
-			else							end.y		= (int)(control.y - Math.sin(angle) * (hypotenuse - State.RADIUS-1));
+			if (control.y<target.getY())	end.y		= (int)(control.y + Math.sin(angle) * (hypotenuse - Vertex.RADIUS-1));
+			else							end.y		= (int)(control.y - Math.sin(angle) * (hypotenuse - Vertex.RADIUS-1));
 	
 			//--- text point ---
 
@@ -244,18 +242,49 @@ public class Connection {
 
 		//--- draw label ---
 		
-		if (settings.showTypeNames || settings.showConnectionSequence) {
-			g.setColor(Color.BLUE);
-			String label = settings.showConnectionSequence?""+connectionSequence+" ":"";
+		String lab = "";
+		String seq = "";
+		int l = 0;
+
+		if (settings.showConnectionSequence) {
+			seq = ""+connectionSequence;
+			l += seq.length() + 1;
+		}
+
+		if (settings.showTypeNames) {
 			if (type!=null && settings.showTypeNames) {
 				if (type.getNumber()==0) {
-					label += ":"+getValue();
+					lab += getValue();
 				} else {
-					label += ":"+type.getName();
+					lab += type.getName();
 				}
 			}
-			drawCenterString(g,label,text);
+			l += lab.length();
 		}
+
+
+		if (settings.showConnectionSequence) {
+			Dictionary dict = settings.dictionary;
+
+			g.setColor(Color.BLUE);
+			g.setFont(new Font("Arial",Font.ITALIC,9));
+			g.drawString(dict.edge1,text.x-(l*5/2),text.y+5);
+
+			if (!lab.isEmpty()) {
+				seq += ":";
+			}
+
+			g.setFont(new Font("Arial",Font.ITALIC,7));
+			g.drawString(seq,text.x-(l*5/2)+5,text.y+7);
+		}
+
+
+		if (settings.showTypeNames) {
+			g.setColor(Color.RED);
+			g.setFont(new Font("Arial",Font.ITALIC,9));
+			g.drawString(lab,text.x-(l*5/2)+(seq.length()*5),text.y+5);
+		}
+
 		return connectionSequence+1;
 	}
 	
@@ -272,7 +301,7 @@ public class Connection {
 			hypotenuse			= (int)Math.sqrt(Math.pow(Math.abs(control.x-x),2)+Math.pow(Math.abs(control.y-y),2));
 			double hypostate	= (int)Math.sqrt(Math.pow(Math.abs(source.getX()-x),2)+Math.pow(Math.abs(source.getY()-y),2));
 			
-			return (hypotenuse <= distance && hypostate >= State.RADIUS);
+			return (hypotenuse <= distance && hypostate >= Vertex.RADIUS);
 		}
 		
 		if (curve.contains(x,y)) return true;
@@ -284,21 +313,21 @@ public class Connection {
 			angle	= Math.acos(Math.abs(target.getX()-source.getX())/hypotenuse);
 		
 		if (source.getX()<target.getX()) {	
-			xi	= (int)(source.getX() + Math.cos(angle) * State.RADIUS);
-			xf	= (int)(source.getX() + Math.cos(angle) * (hypotenuse - State.RADIUS-3));
+			xi	= (int)(source.getX() + Math.cos(angle) * Vertex.RADIUS);
+			xf	= (int)(source.getX() + Math.cos(angle) * (hypotenuse - Vertex.RADIUS-3));
 		}
 		else {			
-			xi	= (int)(source.getX() - Math.cos(angle) * State.RADIUS);
-			xf	= (int)(source.getX() - Math.cos(angle) * (hypotenuse - State.RADIUS-3));
+			xi	= (int)(source.getX() - Math.cos(angle) * Vertex.RADIUS);
+			xf	= (int)(source.getX() - Math.cos(angle) * (hypotenuse - Vertex.RADIUS-3));
 		}
 		
 		if (source.getY()<target.getY()) {	
-			yi	= (int)(source.getY() + Math.sin(angle) * State.RADIUS);
-			yf	= (int)(source.getY() + Math.sin(angle) * (hypotenuse - State.RADIUS-3));
+			yi	= (int)(source.getY() + Math.sin(angle) * Vertex.RADIUS);
+			yf	= (int)(source.getY() + Math.sin(angle) * (hypotenuse - Vertex.RADIUS-3));
 		}
 		else {			
-			yi	= (int)(source.getY() - Math.sin(angle) * State.RADIUS);
-			yf	= (int)(source.getY() - Math.sin(angle) * (hypotenuse - State.RADIUS-3));
+			yi	= (int)(source.getY() - Math.sin(angle) * Vertex.RADIUS);
+			yf	= (int)(source.getY() - Math.sin(angle) * (hypotenuse - Vertex.RADIUS-3));
 		}
 		
 		if (xi<xf && (x<xi || x>xf))	return false;
@@ -331,7 +360,7 @@ public class Connection {
 
 	//-------------------------------------------------------------------------------------
 
-	public void setType(ConnectionType type) {
+	public void setType(EdgeType type) {
 		this.type	= type;
 	}
 	
@@ -343,7 +372,7 @@ public class Connection {
 	//-------------------------------------------------------------
 
 	public void setAmountDistance(int dif){
-		if (source.equals(target) && distance + dif < State.RADIUS) return;
+		if (source.equals(target) && distance + dif < Vertex.RADIUS) return;
 		distance	+=	dif;
 	}
 
@@ -371,19 +400,19 @@ public class Connection {
 
 	//-------------------------------------------------------------
 
-	public State getSource(){
+	public Vertex getSource(){
 		return source;
 	}
 	
 	//-------------------------------------------------------------
 
-	public State getTarget(){
+	public Vertex getTarget(){
 		return target;
 	}
 	
 	//-------------------------------------------------------------
 
-	public ConnectionType getType(){
+	public EdgeType getType(){
 		return type;
 	}	
 	
@@ -410,15 +439,4 @@ public class Connection {
 	public boolean isActive() {
 		return active;
 	}
-
-	//-------------------------------------------------------------
-
-	static public void drawCenterString(Graphics g,String s,Point p){
-		if (s.isEmpty()) return;
-		g.setFont(new Font("Arial",Font.ITALIC,9));
-		g.drawString("E",p.x-(2*s.length()),p.y+5);		
-		g.setFont(new Font("Arial",Font.ITALIC,7));
-		g.drawString(s,p.x+5-(2*s.length()),p.y+7);		
-	}
-	
 }

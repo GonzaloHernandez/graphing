@@ -15,10 +15,11 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.UIManager;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 
-public class PrintView extends JPanel{
+public class ViewPrint extends JPanel{
 
 	//-------------------------------------------------------------------------------------
 
@@ -32,7 +33,7 @@ public class PrintView extends JPanel{
 	
 	//-------------------------------------------------------------------------------------
 
-	public PrintView(GrapherMain main){
+	public ViewPrint(GrapherMain main){
 		this.main	= main;
 		initElements();
 		progListeners();
@@ -105,7 +106,9 @@ public class PrintView extends JPanel{
 		objects.add(bottom,gbc);
 		
 		add(objects,"North");
-		Font defaultFont	= new Font("Cantarell",Font.PLAIN,11);
+		Font currentFont	= UIManager.getFont("Label.font");
+		Font defaultFont	= new Font(currentFont.getName(),Font.PLAIN,currentFont.getSize());
+
 		for (Component component : objects.getComponents()) {
 			component.setFont(defaultFont);			
 		}

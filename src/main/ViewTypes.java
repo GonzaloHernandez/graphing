@@ -1,4 +1,7 @@
 package main;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -8,16 +11,16 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.UIManager;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 
-public class WindowTypes extends JDialog {
+public class ViewTypes extends JPanel {
 
 	//-------------------------------------------------------------------------------------
 
@@ -25,19 +28,14 @@ public class WindowTypes extends JDialog {
 	private	JPanel		controls;
 	private	JTextField	name,symbols;
 	private	JButton		add,delete;
-	private	Board		board;
+	private	GrapherMain	main;
 	
 	//-------------------------------------------------------------------------------------
 
-	public WindowTypes(Board board) {
-		super(board.session.main,true);
-		this.board	= board;
-		setTitle("Tipos - "+board.session.getTitle());
-		setSize(300,300);
-		setLocation(50,50);
+	public ViewTypes(GrapherMain main) {
+		this.main = main;
 		initElements();
 		progListeners();
-		setVisible(true);
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -48,16 +46,22 @@ public class WindowTypes extends JDialog {
 		name		= new JTextField();
 		symbols		= new JTextField();
 		add			= new JButton("Save");
-		delete		= new JButton("Remove");
-		
+		delete		= new JButton("Delete");
+		setLayout(new BorderLayout());
 		add(new JScrollPane(table),"Center");
 		add(controls,"South");
 		controls.add(new JLabel("Name"));		controls.add(name);
-		controls.add(new JLabel("Symbol"));	controls.add(symbols);
-		controls.add(add);							controls.add(delete);
+		controls.add(new JLabel("Symbols"));	controls.add(symbols);
+		controls.add(add);						controls.add(delete);
 		delete.setEnabled(false);
 		table.setRowSelectionAllowed(true);
-		loadTable();		
+		if (main.currentSession!=null) loadTable();		
+
+		Font currentFont	= UIManager.getFont("Label.font");
+		Font defaultFont	= new Font(currentFont.getName(),Font.PLAIN,currentFont.getSize());
+		for (Component component : controls.getComponents()) {
+			component.setFont(defaultFont);			
+		}
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -66,7 +70,7 @@ public class WindowTypes extends JDialog {
 		TableModel model = new TableModel() {
 
 			public int getRowCount() {
-				return board.types.size();
+				return main.currentSession.board.types.size()-1;
 			}
 
 			public int getColumnCount() {
@@ -76,7 +80,7 @@ public class WindowTypes extends JDialog {
 			public String getColumnName(int column) {
 				switch (column){
 					case 0:	return "Name";
-					case 1: return "Symbol";
+					case 1: return "Symbols";
 				}
 				return null;
 			}
@@ -87,8 +91,8 @@ public class WindowTypes extends JDialog {
 
 			public Object getValueAt(int row, int column) {
 				switch(column) {
-					case 0:	return board.types.elementAt(row).getName();
-					case 1: return board.types.elementAt(row).getSymbols();		
+					case 0:	return main.currentSession.board.types.elementAt(row+1).getName();
+					case 1: return main.currentSession.board.types.elementAt(row+1).getSymbols();		
 				}
 				return null;
 			}
@@ -116,38 +120,40 @@ public class WindowTypes extends JDialog {
 		
 		add.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
-				for (int i=0;i<board.types.size();i++){
-					if (board.types.elementAt(i).getName().equals(name.getText())){
-						board.session.main.messageBox("Name of type duplicated","Addition error","Accept");
+				for (int i=0;i<main.currentSession.board.types.size();i++){
+					if (main.currentSession.board.types.elementAt(i).getName().equals(name.getText())){
+						main.currentSession.board.session.main.messageBox("Duplicated name of type ≈","Addition error","Accept");
 						return;
 					}
 					for (int c=0;c<symbols.getText().length();c++){
-						if (board.types.elementAt(i).getSymbols().contains(symbols.getText().substring(c,c+1))){
-							board.session.main.messageBox("The symbol ["+symbols.getText().substring(c,c+1)+"] is dupplicated in type "+board.types.elementAt(i).getName()+"!","Addition error","Accept");
+						if (main.currentSession.board.types.elementAt(i).getSymbols().contains(symbols.getText().substring(c,c+1))){
+							main.currentSession.board.session.main.messageBox("The symbol ["+symbols.getText().substring(c,c+1)+"] is dupplicated in type "+main.currentSession.board.types.elementAt(i).getName()+"!","Addition error","Accept");
 							return;
 						}
 					}
 				}
 				if (add.getText().equals("Save")){
-					board.types.add(new ConnectionType(board.types.size()+1,name.getText(),symbols.getText()));
+					int n;
+					n = main.currentSession.board.types.size();
+					main.currentSession.board.types.add(new EdgeType(n+1,name.getText(),symbols.getText()));
 				}
 				loadTable();
 				name.setText("");
 				symbols.setText("");
-				board.session.setModified(true);
+				main.currentSession.board.session.setModified(true);
 			}
 		});
 		
 		delete.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
 				boolean question = false;
-				for (int s=0;s<board.states.size();s++){
-					State state = board.states.elementAt(s);
+				for (int s=0;s<main.currentSession.board.vertices.size();s++){
+					Vertex state = main.currentSession.board.vertices.elementAt(s);
 					for (int c=0;c<state.getConnections().size();c++){
-						Connection connection = state.getConnections().elementAt(c); 
-						if (connection.getType()!=null && connection.getType().equals(board.types.elementAt(table.getSelectedRow()))){
+						Edge connection = state.getConnections().elementAt(c); 
+						if (connection.getType()!=null && connection.getType().equals(main.currentSession.board.types.elementAt(table.getSelectedRow()+1))){
 							if (!question) {
-								String opc = board.session.main.messageBox("Types used currently.|Do you want to keep updating the connections?","Warning!","Ye|Cancel");
+								String opc = main.currentSession.board.session.main.messageBox("Type currently used.|Do you want to keep updating the connections?","Warning!","Yes|Cancel");
 								if (opc.equals("Cancel")||opc.equals("")) return;
 								question = true;
 							}							
@@ -155,13 +161,16 @@ public class WindowTypes extends JDialog {
 						}
 					}
 				}
-				board.repaint();
-				board.types.remove(table.getSelectedRow());
+				main.currentSession.board.repaint();
+				main.currentSession.board.types.remove(table.getSelectedRow()+1);
+				for (int i=1;i<main.currentSession.board.types.size();i++){
+					main.currentSession.board.types.elementAt(i).setNumber(i+1);
+				}
 				loadTable();
 				delete.setEnabled(false);
 				name.setText("");
 				symbols.setText("");
-				board.session.setModified(true);
+				main.currentSession.board.session.setModified(true);
 			}
 		});
 		
@@ -202,6 +211,12 @@ public class WindowTypes extends JDialog {
 		});
 		
 
+	}
+	
+	//-------------------------------------------------------------------------------------
+
+	public void refresh(){
+		loadTable();
 	}
 	
 }
