@@ -4,6 +4,7 @@ import java.util.Vector;
 class Dictionary {
 	public String graph,graph1;
 	public String vertex,vertex1;
+	public String vertexType,vertexType1;
 	public String vertexValue,vertexValue1;
 	public String edge,edge1;
 	public String edgeValue,edgeValue1;
@@ -11,6 +12,7 @@ class Dictionary {
 	public Dictionary(){
 		this.graph			= "Graph";
 		this.vertex			= "Vertex";
+		this.vertexType		= "Type";
 		this.vertexValue	= "Value";
 		this.edge			= "Edge";
 		this.edgeValue		= "Cost";
@@ -24,7 +26,12 @@ class Dictionary {
 
 public class GrapherSettings {
 
-	public static final String[] exportTypes = {"Json", "Dzn", "Ajacency Matrix (Mzn)", "Lists"};
+	public static final String[] exportTypes = {
+		"Json", 
+		"Dzn", 
+		"Ajacency Matrix (Mzn)", 
+		"Ajacency Matrix with costs(Mzn)", 
+		"Lists"};
 
 	//---------------------------------------------------------------------------
 	
@@ -38,6 +45,8 @@ public class GrapherSettings {
 	protected	boolean showVertexPriorities;
 	protected	boolean allowFirsVertex;
 	protected	boolean firstZero;
+	protected	int		gridScale;
+
 	protected	boolean exportAuto;
 	protected	int		exportType;
 
@@ -56,6 +65,7 @@ public class GrapherSettings {
 		this.showVertexPriorities	= false;
 		this.allowFirsVertex		= true;
 		this.firstZero				= true;
+		this.gridScale				= 10;
 		this.exportAuto				= false;
 		this.exportType				= 0;
 		this.dictionary				= new Dictionary();

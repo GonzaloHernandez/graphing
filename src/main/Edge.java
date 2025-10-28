@@ -19,7 +19,7 @@ public class Edge {
 
 	private	Vertex				source,target;
 	private	int					status;
-	private	EdgeType		type;
+	private	EdgeType			type;
 	private	QuadCurve2D.Double	curve;
 	private	Point				start,end,middle,control,text,arrowleft,arrowright,arrow;
 	private	int					distance;
@@ -201,7 +201,6 @@ public class Edge {
 			
 			arrow.x	= control.x;
 			arrow.y	= control.y;
-
 		}
 
 		//--- draw arrow ---
@@ -294,55 +293,193 @@ public class Edge {
 		int x = px;
 		int	y = py;
 		
-		int		xi,yi,xf,yf;
-		double	angle,otherangle,hypotenuse;
+		double	angle,hypotenuse;
 		
 		if (source.equals(target)){
 			hypotenuse			= (int)Math.sqrt(Math.pow(Math.abs(control.x-x),2)+Math.pow(Math.abs(control.y-y),2));
 			double hypostate	= (int)Math.sqrt(Math.pow(Math.abs(source.getX()-x),2)+Math.pow(Math.abs(source.getY()-y),2));
 			
-			return (hypotenuse <= distance && hypostate >= Vertex.RADIUS);
+			return (hypotenuse < distance+5 && hypotenuse > distance-5 && hypostate >= Vertex.RADIUS);
 		}
 		
-		if (curve.contains(x,y)) return true;
-		
-		hypotenuse	= (int)Math.sqrt(Math.pow(Math.abs(target.getX()-source.getX()),2)+Math.pow(Math.abs(target.getY()-source.getY()),2));
-		if (Math.abs(source.getY()-target.getY())<Math.abs(source.getX()-target.getX()))
-			angle	= Math.asin(Math.abs(target.getY()-source.getY())/hypotenuse);
-		else
-			angle	= Math.acos(Math.abs(target.getX()-source.getX())/hypotenuse);
-		
-		if (source.getX()<target.getX()) {	
-			xi	= (int)(source.getX() + Math.cos(angle) * Vertex.RADIUS);
-			xf	= (int)(source.getX() + Math.cos(angle) * (hypotenuse - Vertex.RADIUS-3));
+		int sill=8;
+		double	alpha,theta,grandHypotenuse;
+		boolean	isInCurve1=false,isInCurve2=false;
+
+		{ // curve 1
+
+			//--- middle point ---
+			
+			hypotenuse	= (int)Math.sqrt(Math.pow(Math.abs(target.getX()-source.getX()),2)+Math.pow(Math.abs(target.getY()-source.getY()),2));
+			if (Math.abs(source.getY()-target.getY())<Math.abs(source.getX()-target.getX()))
+				angle	= Math.asin(Math.abs(target.getY()-source.getY())/hypotenuse);
+			else
+				angle	= Math.acos(Math.abs(target.getX()-source.getX())/hypotenuse);
+			
+			if (source.getX()<target.getX())	middle.x	= (int)(source.getX() + Math.cos(angle) * (hypotenuse /2));
+			else								middle.x	= (int)(source.getX() - Math.cos(angle) * (hypotenuse /2));
+			if (source.getY()<target.getY())	middle.y	= (int)(source.getY() + Math.sin(angle) * (hypotenuse /2));
+			else								middle.y	= (int)(source.getY() - Math.sin(angle) * (hypotenuse /2));
+	
+			grandHypotenuse	= hypotenuse;
+					
+			//--- control point ---
+			
+			hypotenuse	= (int)Math.sqrt(Math.pow((distance+(sill*(distance>=0?1:-1))),2)+Math.pow(grandHypotenuse/2,2));
+			if ((source.getX()<=target.getX() && source.getY()<=target.getY()) || (source.getX()>target.getX() && source.getY()>target.getY()) )
+				alpha	= Math.asin((distance+(sill*(distance>=0?1:-1)))/hypotenuse);
+			else
+				alpha	= Math.asin(((distance+(sill*(distance>=0?1:-1)))*-1)/hypotenuse);
+				
+			theta	= angle - alpha;
+			
+			if (source.getX() <= middle.x)	control.x	= (int)(source.getX() + Math.cos(theta) * (hypotenuse));
+			else							control.x	= (int)(source.getX() - Math.cos(theta) * (hypotenuse));
+	
+			if (source.getY() <= middle.y)	control.y	= (int)(source.getY() + Math.sin(theta) * (hypotenuse));
+			else							control.y	= (int)(source.getY() - Math.sin(theta) * (hypotenuse));
+	
+			//--- start point ---
+			
+			if (Math.abs(source.getY()-control.y)<Math.abs(source.getX()-control.y))
+				angle	= Math.asin(Math.abs(control.y-source.getY())/hypotenuse);
+			else
+				angle	= Math.acos(Math.abs(control.x-source.getX())/hypotenuse);
+					
+			if (source.getX()<control.x)	start.x		= (int)(source.getX() + Math.cos(angle) * Vertex.RADIUS);
+			else							start.x		= (int)(source.getX() - Math.cos(angle) * Vertex.RADIUS);
+			
+			if (source.getY()<control.y)	start.y		= (int)(source.getY() + Math.sin(angle) * Vertex.RADIUS);
+			else							start.y		= (int)(source.getY() - Math.sin(angle) * Vertex.RADIUS);
+			
+			//--- end point ---
+			
+			if (Math.abs(control.y-target.getY())<Math.abs(control.x-target.getX()))
+				angle	= Math.asin(Math.abs(target.getY()-control.y)/hypotenuse);
+			else
+				angle	= Math.acos(Math.abs(target.getX()-control.x)/hypotenuse);
+					
+			if (control.x<target.getX())	end.x		= (int)(control.x + Math.cos(angle) * (hypotenuse - Vertex.RADIUS-1));
+			else							end.x		= (int)(control.x - Math.cos(angle) * (hypotenuse - Vertex.RADIUS-1));
+			
+			if (control.y<target.getY())	end.y		= (int)(control.y + Math.sin(angle) * (hypotenuse - Vertex.RADIUS-1));
+			else							end.y		= (int)(control.y - Math.sin(angle) * (hypotenuse - Vertex.RADIUS-1));
+	
+			curve.setCurve(start,control,end);
+
+			isInCurve1 = curve.contains(x,y);
 		}
-		else {			
-			xi	= (int)(source.getX() - Math.cos(angle) * Vertex.RADIUS);
-			xf	= (int)(source.getX() - Math.cos(angle) * (hypotenuse - Vertex.RADIUS-3));
+
+		{ // curve 2
+
+			//--- middle point ---
+			
+			hypotenuse	= (int)Math.sqrt(Math.pow(Math.abs(target.getX()-source.getX()),2)+Math.pow(Math.abs(target.getY()-source.getY()),2));
+			if (Math.abs(source.getY()-target.getY())<Math.abs(source.getX()-target.getX()))
+				angle	= Math.asin(Math.abs(target.getY()-source.getY())/hypotenuse);
+			else
+				angle	= Math.acos(Math.abs(target.getX()-source.getX())/hypotenuse);
+			
+			if (source.getX()<target.getX())	middle.x	= (int)(source.getX() + Math.cos(angle) * (hypotenuse /2));
+			else								middle.x	= (int)(source.getX() - Math.cos(angle) * (hypotenuse /2));
+			if (source.getY()<target.getY())	middle.y	= (int)(source.getY() + Math.sin(angle) * (hypotenuse /2));
+			else								middle.y	= (int)(source.getY() - Math.sin(angle) * (hypotenuse /2));
+	
+			grandHypotenuse	= hypotenuse;
+					
+			//--- control point ---
+			
+			hypotenuse	= (int)Math.sqrt(Math.pow((distance-(sill*(distance>=0?1:-1))),2)+Math.pow(grandHypotenuse/2,2));
+			if ((source.getX()<=target.getX() && source.getY()<=target.getY()) || (source.getX()>target.getX() && source.getY()>target.getY()) )
+				alpha	= Math.asin((distance-(sill*(distance>=0?1:-1)))/hypotenuse);
+			else
+				alpha	= Math.asin(((distance-(sill*(distance>=0?1:-1)))*-1)/hypotenuse);
+				
+			theta	= angle - alpha;
+			
+			if (source.getX() <= middle.x)	control.x	= (int)(source.getX() + Math.cos(theta) * (hypotenuse));
+			else							control.x	= (int)(source.getX() - Math.cos(theta) * (hypotenuse));
+	
+			if (source.getY() <= middle.y)	control.y	= (int)(source.getY() + Math.sin(theta) * (hypotenuse));
+			else							control.y	= (int)(source.getY() - Math.sin(theta) * (hypotenuse));
+	
+			//--- start point ---
+			
+			if (Math.abs(source.getY()-control.y)<Math.abs(source.getX()-control.y))
+				angle	= Math.asin(Math.abs(control.y-source.getY())/hypotenuse);
+			else
+				angle	= Math.acos(Math.abs(control.x-source.getX())/hypotenuse);
+					
+			if (source.getX()<control.x)	start.x		= (int)(source.getX() + Math.cos(angle) * Vertex.RADIUS);
+			else							start.x		= (int)(source.getX() - Math.cos(angle) * Vertex.RADIUS);
+			
+			if (source.getY()<control.y)	start.y		= (int)(source.getY() + Math.sin(angle) * Vertex.RADIUS);
+			else							start.y		= (int)(source.getY() - Math.sin(angle) * Vertex.RADIUS);
+			
+			//--- end point ---
+			
+			if (Math.abs(control.y-target.getY())<Math.abs(control.x-target.getX()))
+				angle	= Math.asin(Math.abs(target.getY()-control.y)/hypotenuse);
+			else
+				angle	= Math.acos(Math.abs(target.getX()-control.x)/hypotenuse);
+					
+			if (control.x<target.getX())	end.x		= (int)(control.x + Math.cos(angle) * (hypotenuse - Vertex.RADIUS-1));
+			else							end.x		= (int)(control.x - Math.cos(angle) * (hypotenuse - Vertex.RADIUS-1));
+			
+			if (control.y<target.getY())	end.y		= (int)(control.y + Math.sin(angle) * (hypotenuse - Vertex.RADIUS-1));
+			else							end.y		= (int)(control.y - Math.sin(angle) * (hypotenuse - Vertex.RADIUS-1));
+	
+			curve.setCurve(start,control,end);
+
+			isInCurve2 = curve.contains(x,y);
 		}
-		
-		if (source.getY()<target.getY()) {	
-			yi	= (int)(source.getY() + Math.sin(angle) * Vertex.RADIUS);
-			yf	= (int)(source.getY() + Math.sin(angle) * (hypotenuse - Vertex.RADIUS-3));
+
+		if (Math.abs(distance) <= sill) {
+			if (isInCurve1 || isInCurve2) return true;
+
+			int		xi,yi,xf,yf;
+			double	otherangle;
+			hypotenuse	= (int)Math.sqrt(Math.pow(Math.abs(target.getX()-source.getX()),2)+Math.pow(Math.abs(target.getY()-source.getY()),2));
+			if (Math.abs(source.getY()-target.getY())<Math.abs(source.getX()-target.getX()))
+				angle	= Math.asin(Math.abs(target.getY()-source.getY())/hypotenuse);
+			else
+				angle	= Math.acos(Math.abs(target.getX()-source.getX())/hypotenuse);
+			
+			if (source.getX()<target.getX()) {	
+				xi	= (int)(source.getX() + Math.cos(angle) * Vertex.RADIUS);
+				xf	= (int)(source.getX() + Math.cos(angle) * (hypotenuse - Vertex.RADIUS-3));
+			}
+			else {			
+				xi	= (int)(source.getX() - Math.cos(angle) * Vertex.RADIUS);
+				xf	= (int)(source.getX() - Math.cos(angle) * (hypotenuse - Vertex.RADIUS-3));
+			}
+			
+			if (source.getY()<target.getY()) {	
+				yi	= (int)(source.getY() + Math.sin(angle) * Vertex.RADIUS);
+				yf	= (int)(source.getY() + Math.sin(angle) * (hypotenuse - Vertex.RADIUS-3));
+			}
+			else {			
+				yi	= (int)(source.getY() - Math.sin(angle) * Vertex.RADIUS);
+				yf	= (int)(source.getY() - Math.sin(angle) * (hypotenuse - Vertex.RADIUS-3));
+			}
+			
+			if (xi<xf && (x<xi || x>xf))	return false;
+			if (xi>xf && (x<xf || x>xi))	return false;
+			if (yi<yf && (y<yi || y>yf))	return false;
+			if (yi>yf && (y<yf || y>yi))	return false;
+			
+			hypotenuse	= (int)Math.sqrt(Math.pow(Math.abs(x-source.getX()),2)+Math.pow(Math.abs(y-source.getY()),2));
+			if (Math.abs(source.getY()-y)<Math.abs(source.getX()-x))
+				otherangle	= Math.asin(Math.abs(y-source.getY())/hypotenuse);
+			else
+				otherangle	= Math.acos(Math.abs(x-source.getX())/hypotenuse);
+			
+			if (Math.abs(angle - otherangle) > 0.1) return false;
+			return true;
 		}
-		else {			
-			yi	= (int)(source.getY() - Math.sin(angle) * Vertex.RADIUS);
-			yf	= (int)(source.getY() - Math.sin(angle) * (hypotenuse - Vertex.RADIUS-3));
+		else {
+			return (isInCurve1 && !isInCurve2);
 		}
-		
-		if (xi<xf && (x<xi || x>xf))	return false;
-		if (xi>xf && (x<xf || x>xi))	return false;
-		if (yi<yf && (y<yi || y>yf))	return false;
-		if (yi>yf && (y<yf || y>yi))	return false;
-		
-		hypotenuse	= (int)Math.sqrt(Math.pow(Math.abs(x-source.getX()),2)+Math.pow(Math.abs(y-source.getY()),2));
-		if (Math.abs(source.getY()-y)<Math.abs(source.getX()-x))
-			otherangle	= Math.asin(Math.abs(y-source.getY())/hypotenuse);
-		else
-			otherangle	= Math.acos(Math.abs(x-source.getX())/hypotenuse);
-		
-		if (Math.abs(angle - otherangle) > 0.1) return false;
-		return true;
 	}
 	
 	//-------------------------------------------------------------------------------------

@@ -1,6 +1,7 @@
 package main;
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -8,13 +9,21 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JFormattedTextField;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.UIManager;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
+import javax.swing.text.DefaultFormatterFactory;
+import javax.swing.text.NumberFormatter;
 
 public class ViewGeneral extends JPanel {
 
@@ -31,6 +40,7 @@ public class ViewGeneral extends JPanel {
 	protected	JTabbedPane	info;
 	protected	JTextArea	comment;
 	protected	JTextArea	export;
+	protected	JSpinner	gridScale;
 	protected	JComboBox<String>	exportType;
 
 	private GrapherSettings settings;
@@ -56,9 +66,22 @@ public class ViewGeneral extends JPanel {
 		showTypeNames			= new JCheckBox("Show connection values");
 		allowFirstState			= new JCheckBox("Allow first state");
 		firstZero				= new JCheckBox("Start at Zero (0)");
-		exportAuto				= new JCheckBox("Export automatically" + 
-									GrapherSettings.exportTypes[0] + "]");
+		gridScale				= new JSpinner(new SpinnerNumberModel(10,1,100,1));
+		JPanel gridScalePanel	= new JPanel(new FlowLayout(FlowLayout.LEFT));
+		exportAuto				= new JCheckBox("Export automatically");
 
+		gridScalePanel.add(new JLabel("Grid Scale: "));
+		gridScalePanel.add(gridScale);
+
+		JComponent editor = gridScale.getEditor();
+		JFormattedTextField tf = ((JSpinner.DefaultEditor) editor).getTextField();
+		tf.setEditable(true); // allow editing
+		tf.setHorizontalAlignment(JTextField.CENTER);
+		
+		((NumberFormatter) ((JFormattedTextField.AbstractFormatter) 
+		((DefaultFormatterFactory) tf.getFormatterFactory()).getDefaultFormatter()))
+		.setAllowsInvalid(false
+		);
 
 		panelChecks.add(showStateNumbers);
 		panelChecks.add(showStateValues);
@@ -66,7 +89,7 @@ public class ViewGeneral extends JPanel {
 		panelChecks.add(showTypeNames);
 		panelChecks.add(allowFirstState);
 		panelChecks.add(firstZero);
-
+		panelChecks.add(gridScalePanel);
 
 		info					= new JTabbedPane();
 
@@ -181,7 +204,14 @@ public class ViewGeneral extends JPanel {
 				main.currentSession.board.repaint();
 			}
 		});
-	
+
+		gridScale.addChangeListener(e -> {
+			settings = main.currentSession.board.settings;
+			settings.gridScale = (Integer)gridScale.getValue();
+			main.currentSession.board.gridScale = (Integer)settings.gridScale;
+			main.currentSession.setModified(true);
+			main.currentSession.board.repaint();
+		});
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -194,6 +224,8 @@ public class ViewGeneral extends JPanel {
 		showStateValues.setSelected(settings.showVertexPriorities);
 		allowFirstState.setSelected(settings.allowFirsVertex);
 		firstZero.setSelected(settings.firstZero);
+		gridScale.setValue(settings.gridScale);
+
 		exportAuto.setSelected(settings.exportAuto);
 		comment.setText(settings.comment);
 		exportType.setSelectedIndex(settings.exportType);

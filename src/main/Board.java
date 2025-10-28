@@ -40,22 +40,27 @@ public class Board extends JComponent implements Printable{
 	protected	Vector			<Vertex>vertices;
 	protected	GrapherSession	session;
 	protected	Vector			<EdgeType>types;
-	protected	Edge		currentConnection;
+	protected	Edge			currentConnection;
 	protected	Vertex			vertexSource,vertexTarget;
 	protected	boolean			menuBlock;
 	protected	Compiler		compiler;
 	protected	PageFormat		pageFormat;
 	protected	double			scaleFactor;
+	protected	int				gridScale;
 	protected	boolean			hidden;
+	protected	boolean			showGrid;
 		
 	//-------------------------------------------------------------------------------------
 	
 	public Board(GrapherSession session) {
 		this.session		= session;
+
 		this.menuBlock		= false;
 		this.compiler		= null;
 		this.scaleFactor	= 1;
+		this.gridScale		= 10;
 		this.hidden			= false;
+		this.showGrid		= false;
 		getInputMap().put(KeyStroke.getKeyStroke("A"), "actionName");
 		initElements();
 		progListeners();
@@ -104,8 +109,22 @@ public class Board extends JComponent implements Printable{
 			RenderingHints.KEY_TEXT_ANTIALIASING,
 			RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
+
 		g.setColor(Color.WHITE);
 		g.fillRect(0,0,getWidth(),getHeight());
+
+
+		if (showGrid) {
+			for(int gy=0; gy<getHeight()/scaleFactor; gy+=gridScale){
+				g.setColor(new Color(245,245,245));
+				g.drawLine(0,gy,getWidth(),gy);
+			}
+			for(int gx=gridScale; gx<getWidth()/scaleFactor; gx+=gridScale){
+				g.setColor(new Color(245,245,245));
+				g.drawLine(gx,0,gx,getHeight());
+			}
+		}
+
 		if (controled) {
 			g.setColor(Color.BLACK);
 			if (vertexTarget!=null) {
@@ -209,6 +228,9 @@ public class Board extends JComponent implements Printable{
 				if (e.getKeyCode() == KeyEvent.VK_H) {
 					hidden = true;
 				}
+				else if (e.getKeyCode() == KeyEvent.VK_G) {
+					showGrid = !showGrid;
+				}
 
 				repaint();
 			}
@@ -216,8 +238,8 @@ public class Board extends JComponent implements Printable{
 			public void keyReleased(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_H) {
 					hidden = false;
-					repaint();
 				}
+				repaint();
 			}
 
 			public void keyTyped(KeyEvent e) {
@@ -262,8 +284,8 @@ public class Board extends JComponent implements Printable{
 
 				// BUTTON1 + Double-click (No CTRL)
 				if (button == MouseEvent.BUTTON1 && e.getClickCount() == 2 && !ctrlDown) {
-					int mousex = (int) (Math.round((int) (e.getX() / scaleFactor) / 10) * 10);
-					int mousey = (int) (Math.round((int) (e.getY() / scaleFactor) / 10) * 10);
+					int mousex = (int) (Math.round((e.getX() / scaleFactor) / gridScale) * gridScale);
+					int mousey = (int) (Math.round((e.getY() / scaleFactor) / gridScale) * gridScale);
 					if (vertexTarget != null) {
 						vertexTarget.setStatus(Vertex.STILL);
 					}
@@ -309,7 +331,6 @@ public class Board extends JComponent implements Printable{
 						else {
 							if (vertexTarget!=null) vertexTarget.setStatus(Vertex.STILL);
 							vertexTarget = vertex;
-							vertexTarget.setMouseDiference((int)(e.getX()/scaleFactor),(int)(e.getY()/scaleFactor));
 							vertexTarget.setStatus(Vertex.FOCUSED);
 						}
 					}
@@ -352,8 +373,8 @@ public class Board extends JComponent implements Printable{
 				mousey = (int)(e.getY()/scaleFactor);
 				if (!e.isControlDown()) {
 					if (!controled && vertexTarget!=null) {
-						mousex = (int)(Math.round(mousex/10)*10);
-						mousey = (int)(Math.round(mousey/10)*10);
+						mousex = (int)(Math.round((double)mousex/gridScale)*gridScale);
+						mousey = (int)(Math.round((double)mousey/gridScale)*gridScale);
 						vertexTarget.setLocation(mousex,mousey);
 						session.setModified(true);
 					}
@@ -559,12 +580,15 @@ public class Board extends JComponent implements Printable{
 
 			settings.exportAuto				= file.readBoolean();
 			settings.exportType				= file.readShort();
+			settings.gridScale				= file.readShort();
 
 			Dictionary dict = settings.dictionary;
 			dict.graph			= file.readUTF();
 			dict.graph1			= file.readUTF();
 			dict.vertex			= file.readUTF();
 			dict.vertex1		= file.readUTF();
+			dict.vertexType		= file.readUTF();
+			dict.vertexType1	= file.readUTF();
 			dict.vertexValue	= file.readUTF();
 			dict.vertexValue1	= file.readUTF();
 			dict.edge			= file.readUTF();
@@ -789,6 +813,7 @@ public class Board extends JComponent implements Printable{
 
 			file.writeBoolean(settings.exportAuto);
 			file.writeShort(settings.exportType);
+			file.writeShort(settings.gridScale);
 
 			Dictionary dict = settings.dictionary;
 			
@@ -796,6 +821,8 @@ public class Board extends JComponent implements Printable{
 			file.writeUTF(dict.graph1);
 			file.writeUTF(dict.vertex);
 			file.writeUTF(dict.vertex1);
+			file.writeUTF(dict.vertexType);
+			file.writeUTF(dict.vertexType1);
 			file.writeUTF(dict.vertexValue);
 			file.writeUTF(dict.vertexValue1);
 			file.writeUTF(dict.edge);
@@ -861,8 +888,8 @@ public class Board extends JComponent implements Printable{
 			for (int i = 0; i < vertices.size(); i++) {
 				Vertex s = vertices.elementAt(i);
 				json.append("    { \"id\": ").append(i + first)
-					.append(", \"value\": ").append(s.getValue())
-					.append(", \"owner\": ").append(s.getOwner())
+					.append(", \""+settings.dictionary.vertexType+"\": ").append(s.getOwner())
+					.append(", \""+settings.dictionary.vertexValue+"\": ").append(s.getValue())
 					.append(" }");
 				if (i < vertices.size() - 1) json.append(",");
 				json.append("\n");
@@ -870,16 +897,21 @@ public class Board extends JComponent implements Printable{
 			json.append("  ],\n");
 
 			json.append("  \"edges\": [\n");
+			int id=0;
 			boolean firstEdge = true;
 			for (Vertex s : vertices) {
 				for (Edge c : s.getConnections()) {
 					if (!firstEdge) json.append(",\n");
-					json.append("    { \"source\": ")
+					json.append("    { \"id\": ").append(id + first)
+						.append(", \"source\": ")
 						.append(c.getSource().getNumber() + first)
 						.append(", \"target\": ")
 						.append(c.getTarget().getNumber() + first)
+						.append(", \""+settings.dictionary.edgeValue+"\": ")
+						.append(c.getValue())
 						.append(" }");
 					firstEdge = false;
+					id++;
 				}
 			}
 			json.append("\n  ]\n");
@@ -907,33 +939,39 @@ public class Board extends JComponent implements Printable{
 				to		= to	.substring(0, to.length()-1);	
 			}
 
-			String values = "";
-			String owners = "";
+			String vertexTypes = "";
+			String vertexValues = "";
+			String edgeValues = "";
 
-			for (int i=0;i<vertices.size();i++){
-				values += vertices.elementAt(i).getValue() + ",";
-				owners += vertices.elementAt(i).getOwner() + ",";
+			for (int v=0;v<vertices.size();v++){
+				vertexValues += vertices.elementAt(v).getValue() + ",";
+				vertexTypes += vertices.elementAt(v).getOwner() + ",";
+				for (Edge e : vertices.elementAt(v).getConnections()) {
+					edgeValues += e.getValue() + ",";
+				}
 			}
 
-			if (values.length()>0) {
-				values = values.substring(0, values.length()-1);
-				owners = owners.substring(0, owners.length()-1);	
+			if (vertexValues.length()>0) {
+				vertexValues = vertexValues.substring(0, vertexValues.length()-1);
+				vertexTypes = vertexTypes.substring(0, vertexTypes.length()-1);
+				edgeValues = edgeValues.substring(0, edgeValues.length()-1);
 			}
 
 			//----------------------------------------------------------
 
 			session.main.properties.generalView.export.setText(
 				"nvertices = " + size + ";\n" +
-				"owners    = [" + owners + "];\n" +
-				"colors    = [" + values + "];\n" +
-				"nedges    = " + nConections + ";\n" +
-				"sources   = [" + from + "];\n" +
-				"targets   = [" + to + "];\n" +
+				settings.dictionary.vertexType + " = [" + vertexTypes + "];\n" +
+				settings.dictionary.vertexValue + " = [" + vertexValues + "];\n" +
+				"nedges = " + nConections + ";\n" +
+				"sources = [" + from + "];\n" +
+				"targets = [" + to + "];\n" +
+				settings.dictionary.edgeValue + " = [" + edgeValues + "];\n" +
 				"\n"
 			);
 			return true;
 
-		case 2: // Adjacency Matrix (Minizinc)
+		case 2: { // Adjacency Matrix (MZN)
 		
 			String matrix = "[";
 			for (int v=0;v<size;v++){
@@ -943,6 +981,7 @@ public class Board extends JComponent implements Printable{
 					for (int i=0;i<vertices.elementAt(v).getConnections().size();i++){
 						if (vertices.elementAt(v).getConnections().elementAt(i).getTarget().getNumber()==t) {
 							found = true;
+							break;
 						}
 					}
 					matrix += found?"1":"0";
@@ -958,7 +997,48 @@ public class Board extends JComponent implements Printable{
 				matrix +
 				"\n"
 			);
-			return true;
+		}
+		return true;
+
+		case 3: { // Adjacency Matrix with costs (MZN)
+		
+			int max = 0;
+			for (Vertex v : vertices){
+				for (Edge e : v.getConnections()){
+					if (e.getValue() > max) {
+						max = e.getValue();
+					}
+				}
+			}
+			int digits = String.valueOf(Math.abs(max)).length();
+
+			String matrix = "[";
+			for (int v=0;v<size;v++){
+				matrix += v==0?"|":" |";
+				for (int t=0;t<size;t++){
+					int cost = 0;
+					for (int i=0;i<vertices.elementAt(v).getConnections().size();i++){
+						if (vertices.elementAt(v).getConnections().elementAt(i).getTarget().getNumber()==t) {
+							cost = vertices.elementAt(v).getConnections().elementAt(i).getValue();
+							break;
+						}
+					}
+					String s = String.format("%"+digits+"d", cost );
+					matrix += s;
+					if (t<vertices.size()-1) matrix += ","; 
+					else 
+						matrix += "";
+				}
+				if (v<vertices.size()-1) matrix += "\n"; 
+				else 
+					matrix += "|];\n";
+			}
+			session.main.properties.generalView.export.setText(
+				matrix +
+				"\n"
+			);
+		}
+		return true;
 
 		default:
 			session.main.properties.generalView.export.setText(
@@ -1130,13 +1210,13 @@ public class Board extends JComponent implements Printable{
 	}
 
 	public void screenshot(Graphics g1) {
-        int width	= (int)(getWidth() * scaleFactor);
-        int height	= (int)(getHeight() * scaleFactor);
+        int width	= (int)(getWidth() * Math.max(scaleFactor,2));
+        int height	= (int)(getHeight() * Math.max(scaleFactor,2));
 
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         
         Graphics2D g2 = image.createGraphics();
-		g2.scale(scaleFactor,scaleFactor);
+		g2.scale(Math.max(scaleFactor,2),Math.max(scaleFactor,2));
         paint(g2);
         g2.dispose();
 

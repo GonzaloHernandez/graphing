@@ -3,7 +3,7 @@
 # Define versioning variables
 FAMILY=1
 VERSION=2
-CONSTRUCTION=9
+CONSTRUCTION=10
 
 # File paths
 JAVA_FILE="src/main/GrapherMain.java"
@@ -48,8 +48,8 @@ sed -i "s/Graphing-v[0-9]*\.[0-9]*\.[0-9]*\.jar/$JAR_NAME/" "$README_FILE"
 echo "::Updated $README_FILE with the new JAR file name: $JAR_NAME"
 
 # ===============================================================================
-# (DONE) Scale menu options according to OS settings or custom scaling
-# (DONE) Initials of States and Actions
-# (DONE) Export to JSON and TXT (in addition to DZN)
-# (DONE) Dictionary for common names (Vertex, Node, State, etc.)
-# (DONE) Source code reestructured
+# (DONE) Fixed checkbox text: "Export automatically..."
+# (DONE) Export adjacency matrix including costs
+# (DONE) Customizable "Snap to Grid" with grid display (G)
+# (DONE) Improved edge selection functionality
+# (DONE) Export using dictionary's words

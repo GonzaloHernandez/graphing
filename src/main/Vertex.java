@@ -18,7 +18,6 @@ public class Vertex {
 	
 	private	int		x,y,number;
 	private	int		status;
-	private	int		diferencex,diferencey;
 	private	Vector	<Edge>connections;
 	private	Vector	<Edge>arrivals;
 	private	boolean	accepted;
@@ -80,7 +79,7 @@ public class Vertex {
 
 		for (int i=0 ; i<connections.size() ; i++) {
 			Edge connection = (Edge)connections.elementAt(i);
-			if (hidden && !connection.getTarget().isActive()) {
+			if (hidden && !connection.isActive()) {
 				connectionSequence++;
 			}
 			else {
@@ -180,8 +179,8 @@ public class Vertex {
 	//-------------------------------------------------------------------------------------
 
 	public void setLocation(int mousex,int mousey) {
-		x = (int)(Math.round((mousex-diferencex)/10.0)*10);
-		y = (int)(Math.round((mousey-diferencey)/10.0)*10);
+		x = mousex;
+		y = mousey;
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -228,10 +227,10 @@ public class Vertex {
 	}
 	//-------------------------------------------------------------------------------------
 
-	public void setMouseDiference(int mousex,int mousey) {
-		diferencex	= mousex - x;
-		diferencey	= mousey - y;
-	}
+	// public void setMouseDiference(int mousex,int mousey) {
+	// 	diferencex	= mousex - x;
+	// 	diferencey	= mousey - y;
+	// }
 	
 	//-------------------------------------------------------------------------------------
 
