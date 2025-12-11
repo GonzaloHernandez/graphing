@@ -92,8 +92,8 @@ public class Edge {
 		
 		if (source.equals(target)){
 			switch (status) {
+				case STILL:		if (active) g.setColor(Color.GRAY); else g.setColor(Color.lightGray); break;
 				case MARKED:	g.setColor(Color.YELLOW);	break;
-				case STILL:		if (type!=null) g.setColor(Color.BLACK); else g.setColor(Color.GRAY); break;
 				case FOCUSED:	g.setColor(Color.RED);		break;
 			}
 			

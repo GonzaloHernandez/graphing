@@ -1,5 +1,9 @@
 package main;
 
+import java.awt.Dimension;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+
 import javax.swing.JInternalFrame;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;

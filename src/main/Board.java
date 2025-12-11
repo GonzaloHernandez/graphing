@@ -1,5 +1,6 @@
 package main;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.FileDialog;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -27,6 +28,7 @@ import java.util.Vector;
 import javax.imageio.ImageIO;
 import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
+import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
 public class Board extends JComponent implements Printable{
@@ -96,7 +98,6 @@ public class Board extends JComponent implements Printable{
 	//-------------------------------------------------------------------------------------
 
 	public void paint(Graphics g1) {
-
 		Graphics2D g = (Graphics2D) g1;
 
 		g.scale(scaleFactor,scaleFactor);
@@ -109,10 +110,8 @@ public class Board extends JComponent implements Printable{
 			RenderingHints.KEY_TEXT_ANTIALIASING,
 			RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
-
 		g.setColor(Color.WHITE);
-		g.fillRect(0,0,getWidth(),getHeight());
-
+		g.fillRect(0,0,(int)(session.getWidth()/scaleFactor),(int)(session.getHeight()/scaleFactor));
 
 		if (showGrid) {
 			for(int gy=0; gy<getHeight()/scaleFactor; gy+=gridScale){
@@ -218,10 +217,14 @@ public class Board extends JComponent implements Printable{
 					else if (e.getKeyChar() == '+' || e.getKeyChar() == '=' || 
 							e.getKeyChar() == '*' || e.getKeyCode() == KeyEvent.VK_PLUS) {
 						scaleFactor += 0.1;
+						Dimension d = session.getPreferredSize();
+						session.setSize((int)(d.width*scaleFactor),(int)(d.height*scaleFactor));
 					}
 					else if (e.getKeyChar() == '-' || e.getKeyChar() == '_' ||
 							e.getKeyCode() == KeyEvent.VK_MINUS) {
 						scaleFactor -= 0.1;
+						Dimension d = session.getPreferredSize();
+						session.setSize((int)(d.width*scaleFactor),(int)(d.height*scaleFactor));
 					}
 				}
 
@@ -247,6 +250,7 @@ public class Board extends JComponent implements Printable{
 			}
 			
 		});
+
 		addMouseListener(new MouseListener() {
 			public void mouseClicked(MouseEvent e) {
 				int modifiers = e.getModifiersEx();
@@ -284,6 +288,42 @@ public class Board extends JComponent implements Printable{
 
 				// BUTTON1 + Double-click (No CTRL)
 				if (button == MouseEvent.BUTTON1 && e.getClickCount() == 2 && !ctrlDown) {
+					if (vertexTarget != null) {
+						int currentval = vertexTarget.getValue();
+						String val = JOptionPane.showInputDialog(session, settings.dictionary.vertexValue,""+currentval);
+						if (val != null) {
+							try {
+								vertexTarget.setValue(Integer.parseInt(val));
+							}
+							catch (NumberFormatException ex) {
+								return;
+							}
+						} else {
+							return;
+						}
+						repaint();
+						session.setModified(true);						
+						return;
+					}
+					if (currentConnection != null) {
+						EdgeType t = new EdgeType(0,"","");
+						int currentval = currentConnection.getValue();
+						String val = JOptionPane.showInputDialog(session, settings.dictionary.edgeValue,""+currentval);
+						if (val != null) {
+							try {
+								currentConnection.setValue(Integer.parseInt(val));
+							}
+							catch (NumberFormatException ex) {
+								return;
+							}
+						} else {
+							return;
+						}						
+						currentConnection.setType(t);
+						repaint();
+						session.setModified(true);						
+						return;
+					}
 					int mousex = (int) (Math.round((e.getX() / scaleFactor) / gridScale) * gridScale);
 					int mousey = (int) (Math.round((e.getY() / scaleFactor) / gridScale) * gridScale);
 					if (vertexTarget != null) {
@@ -309,7 +349,7 @@ public class Board extends JComponent implements Printable{
 
 			}
 
-			public void mousePressed(MouseEvent e) {				
+			public void mousePressed(MouseEvent e) {
 				if (vertexTarget != null) {
 					vertexTarget.setStatus(Vertex.STILL);
 					vertexTarget = null;
@@ -427,6 +467,7 @@ public class Board extends JComponent implements Printable{
 			}
 			
 		});
+
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -576,7 +617,9 @@ public class Board extends JComponent implements Printable{
 
 			settings.comment				= file.readUTF();
 	        
-	        session.setSize(file.readShort(),file.readShort());
+			Dimension d = new Dimension(file.readShort(),file.readShort());
+	        session.setSize(d);
+			session.setPreferredSize(d);
 
 			settings.exportAuto				= file.readBoolean();
 			settings.exportType				= file.readShort();
@@ -944,17 +987,16 @@ public class Board extends JComponent implements Printable{
 			String edgeValues = "";
 
 			for (int v=0;v<vertices.size();v++){
-				vertexValues += vertices.elementAt(v).getValue() + ",";
-				vertexTypes += vertices.elementAt(v).getOwner() + ",";
-				for (Edge e : vertices.elementAt(v).getConnections()) {
-					edgeValues += e.getValue() + ",";
+				if (v>0){
+					vertexValues += ",";
+					vertexTypes += ",";
 				}
-			}
-
-			if (vertexValues.length()>0) {
-				vertexValues = vertexValues.substring(0, vertexValues.length()-1);
-				vertexTypes = vertexTypes.substring(0, vertexTypes.length()-1);
-				edgeValues = edgeValues.substring(0, edgeValues.length()-1);
+				vertexValues += vertices.elementAt(v).getValue();
+				vertexTypes += vertices.elementAt(v).getOwner();
+				for (Edge e : vertices.elementAt(v).getConnections()) {
+					if (edgeValues.length()>0)  edgeValues += ",";
+					edgeValues += e.getValue();
+				}
 			}
 
 			//----------------------------------------------------------
