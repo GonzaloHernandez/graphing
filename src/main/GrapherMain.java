@@ -35,7 +35,7 @@ public class GrapherMain extends JFrame{
 	//-------------------------------------------------------------------------------------
 	final int	family			= 1;
 	final int	version			= 2;
-	final int	construcction	= 11;
+	final int	construcction	= 12;
 	
 	//-------------------------------------------------------------------------------------
 
@@ -229,7 +229,7 @@ public class GrapherMain extends JFrame{
 			int xa = 0;
 			int ya = 0;
 			for (int i=0;i<frames.length;i++){
-				if (frames[i].getClass().getName().equals("GrapherSession")){
+				if (frames[i].getClass().getName().equals("main.GrapherSession")){
 					if (frames[i].getX()>xa) xa = frames[i].getX();
 					if (frames[i].getY()>ya) ya = frames[i].getY();
 				}
@@ -249,7 +249,7 @@ public class GrapherMain extends JFrame{
 		int sessionNumber=0;
 		JInternalFrame iframes[] = desktop.getAllFrames();
 		for (int i=0;i<iframes.length;i++){
-			if (iframes[i].getClass().getName().equals("GrapherSession")){
+			if (iframes[i].getClass().getName().equals("main.GrapherSession")){
 				GrapherSession	session = (GrapherSession)iframes[i];
 				if (session.getSessionNumber()>sessionNumber){
 					sessionNumber = session.getSessionNumber();

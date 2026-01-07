@@ -3,7 +3,7 @@
 # Define versioning variables
 FAMILY=1
 VERSION=2
-CONSTRUCTION=11
+CONSTRUCTION=12
 
 # File paths
 JAVA_FILE="src/main/GrapherMain.java"
@@ -48,8 +48,4 @@ sed -i "s/Graphing-v[0-9]*\.[0-9]*\.[0-9]*\.jar/$JAR_NAME/" "$README_FILE"
 echo "::Updated $README_FILE with the new JAR file name: $JAR_NAME"
 
 # ===============================================================================
-# (DONE) Zoom in/out including resizing the window
-# (DONE) Double click over objects to edit property
-# (DONE) Improved edge drawing (curved edges, better selection)
-# (DONE) Correction exporting to DZN
-# (DONE) Correction color of circular edges
+# (DONE) Zoom in/out and resizing corrections

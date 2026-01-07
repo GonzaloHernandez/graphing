@@ -217,14 +217,16 @@ public class Board extends JComponent implements Printable{
 					else if (e.getKeyChar() == '+' || e.getKeyChar() == '=' || 
 							e.getKeyChar() == '*' || e.getKeyCode() == KeyEvent.VK_PLUS) {
 						scaleFactor += 0.1;
-						Dimension d = session.getPreferredSize();
-						session.setSize((int)(d.width*scaleFactor),(int)(d.height*scaleFactor));
+						Dimension d = getPreferredSize();
+						session.manualResizing = true;
+						session.setSize((int)(d.width*scaleFactor)+session.deltaWidth,(int)(d.height*scaleFactor)+session.deltaHeight);
 					}
 					else if (e.getKeyChar() == '-' || e.getKeyChar() == '_' ||
 							e.getKeyCode() == KeyEvent.VK_MINUS) {
 						scaleFactor -= 0.1;
-						Dimension d = session.getPreferredSize();
-						session.setSize((int)(d.width*scaleFactor),(int)(d.height*scaleFactor));
+						Dimension d = getPreferredSize();
+						session.manualResizing = true;
+						session.setSize((int)(d.width*scaleFactor)+session.deltaWidth,(int)(d.height*scaleFactor)+session.deltaHeight);
 					}
 				}
 
@@ -619,7 +621,7 @@ public class Board extends JComponent implements Printable{
 	        
 			Dimension d = new Dimension(file.readShort(),file.readShort());
 	        session.setSize(d);
-			session.setPreferredSize(d);
+			setPreferredSize(d);
 
 			settings.exportAuto				= file.readBoolean();
 			settings.exportType				= file.readShort();

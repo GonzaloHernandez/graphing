@@ -16,6 +16,11 @@ public class GrapherSession extends JInternalFrame{
 	protected	GrapherMain	main;
 	protected	boolean		modified;
 	private		int			sessionNumber;
+
+	boolean		manualResizing;
+
+	int			deltaWidth	= 12;	// Difference between JInternalFrame and Jcomponent size
+	int			deltaHeight	= 36;
 	
 	//-------------------------------------------------------------------------------------
 
@@ -23,8 +28,10 @@ public class GrapherSession extends JInternalFrame{
 		super("",true,true,true,true);
 		this.main 		=  main;
 		this.modified	= false;
-		this.sessionNumber	= 0; 
+		this.sessionNumber	= 0;
+		this.manualResizing = false; 
 		setSize(500,400);
+		setPreferredSize(new Dimension(500-deltaWidth,400-deltaHeight));
 		initElements();
 		progListeners();
 		setDefaultCloseOperation(JInternalFrame.DO_NOTHING_ON_CLOSE);
@@ -77,6 +84,31 @@ public class GrapherSession extends JInternalFrame{
 			public void internalFrameDeactivated(InternalFrameEvent arg0) {
 				main.currentSession = null;
 				main.properties.refresh();
+			}
+			
+		});
+
+		addComponentListener(new ComponentListener() {
+
+			@Override
+			public void componentHidden(ComponentEvent e) {
+			}
+
+			@Override
+			public void componentMoved(ComponentEvent e) {
+			}
+
+			@Override
+			public void componentResized(ComponentEvent e) {
+				if (!manualResizing) {
+					Dimension nd = new Dimension((int)(board.getWidth()/board.scaleFactor),(int)(board.getHeight()/board.scaleFactor));
+					board.setPreferredSize(new Dimension(nd.width, nd.height));
+				}
+				manualResizing = false;
+			}
+
+			@Override
+			public void componentShown(ComponentEvent e) {
 			}
 			
 		});
