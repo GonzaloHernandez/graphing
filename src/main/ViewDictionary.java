@@ -2,6 +2,8 @@ package main;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
@@ -181,6 +183,61 @@ public class ViewDictionary extends JPanel{
 				edgeValue1.getSelectedText().length() <1) {
 					e.consume();
 				}
+			}
+		});
+		graph.addFocusListener(new FocusAdapter() {			
+			public void focusGained(FocusEvent e) {
+				graph.selectAll();
+			}
+		});
+		graph1.addFocusListener(new FocusAdapter() {			
+			public void focusGained(FocusEvent e) {
+				graph1.selectAll();
+			}
+		});
+		vertex.addFocusListener(new FocusAdapter() {			
+			public void focusGained(FocusEvent e) {
+				vertex.selectAll();
+			}
+		});
+		vertexType.addFocusListener(new FocusAdapter() {			
+			public void focusGained(FocusEvent e) {
+				vertexType.selectAll();
+			}
+		});
+		vertexType1.addFocusListener(new FocusAdapter() {			
+			public void focusGained(FocusEvent e) {
+				vertexType1.selectAll();
+			}
+		});
+		vertexValue.addFocusListener(new FocusAdapter() {			
+			public void focusGained(FocusEvent e) {
+				vertexValue.selectAll();
+			}
+		});
+		vertexValue1.addFocusListener(new FocusAdapter() {			
+			public void focusGained(FocusEvent e) {
+				vertexValue1.selectAll();
+			}
+		});
+		edge.addFocusListener(new FocusAdapter() {			
+			public void focusGained(FocusEvent e) {
+				edge.selectAll();
+			}
+		});
+		edge1.addFocusListener(new FocusAdapter() {			
+			public void focusGained(FocusEvent e) {
+				edge1.selectAll();
+			}
+		});
+		edgeValue.addFocusListener(new FocusAdapter() {			
+			public void focusGained(FocusEvent e) {
+				edgeValue.selectAll();
+			}
+		});
+		edgeValue1.addFocusListener(new FocusAdapter() {			
+			public void focusGained(FocusEvent e) {
+				edgeValue1.selectAll();
 			}
 		});
 	}

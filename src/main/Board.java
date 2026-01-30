@@ -216,6 +216,7 @@ public class Board extends JComponent implements Printable{
 					}
 					else if (e.getKeyChar() == '+' || e.getKeyChar() == '=' || 
 							e.getKeyChar() == '*' || e.getKeyCode() == KeyEvent.VK_PLUS) {
+						if (scaleFactor > 5.0) return;
 						scaleFactor += 0.1;
 						Dimension d = getPreferredSize();
 						session.manualResizing = true;
@@ -223,6 +224,7 @@ public class Board extends JComponent implements Printable{
 					}
 					else if (e.getKeyChar() == '-' || e.getKeyChar() == '_' ||
 							e.getKeyCode() == KeyEvent.VK_MINUS) {
+						if (scaleFactor < 0.2) return;
 						scaleFactor -= 0.1;
 						Dimension d = getPreferredSize();
 						session.manualResizing = true;
@@ -1010,8 +1012,7 @@ public class Board extends JComponent implements Printable{
 				"nedges = " + nConections + ";\n" +
 				"sources = [" + from + "];\n" +
 				"targets = [" + to + "];\n" +
-				settings.dictionary.edgeValue + " = [" + edgeValues + "];\n" +
-				"\n"
+				settings.dictionary.edgeValue + " = [" + edgeValues + "];\n"
 			);
 			return true;
 

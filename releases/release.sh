@@ -3,7 +3,7 @@
 # Define versioning variables
 FAMILY=1
 VERSION=2
-CONSTRUCTION=12
+CONSTRUCTION=13
 
 # File paths
 JAVA_FILE="src/main/GrapherMain.java"
@@ -49,3 +49,4 @@ echo "::Updated $README_FILE with the new JAR file name: $JAR_NAME"
 
 # ===============================================================================
 # (DONE) Zoom in/out and resizing corrections
+# (DONE) Some improvements in properties elements
