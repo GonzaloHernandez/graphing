@@ -30,7 +30,9 @@ public class GrapherSession extends JInternalFrame{
 		this.modified	= false;
 		this.sessionNumber	= 0;
 		this.manualResizing = false; 
-		setSize(500,400);
+		int w = (int)(main.desktop.getWidth()*0.7);
+		int h = (int)(main.desktop.getHeight()*0.7);
+		setSize(w,h);
 		setPreferredSize(new Dimension(500-deltaWidth,400-deltaHeight));
 		initElements();
 		progListeners();

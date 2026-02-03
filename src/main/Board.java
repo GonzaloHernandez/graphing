@@ -35,23 +35,23 @@ public class Board extends JComponent implements Printable{
 	
 	//-------------------------------------------------------------------------------------
 	
-	protected	int				mousex,mousey;
-	protected	boolean			controled;
-	protected	String			fileName;
-	protected	GrapherSettings	settings;
-	protected	Vector			<Vertex>vertices;
-	protected	GrapherSession	session;
-	protected	Vector			<EdgeType>types;
-	protected	Edge			currentConnection;
-	protected	Vertex			vertexSource,vertexTarget;
-	protected	boolean			menuBlock;
-	protected	Compiler		compiler;
-	protected	PageFormat		pageFormat;
-	protected	double			scaleFactor;
-	protected	int				gridScale;
-	protected	boolean			hidden;
-	protected	boolean			showGrid;
-		
+	protected int				mousex,mousey;
+	protected boolean			controled;
+	protected String			fileName;
+	protected GrapherSettings	settings;
+	protected Vector			<Vertex>vertices;
+	protected GrapherSession	session;
+	protected Vector			<EdgeType>types;
+	protected Edge				currentConnection;
+	protected Vertex			vertexSource,vertexTarget;
+	protected boolean			menuBlock;
+	protected Compiler			compiler;
+	protected PageFormat		pageFormat;
+	protected double			scaleFactor;
+	protected int				gridScale;
+	protected boolean			hidden;
+	protected boolean			showGrid;
+
 	//-------------------------------------------------------------------------------------
 	
 	public Board(GrapherSession session) {
@@ -422,6 +422,10 @@ public class Board extends JComponent implements Printable{
 						vertexTarget.setLocation(mousex,mousey);
 						session.setModified(true);
 					}
+					else if (!controled && currentConnection!=null) {
+						currentConnection.setRotation(mousex, mousey);
+						session.setModified(true);
+					}
 				}
 				else {
 					vertexTarget = null;
@@ -502,7 +506,7 @@ public class Board extends JComponent implements Printable{
 		dialog.setDirectory(session.main.curdir);
 		dialog.setFile("*.aut");
 		dialog.setVisible(true);
-		
+		session.main.requestFocus();		
 		if (dialog.getFile()==null) return;
 		session.main.curdir = dialog.getDirectory();
 
@@ -678,7 +682,7 @@ public class Board extends JComponent implements Printable{
 		dialog.setDirectory(session.main.curdir);
 		dialog.setFile("*.gm");
 		dialog.setVisible(true);
-		
+		session.main.requestFocus();		
 		if (dialog.getFile()==null) return;
 
 		loadImport(dialog.getDirectory()+dialog.getFile());
@@ -708,7 +712,7 @@ public class Board extends JComponent implements Printable{
 				// Parse header
 				if (line.startsWith("parity")) {
 					String[] parts = line.split("\\s+|;");
-					nvertices = Integer.parseInt(parts[1]);
+					nvertices = Integer.parseInt(parts[1])+1;
 					for(int v=0; v<nvertices; v++) {
 						Vertex s = new Vertex(v,x,y,Vertex.STILL,false,0,0);
 						if (x>=250) {
@@ -773,10 +777,16 @@ public class Board extends JComponent implements Printable{
 						return name.endsWith(".aut");
 					}
 				});
-
 				dialog.setDirectory(session.main.curdir);
 				dialog.setFile("*.aut");
+
+				dialog.pack();
+				int x = session.main.getX() + 100;
+				int y = session.main.getY() + 100;
+				dialog.setLocation(x, y);
+
 				dialog.setVisible(true);
+				session.main.requestFocus();
 				if (dialog.getFile()==null) return false;
 				session.main.curdir = dialog.getDirectory();
 				fileName = session.main.curdir+dialog.getFile();
@@ -1276,14 +1286,14 @@ public class Board extends JComponent implements Printable{
 			});
 
 			dialog.setDirectory(session.main.curdir);
-			dialog.setFile(fileName.substring(0, fileName.length()-4)+".png");
+			dialog.setFile("*.png");
 			dialog.setVisible(true);
+			session.main.requestFocus();
 			if (dialog.getFile()==null) return;
 			String pngFileName = dialog.getDirectory()+dialog.getFile();
 
 
 			ImageIO.write(image, "png", new File(pngFileName));
-            System.out.println("Image saved: " + pngFileName);
         } catch (Exception e) {
             e.printStackTrace();
         }		

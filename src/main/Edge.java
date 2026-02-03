@@ -535,6 +535,15 @@ public class Edge {
 		}			
 	}
 
+	public void setRotation(int mx, int my){
+		int a = my - source.getY();
+		int b = mx - source.getX();
+		double h = Math.sqrt(Math.pow(a,2)+Math.pow(b, 2));
+		if (b<0) 
+			rotation = Math.PI + Math.asin(a/h);
+		else
+			rotation = 0-Math.asin(a/h);
+	}
 	//-------------------------------------------------------------
 
 	public Vertex getSource(){

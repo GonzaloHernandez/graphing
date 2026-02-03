@@ -10,17 +10,18 @@ class Dictionary {
 	public String edgeValue,edgeValue1;
 
 	public Dictionary(){
-		this.graph			= "Graph";
-		this.vertex			= "Vertex";
-		this.vertexType		= "Type";
-		this.vertexValue	= "Value";
-		this.edge			= "Edge";
-		this.edgeValue		= "Cost";
+		this.graph			= "graph";
+		this.vertex			= "vertex";
+		this.vertexType		= "type";
+		this.vertexValue	= "value";
+		this.edge			= "edge";
+		this.edgeValue		= "cost";
 		this.graph1			= "g";
 		this.vertex1		= "v";
-		this.vertexValue1	= "";
+		this.vertexType1	= " ";
+		this.vertexValue1	= " ";
 		this.edge1			= "e";
-		this.edgeValue1		= "";
+		this.edgeValue1		= " ";
 	}
 }
 
@@ -40,7 +41,7 @@ public class GrapherSettings {
 	protected	boolean	showConnectionSequence;
 	protected	String	comment;
 	protected	Vector	<EdgeType>types;
-	protected	int	measure;
+	protected	int		measure;
 
 	protected	boolean showVertexPriorities;
 	protected	boolean allowFirsVertex;

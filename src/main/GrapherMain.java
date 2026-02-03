@@ -25,6 +25,7 @@ import javax.swing.JInternalFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JSplitPane;
 import javax.swing.UIManager;
 
@@ -35,7 +36,7 @@ public class GrapherMain extends JFrame{
 	//-------------------------------------------------------------------------------------
 	final int	family			= 1;
 	final int	version			= 2;
-	final int	construcction	= 13;
+	final int	construcction	= 14;
 	
 	//-------------------------------------------------------------------------------------
 
@@ -44,7 +45,7 @@ public class GrapherMain extends JFrame{
 	private	JSplitPane		split;
 	private	JMenuBar		menuBar;
 	private	JMenu			system,help,relatedTopics,samples;
-	private	JMenuItem		newSession,open,importSession,exit,contents,about,credits;
+	private	JMenuItem		newSession,open,importSession,exit,contents,shortcuts,about,credits;
 	
 	protected	String			messageReturn;
 	protected	MenuOptions		menuOptions;
@@ -91,6 +92,7 @@ public class GrapherMain extends JFrame{
 		
 		help			= new GrapherMenu("Help",defaultFont,"help.png");
 		contents		= new GrapherItem("Content",defaultFont,"contents.png");
+		shortcuts		= new GrapherItem("Short cuts",defaultFont,"shortcut.png");
 		relatedTopics	= new GrapherMenu("Related topics",defaultFont,"related_topics.png");
 		samples			= new GrapherMenu("Samples",defaultFont,"samples.png");
 		about			= new GrapherItem("About of Graphing'",defaultFont,"about.png");
@@ -113,6 +115,7 @@ public class GrapherMain extends JFrame{
 		
 		menuBar.add(help);
 		help.add(contents);
+		help.add(shortcuts);
 		help.add(relatedTopics);
 		help.add(samples);
 		help.addSeparator();
@@ -214,6 +217,51 @@ public class GrapherMain extends JFrame{
 		contents.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
 				openHelpContents();
+			}
+		});
+
+		JFrame frame = this;
+		shortcuts.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e){
+
+				String message = "<html>" +
+					"<body style='width: 300px; padding: 5px;'>" +
+					"<b>General:</b>" +
+					"<ul>" +
+					"  <li><b>Ctrl + S:</b> Save project</li>" +
+					"  <li><b>G:</b> Toggle grid</li>" +
+					"  <li><b>H (Hold):</b> Hide elements</li>" +
+					"  <li><b>Ctrl + (+/-):</b> Zoom in/out</li>" +
+					"</ul>" +
+					"<b>When a Vertex is selected:</b>" +
+					"<ul>" +
+					"  <li><b>Delete:</b> Remove vertex</li>" +
+					"  <li><b>A / Z:</b> Increase / Decrease value</li>" +
+					"  <li><b>Shift + Scroll:</b> Increase / Decrease value</li>" +
+					"  <li><b>0-9:</b> Set value directly</li>" +
+					"  <li><b>O:</b> Switch type</li>" +
+					"</ul>" +
+					"<b>When an Edge is selected:</b>" +
+					"<ul>" +
+					"  <li><b>Delete:</b> Remove edge</li>" +
+					"  <li><b>A / Z:</b> Adjust distance</li>" +
+					"  <li><b>Ctrl + A / Z:</b> Rotate edge</li>" +
+					"  <li><b>Scroll:</b> Adjust distance</li>" +
+					"  <li><b>Ctrl + Scroll:</b> Rotate edge</li>" +
+					"  <li><b>Shift + Scroll:</b> Adjust value</li>" +
+					"</ul>" +
+					"<b>Mouse Controls:</b>" +
+					"<ul>" +
+					"  <li><b>Double-Click:</b> Add vertex / Edit value</li>" +
+					"  <li><b>Ctrl + Drag:</b> Create new edge</li>" +
+					"  <li><b>Shift + Click:</b> Toggle active state</li>" +
+					"  <li><b>Shift + Right-Click:</b> Toggle active state propagating</li>" +
+					"  <li><b>Right-Click:</b> Open context menu</li>" +
+					"</ul>" +
+					"</body></html>";
+
+
+		        JOptionPane.showMessageDialog(frame, message, "Shortcuts", JOptionPane.INFORMATION_MESSAGE);
 			}
 		});
 	}

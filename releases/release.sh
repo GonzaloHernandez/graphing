@@ -3,7 +3,7 @@
 # Define versioning variables
 FAMILY=1
 VERSION=2
-CONSTRUCTION=13
+CONSTRUCTION=14
 
 # File paths
 JAVA_FILE="src/main/GrapherMain.java"
@@ -48,5 +48,9 @@ sed -i "s/Graphing-v[0-9]*\.[0-9]*\.[0-9]*\.jar/$JAR_NAME/" "$README_FILE"
 echo "::Updated $README_FILE with the new JAR file name: $JAR_NAME"
 
 # ===============================================================================
-# (DONE) Zoom in/out and resizing corrections
-# (DONE) Some improvements in properties elements
+# (DONE) Dragging self loops to move them
+# (DONE) Use of templates (parity games)
+# (DONE) Improved dialogs
+# (DONE) Fixed edge creation after file manager dialog
+# (DONE) Fixed importing GM files
+# (DONE) Shortcuts information

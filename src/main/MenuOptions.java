@@ -53,13 +53,13 @@ public class MenuOptions extends JPopupMenu{
 
 	//-------------------------------------------------------------------------------------
 
-	protected	GrapherMenu		vertexMenu,edgeMenu,grapherMenu;
+	protected	GrapherMenu		vertexMenu,edgeMenu,grapherMenu,template;
 	
 	private	GrapherMain		main;
 	private GrapherMenu		edgeTypes;
 	private	GrapherItem		vertexDelete,vertexDeleteAllOutgoings,vertexAccepted,vertexOnwer;
 	private	GrapherItem		edgeDelete,edgeTune,edgeNoType;
-	private	GrapherItem		restart,load,loadImport,save,saveAs,print,simulate,help;
+	private	GrapherItem		restart,parityGame,load,loadImport,save,saveAs,print,simulate,help;
 	private	TypeMenuItem	typeItems[];
 	
 	//-------------------------------------------------------------------------------------
@@ -77,20 +77,22 @@ public class MenuOptions extends JPopupMenu{
 		Font defaultFont		= new Font(currentFont.getName(),Font.PLAIN,currentFont.getSize());
 
 		vertexMenu				= new GrapherMenu("State",defaultFont,"state.png");
-		edgeMenu			= new GrapherMenu("Connection",defaultFont,"connection.png");
+		edgeMenu				= new GrapherMenu("Connection",defaultFont,"connection.png");
 		grapherMenu				= new GrapherMenu("Grapher",defaultFont,"application.png");
+		template				= new GrapherMenu("Use template",defaultFont,"credits.png");
 				
 		vertexDelete				= new GrapherItem("Delete state",defaultFont,"delete_state.png");
 		vertexDeleteAllOutgoings	= new GrapherItem("Delete all outgoing connections",defaultFont,"delete_connection.png");
 		vertexAccepted			= new GrapherItem("Set final state",defaultFont,"accepted_state.png");
 		vertexOnwer				= new GrapherItem("Switch owner",defaultFont,"owner.png");
 		
-		edgeTypes			= new GrapherMenu("Set state",defaultFont,"type_connection.png");
-		edgeNoType		= new GrapherItem("Unset state",defaultFont,"no_type_connection.png");
-		edgeDelete		= new GrapherItem("Delete connection",defaultFont,"delete_connection.png");
-		edgeTune			= new GrapherItem("Tune arc",defaultFont,"tune_connection.png");
+		edgeTypes				= new GrapherMenu("Set state",defaultFont,"type_connection.png");
+		edgeNoType				= new GrapherItem("Unset state",defaultFont,"no_type_connection.png");
+		edgeDelete				= new GrapherItem("Delete connection",defaultFont,"delete_connection.png");
+		edgeTune				= new GrapherItem("Tune arc",defaultFont,"tune_connection.png");
 		
 		restart					= new GrapherItem("Restar session",defaultFont,"new.png");
+		parityGame				= new GrapherItem("Parity Game",defaultFont,"");
 		load					= new GrapherItem("Load automaton",defaultFont,"open.png");
 		loadImport				= new GrapherItem("Import automaton",defaultFont,"open.png");
 		save					= new GrapherItem("Save automaton",defaultFont,"save.png");
@@ -113,6 +115,7 @@ public class MenuOptions extends JPopupMenu{
 		edgeMenu.add(edgeTune);
 		
 		grapherMenu.add(restart);
+		grapherMenu.add(template);
 		grapherMenu.add(load);
 		grapherMenu.add(loadImport);
 		grapherMenu.add(save);
@@ -122,6 +125,8 @@ public class MenuOptions extends JPopupMenu{
 		grapherMenu.addSeparator();
 		grapherMenu.add(simulate);
 		grapherMenu.add(help);
+
+		template.add(parityGame);
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -321,6 +326,29 @@ public class MenuOptions extends JPopupMenu{
 				main.currentSession.board.restart();
 				main.currentSession.setModified(false);
 			}
+		});
+
+		parityGame.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				GrapherSettings sets = main.currentSession.board.settings;
+				sets.dictionary.graph		= "game";
+				sets.dictionary.vertex		= "vertex";
+				sets.dictionary.vertexType	= "owners";
+				sets.dictionary.vertexValue	= "priors";
+				sets.dictionary.edge		= "edge";
+				sets.dictionary.edgeValue	= "weights";
+				sets.dictionary.graph1		= "g";
+				sets.dictionary.vertex1		= "v";
+				sets.dictionary.vertexType1	= "o";
+				sets.dictionary.vertexValue1= "p";
+				sets.dictionary.edge1		= "e";
+				sets.dictionary.edgeValue1	= "w";
+				sets.showVertexSequence		= false;
+				sets.showConnectionSequence	= false;
+				sets.showVertexPriorities	= true;
+				main.properties.dictionaryView.refresh();
+				main.properties.generalView.refresh();
+				main.currentSession.setModified(true);			}
 		});
 
 		load.addActionListener(new ActionListener(){

@@ -55,162 +55,94 @@ public class ViewGeneral extends JPanel {
 	
 	//-------------------------------------------------------------------------------------
 
-private void initElements() {
-    setLayout(new BorderLayout());
+	private void initElements() {
+		setLayout(new BorderLayout());
 
-    // 1. Use a vertical BoxLayout for the checkboxes so they don't stretch to equal heights
-    JPanel panelChecks = new JPanel();
-    panelChecks.setLayout(new BoxLayout(panelChecks, BoxLayout.Y_AXIS));
+		// 1. Use a vertical BoxLayout for the checkboxes so they don't stretch to equal heights
+		JPanel panelChecks = new JPanel();
+		panelChecks.setLayout(new BoxLayout(panelChecks, BoxLayout.Y_AXIS));
 
-    showStateNumbers      = new JCheckBox("Show state sequence");
-    showStateValues       = new JCheckBox("Show state priorities");
-    showConnectionNumbers = new JCheckBox("Show connection sequence");
-    showTypeNames         = new JCheckBox("Show connection values");
-    allowFirstState       = new JCheckBox("Allow first state");
-    firstZero             = new JCheckBox("Start at Zero (0)");
-    gridScale             = new JSpinner(new SpinnerNumberModel(10, 1, 100, 1));
-    exportAuto            = new JCheckBox("Export automatically");
+		showStateNumbers      = new JCheckBox("Show state sequence");
+		showStateValues       = new JCheckBox("Show state priorities");
+		showConnectionNumbers = new JCheckBox("Show connection sequence");
+		showTypeNames         = new JCheckBox("Show connection values");
+		allowFirstState       = new JCheckBox("Allow first state");
+		firstZero             = new JCheckBox("Start at Zero (0)");
+		gridScale             = new JSpinner(new SpinnerNumberModel(10, 1, 100, 1));
+		exportAuto            = new JCheckBox("Export automatically");
 
-    // Grid Scale Panel (FlowLayout.LEFT keeps it tight)
-    JPanel gridScalePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 5));
-    gridScalePanel.add(new JLabel("Grid Scale: "));
-    gridScalePanel.add(gridScale);
+		// Grid Scale Panel (FlowLayout.LEFT keeps it tight)
+		JPanel gridScalePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 5));
+		gridScalePanel.add(new JLabel("Grid Scale: "));
+		gridScalePanel.add(gridScale);
 
-    // Spinner formatting
-    JComponent editor = gridScale.getEditor();
-    JFormattedTextField tf = ((JSpinner.DefaultEditor) editor).getTextField();
-    tf.setEditable(true);
-    tf.setHorizontalAlignment(JTextField.CENTER);
-    ((NumberFormatter) ((JFormattedTextField.AbstractFormatter) 
-    ((DefaultFormatterFactory) tf.getFormatterFactory()).getDefaultFormatter()))
-    .setAllowsInvalid(false);
+		// Spinner formatting
+		JComponent editor = gridScale.getEditor();
+		JFormattedTextField tf = ((JSpinner.DefaultEditor) editor).getTextField();
+		tf.setEditable(true);
+		tf.setHorizontalAlignment(JTextField.CENTER);
+		((NumberFormatter) ((JFormattedTextField.AbstractFormatter) 
+		((DefaultFormatterFactory) tf.getFormatterFactory()).getDefaultFormatter()))
+		.setAllowsInvalid(false);
 
-    // Add elements to the vertical panel
-    panelChecks.add(showStateNumbers);
-    panelChecks.add(showStateValues);
-    panelChecks.add(showConnectionNumbers);
-    panelChecks.add(showTypeNames);
-    panelChecks.add(allowFirstState);
-    panelChecks.add(firstZero);
-    panelChecks.add(gridScalePanel);
-
-
-	Component[] comps = {showStateNumbers, showStateValues, showConnectionNumbers, 
-                         showTypeNames, allowFirstState, firstZero, gridScalePanel};
-    
-    for (Component c : comps) {
-        ((JComponent)c).setAlignmentX(Component.LEFT_ALIGNMENT);
-        panelChecks.add(c);
-    }
-
-	// 2. WRAPPER: This prevents the BorderLayout from stretching the panelChecks vertically
-    JPanel northWrapper = new JPanel(new BorderLayout());
-    northWrapper.add(panelChecks, BorderLayout.WEST); 
-
-    info = new JTabbedPane();
-
-    JPanel panelComment = new JPanel(new BorderLayout());
-    comment = new JTextArea();
-    comment.setWrapStyleWord(true);
-    comment.setLineWrap(true);
-
-    JPanel panelExport = new JPanel(new BorderLayout());
-    exportType = new JComboBox<String>(GrapherSettings.exportTypes);
-    export = new JTextArea();
-    export.setWrapStyleWord(true);
-    export.setFont(new Font("FreeMono", Font.PLAIN, 12));
-    export.setEditable(false);
-
-    panelComment.add(new JScrollPane(comment), BorderLayout.CENTER);
-    panelExport.add(exportType, BorderLayout.NORTH);
-    panelExport.add(new JScrollPane(export), BorderLayout.CENTER);
-    panelExport.add(exportAuto, BorderLayout.SOUTH);
-
-    info.addTab("Comment", panelComment);
-    info.addTab("Export", panelExport);
-
-    // Add components to main container
-    add(northWrapper, BorderLayout.NORTH);
-    add(info, BorderLayout.CENTER);
-
-    // 3. Apply font recursively
-    Font currentFont = UIManager.getFont("Label.font");
-    Font defaultFont = new Font(currentFont.getName(), Font.PLAIN, currentFont.getSize());
-
-	for (Component component : getComponents()) {
-		component.setFont(defaultFont);			
-	}
-}
+		// Add elements to the vertical panel
+		panelChecks.add(showStateNumbers);
+		panelChecks.add(showStateValues);
+		panelChecks.add(showConnectionNumbers);
+		panelChecks.add(showTypeNames);
+		panelChecks.add(allowFirstState);
+		panelChecks.add(firstZero);
+		panelChecks.add(gridScalePanel);
 
 
-	// private void initElements(){
-	// 	setLayout(new BorderLayout());
-
-	// 	JPanel panelChecks		= new JPanel(new GridLayout(0,1));
-
-	// 	showStateNumbers		= new JCheckBox("Show state sequence");
-	// 	showStateValues			= new JCheckBox("Show state priorities");
-	// 	showConnectionNumbers	= new JCheckBox("Show connection sequence");
-	// 	showTypeNames			= new JCheckBox("Show connection values");
-	// 	allowFirstState			= new JCheckBox("Allow first state");
-	// 	firstZero				= new JCheckBox("Start at Zero (0)");
-	// 	gridScale				= new JSpinner(new SpinnerNumberModel(10,1,100,1));
-	// 	JPanel gridScalePanel	= new JPanel(new FlowLayout(FlowLayout.LEFT));
-	// 	exportAuto				= new JCheckBox("Export automatically");
-
-	// 	gridScalePanel.add(new JLabel("Grid Scale: "));
-	// 	gridScalePanel.add(gridScale);
-
-	// 	JComponent editor = gridScale.getEditor();
-	// 	JFormattedTextField tf = ((JSpinner.DefaultEditor) editor).getTextField();
-	// 	tf.setEditable(true); // allow editing
-	// 	tf.setHorizontalAlignment(JTextField.CENTER);
+		Component[] comps = {showStateNumbers, showStateValues, showConnectionNumbers, 
+							showTypeNames, allowFirstState, firstZero, gridScalePanel};
 		
-	// 	((NumberFormatter) ((JFormattedTextField.AbstractFormatter) 
-	// 	((DefaultFormatterFactory) tf.getFormatterFactory()).getDefaultFormatter()))
-	// 	.setAllowsInvalid(false
-	// 	);
+		for (Component c : comps) {
+			((JComponent)c).setAlignmentX(Component.LEFT_ALIGNMENT);
+			panelChecks.add(c);
+		}
 
-	// 	panelChecks.add(showStateNumbers);
-	// 	panelChecks.add(showStateValues);
-	// 	panelChecks.add(showConnectionNumbers);
-	// 	panelChecks.add(showTypeNames);
-	// 	panelChecks.add(allowFirstState);
-	// 	panelChecks.add(firstZero);
-	// 	panelChecks.add(gridScalePanel);
+		// 2. WRAPPER: This prevents the BorderLayout from stretching the panelChecks vertically
+		JPanel northWrapper = new JPanel(new BorderLayout());
+		northWrapper.add(panelChecks, BorderLayout.WEST); 
 
-	// 	info					= new JTabbedPane();
+		info = new JTabbedPane();
 
-	// 	JPanel panelComment		= new JPanel(new BorderLayout());
-	// 	comment					= new JTextArea();
-	// 	comment.setWrapStyleWord(true);
-	// 	comment.setLineWrap(true);
+		JPanel panelComment = new JPanel(new BorderLayout());
+		comment = new JTextArea();
+		comment.setWrapStyleWord(true);
+		comment.setLineWrap(true);
 
-	// 	JPanel panelExport		= new JPanel(new BorderLayout());
-	// 	exportType				= new JComboBox<String>(GrapherSettings.exportTypes);
-	// 	export					= new JTextArea();
-	// 	export.setWrapStyleWord(true);
-	// 	export.setFont(new Font("FreeMono", Font.PLAIN, 12));
-	// 	export.setEditable(false);
+		JPanel panelExport = new JPanel(new BorderLayout());
+		exportType = new JComboBox<String>(GrapherSettings.exportTypes);
+		export = new JTextArea();
+		export.setWrapStyleWord(true);
+		export.setFont(new Font("FreeMono", Font.PLAIN, 12));
+		export.setEditable(false);
 
-	// 	panelComment.add(new JScrollPane(comment),BorderLayout.CENTER);
-	// 	panelExport.add(exportType,BorderLayout.NORTH);
-	// 	panelExport.add(new JScrollPane(export),BorderLayout.CENTER);
-	// 	panelExport.add(exportAuto,BorderLayout.SOUTH);
+		panelComment.add(new JScrollPane(comment), BorderLayout.CENTER);
+		panelExport.add(exportType, BorderLayout.NORTH);
+		panelExport.add(new JScrollPane(export), BorderLayout.CENTER);
+		panelExport.add(exportAuto, BorderLayout.SOUTH);
 
-	// 	info.addTab("Comment", panelComment);
-	// 	info.addTab("Export", panelExport);
-				
-	// 	add(panelChecks,BorderLayout.NORTH);
-	// 	add(info,BorderLayout.CENTER);
+		info.addTab("Comment", panelComment);
+		info.addTab("Export", panelExport);
 
-	// 	Font currentFont	= UIManager.getFont("Label.font");
-	// 	Font defaultFont	= new Font(currentFont.getName(),Font.PLAIN,currentFont.getSize());
-	// 	for (Component component : getComponents()) {
-	// 		component.setFont(defaultFont);			
-	// 	}
-	// }
-	
+		// Add components to main container
+		add(northWrapper, BorderLayout.NORTH);
+		add(info, BorderLayout.CENTER);
+
+		// 3. Apply font recursively
+		Font currentFont = UIManager.getFont("Label.font");
+		Font defaultFont = new Font(currentFont.getName(), Font.PLAIN, currentFont.getSize());
+
+		for (Component component : getComponents()) {
+			component.setFont(defaultFont);			
+		}
+	}
+
+
 	//-------------------------------------------------------------------------------------
 
 	private void progListeneres(){
