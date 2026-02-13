@@ -70,7 +70,7 @@ public class ViewTypes extends JPanel {
 		TableModel model = new TableModel() {
 
 			public int getRowCount() {
-				return main.currentSession.board.types.size()-1;
+				return main.currentSession.board.eTypes.size()-1;
 			}
 
 			public int getColumnCount() {
@@ -91,8 +91,8 @@ public class ViewTypes extends JPanel {
 
 			public Object getValueAt(int row, int column) {
 				switch(column) {
-					case 0:	return main.currentSession.board.types.elementAt(row+1).getName();
-					case 1: return main.currentSession.board.types.elementAt(row+1).getSymbols();		
+					case 0:	return main.currentSession.board.eTypes.elementAt(row+1).getName();
+					case 1: return main.currentSession.board.eTypes.elementAt(row+1).getDescription();		
 				}
 				return null;
 			}
@@ -120,22 +120,22 @@ public class ViewTypes extends JPanel {
 		
 		add.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
-				for (int i=0;i<main.currentSession.board.types.size();i++){
-					if (main.currentSession.board.types.elementAt(i).getName().equals(name.getText())){
+				for (int i=0;i<main.currentSession.board.eTypes.size();i++){
+					if (main.currentSession.board.eTypes.elementAt(i).getName().equals(name.getText())){
 						main.currentSession.board.session.main.messageBox("Duplicated name of type ≈","Addition error","Accept");
 						return;
 					}
 					for (int c=0;c<symbols.getText().length();c++){
-						if (main.currentSession.board.types.elementAt(i).getSymbols().contains(symbols.getText().substring(c,c+1))){
-							main.currentSession.board.session.main.messageBox("The symbol ["+symbols.getText().substring(c,c+1)+"] is dupplicated in type "+main.currentSession.board.types.elementAt(i).getName()+"!","Addition error","Accept");
+						if (main.currentSession.board.eTypes.elementAt(i).getDescription().contains(symbols.getText().substring(c,c+1))){
+							main.currentSession.board.session.main.messageBox("The symbol ["+symbols.getText().substring(c,c+1)+"] is dupplicated in type "+main.currentSession.board.eTypes.elementAt(i).getName()+"!","Addition error","Accept");
 							return;
 						}
 					}
 				}
 				if (add.getText().equals("Save")){
 					int n;
-					n = main.currentSession.board.types.size();
-					main.currentSession.board.types.add(new EdgeType(n+1,name.getText(),symbols.getText()));
+					n = main.currentSession.board.eTypes.size();
+					main.currentSession.board.eTypes.add(new Type(n+1,name.getText(),symbols.getText()));
 				}
 				loadTable();
 				name.setText("");
@@ -149,9 +149,9 @@ public class ViewTypes extends JPanel {
 				boolean question = false;
 				for (int s=0;s<main.currentSession.board.vertices.size();s++){
 					Vertex state = main.currentSession.board.vertices.elementAt(s);
-					for (int c=0;c<state.getConnections().size();c++){
-						Edge connection = state.getConnections().elementAt(c); 
-						if (connection.getType()!=null && connection.getType().equals(main.currentSession.board.types.elementAt(table.getSelectedRow()+1))){
+					for (int c=0;c<state.getOuts().size();c++){
+						Edge connection = state.getOuts().elementAt(c); 
+						if (connection.getType()!=null && connection.getType().equals(main.currentSession.board.eTypes.elementAt(table.getSelectedRow()+1))){
 							if (!question) {
 								String opc = main.currentSession.board.session.main.messageBox("Type currently used.|Do you want to keep updating the connections?","Warning!","Yes|Cancel");
 								if (opc.equals("Cancel")||opc.equals("")) return;
@@ -162,9 +162,9 @@ public class ViewTypes extends JPanel {
 					}
 				}
 				main.currentSession.board.repaint();
-				main.currentSession.board.types.remove(table.getSelectedRow()+1);
-				for (int i=1;i<main.currentSession.board.types.size();i++){
-					main.currentSession.board.types.elementAt(i).setNumber(i+1);
+				main.currentSession.board.eTypes.remove(table.getSelectedRow()+1);
+				for (int i=1;i<main.currentSession.board.eTypes.size();i++){
+					main.currentSession.board.eTypes.elementAt(i).setId(i+1);
 				}
 				loadTable();
 				delete.setEnabled(false);

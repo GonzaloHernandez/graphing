@@ -40,7 +40,7 @@ public class GrapherSettings {
 	protected	boolean	showVertexSequence;
 	protected	boolean	showConnectionSequence;
 	protected	String	comment;
-	protected	Vector	<EdgeType>types;
+	protected	Vector	<Type>types;
 	protected	int		measure;
 
 	protected	boolean showVertexPriorities;
@@ -56,7 +56,7 @@ public class GrapherSettings {
 	//---------------------------------------------------------------------------
 	
 	public GrapherSettings(boolean nameTypes,boolean numberVertices,String comment,
-	Vector <EdgeType>types){
+	Vector <Type>types){
 		this.showTypeNames			= nameTypes;
 		this.showVertexSequence		= numberVertices;
 		this.showConnectionSequence	= false;

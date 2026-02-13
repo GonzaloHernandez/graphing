@@ -162,8 +162,8 @@ public class ViewElements extends JPanel{
     Vector<Edge> getConnections() {
         Vector<Edge> connections = new Vector<Edge>();
         for (int i=0; i<main.currentSession.board.vertices.size(); i++) {
-            for (int j=0; j<main.currentSession.board.vertices.elementAt(i).getConnections().size(); j++) {
-                connections.add(main.currentSession.board.vertices.elementAt(i).getConnections().elementAt(j));
+            for (int j=0; j<main.currentSession.board.vertices.elementAt(i).getOuts().size(); j++) {
+                connections.add(main.currentSession.board.vertices.elementAt(i).getOuts().elementAt(j));
             }
         }
         return connections;

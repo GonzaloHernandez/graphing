@@ -1,17 +1,17 @@
 package main;
-public class EdgeType {
+public class Type {
 	
 	//-------------------------------------------------------------------------------------
 
-	private	int		number;
-	private	String	name,symbols;
+	private	int		id;
+	private	String	name,description;
 	
 	//-------------------------------------------------------------------------------------
 
-	public EdgeType(int number,String name,String symbols) {
-		this.number		= number;
-		this.name		= name;
-		this.symbols	= symbols;
+	public Type(int number,String name,String description) {
+		this.id				= number;
+		this.name			= name;
+		this.description	= description;
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -22,14 +22,14 @@ public class EdgeType {
 	
 	//-------------------------------------------------------------------------------------
 
-	public String getSymbols() {
-		return symbols;
+	public String getDescription() {
+		return description;
 	}
 	
 	//-------------------------------------------------------------------------------------
 
-	public int getNumber() {
-		return number;
+	public int getId() {
+		return id;
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -40,13 +40,13 @@ public class EdgeType {
 	
 	//-------------------------------------------------------------------------------------
 
-	public void setSymbols(String symbols){
-		this.symbols	= symbols;
+	public void setDescription(String description){
+		this.description	= description;
 	}
 
 	//-------------------------------------------------------------------------------------
 
-	public void setNumber(int number){
-		this.number	= number;
+	public void setId(int number){
+		this.id	= number;
 	}
 }

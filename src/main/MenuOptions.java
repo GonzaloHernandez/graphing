@@ -17,8 +17,8 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
 class TypeMenuItem extends JMenuItem {
-	private EdgeType	type;
-	public TypeMenuItem(String label,EdgeType type) {
+	private Type	type;
+	public TypeMenuItem(String label,Type type) {
 		super(label);
 		this.type	= type;
 		Font currentFont	= UIManager.getFont("Label.font");
@@ -26,7 +26,7 @@ class TypeMenuItem extends JMenuItem {
 		setFont(defaultFont);
 		setIcon(new ImageIcon("icons/type.png"));
 	}
-	public EdgeType getType() {
+	public Type getType() {
 		return type;
 	}
 }
@@ -133,28 +133,28 @@ public class MenuOptions extends JPopupMenu{
 	
 	public void setMenuTypes(JComponent connectionTypes,boolean retype){
 		connectionTypes.removeAll();
-		typeItems	= new TypeMenuItem[main.currentSession.board.types.size()];
-		for (int i=0 ; i<main.currentSession.board.types.size() ; i++) {
-			EdgeType type = (EdgeType)main.currentSession.board.types.elementAt(i); 
+		typeItems	= new TypeMenuItem[main.currentSession.board.eTypes.size()];
+		for (int i=0 ; i<main.currentSession.board.eTypes.size() ; i++) {
+			Type type = (Type)main.currentSession.board.eTypes.elementAt(i); 
 			typeItems[i]= new TypeMenuItem(type.getName(),type);
 			
 			typeItems[i].addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					EdgeType t = ((TypeMenuItem)e.getSource()).getType();
-					if (t.getNumber() == 0) {
-						int currentval = main.currentSession.board.currentConnection.getValue();
-						String val = JOptionPane.showInputDialog("Value:",""+currentval);
-						if (val != null) {
-							try {
-								main.currentSession.board.currentConnection.setValue(Integer.parseInt(val));
-							}
-							catch (NumberFormatException ex) {
-								return;
-							}
-						} else {
-							return;
-						}						
-					}
+					Type t = ((TypeMenuItem)e.getSource()).getType();
+					// if (t.getNumber() == 0) {
+					// 	int currentval = main.currentSession.board.currentConnection.getValue();
+					// 	String val = JOptionPane.showInputDialog("Value:",""+currentval);
+					// 	if (val != null) {
+					// 		try {
+					// 			main.currentSession.board.currentConnection.setValue(Integer.parseInt(val));
+					// 		}
+					// 		catch (NumberFormatException ex) {
+					// 			return;
+					// 		}
+					// 	} else {
+					// 		return;
+					// 	}						
+					// }
 					main.currentSession.board.currentConnection.setType(t);
 					main.currentSession.board.repaint();
 					main.currentSession.setModified(true);
@@ -290,11 +290,11 @@ public class MenuOptions extends JPopupMenu{
 		
 		vertexOnwer.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
-				main.currentSession.board.vertexTarget.setOwner(1-main.currentSession.board.vertexTarget.getOwner());
+				main.currentSession.board.vertexTarget.setType(1-main.currentSession.board.vertexTarget.getType());
 				main.currentSession.setModified(true);
 				main.currentSession.board.repaint();
 			}
-		});		
+		});
 
 		edgeDelete.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {

@@ -18,13 +18,14 @@ public class Vertex {
 	
 	private	int		x,y,number;
 	private	int		status;
-	private	Vector	<Edge>connections;
-	private	Vector	<Edge>arrivals;
-	private	boolean	accepted;
-
-	private int		value;
-	private int		owner;
+	private String	value;
+	private Type	type;
+	private String	label;
 	private boolean active;
+	
+	private	Vector	<Edge>outs;
+	private	Vector	<Edge>ins;
+	private	boolean	accepted;
 
 	//-------------------------------------------------------------------------------------
 	
@@ -34,14 +35,14 @@ public class Vertex {
 		this.y			= y;
 		this.status		= FOCUSED;
 		this.accepted	= false;
-		this.value		= 0;
-		this.owner		= 0;
+		this.value		= "0";
+		this.type		= null;
 		this.active		= true;
-		connections		= new Vector<Edge>();
-		arrivals		= new Vector<Edge>();
+		this.outs		= new Vector<Edge>();
+		this.ins		= new Vector<Edge>();
 	}
 	
-	//-------------------------------------------------------------------------------------
+	//-------------------------------------------------------------------------
 	
 	public Vertex(int number,int x,int y,int status,boolean accepted) {
 		this.number		= number;
@@ -49,36 +50,40 @@ public class Vertex {
 		this.y			= y;
 		this.status		= status;
 		this.accepted	= accepted;
-		this.value		= 0;
-		this.owner		= 0;
+		this.value		= "0";
+		this.type		= null;
 		this.active		= true;
-		connections		= new Vector<Edge>();
-		arrivals		= new Vector<Edge>();
+		this.outs		= new Vector<Edge>();
+		this.ins		= new Vector<Edge>();
 	}
 	
-	//-------------------------------------------------------------------------------------
+	//-------------------------------------------------------------------------
 	
-	public Vertex(int number,int x,int y,int status,boolean accepted,int value,int owner) {
+	public Vertex(int number,int x,int y,int status,boolean accepted,
+		String value,Type type,String label) 
+	{
 		this.number		= number;
 		this.x			= x;
 		this.y			= y;
 		this.status		= status;
 		this.accepted	= accepted;
 		this.value		= value;
-		this.owner		= owner;
+		this.type		= type;
+		this.label		= label;
 		this.active		= true;
-		connections		= new Vector<Edge>();
-		arrivals		= new Vector<Edge>();
+		this.outs		= new Vector<Edge>();
+		this.ins		= new Vector<Edge>();
 	}
 
-	//-------------------------------------------------------------------------------------
+	//-------------------------------------------------------------------------
 	
-	public int draw(Graphics2D g,GrapherSettings settings,int connectionSequence,boolean hidden) {
-		
-		if (hidden && !active) return connectionSequence + connections.size();
+	public int draw(Graphics2D g,GrapherSettings settings,
+					int connectionSequence,boolean hidden) 
+	{		
+		if (hidden && !active) return connectionSequence + outs.size();
 
-		for (int i=0 ; i<connections.size() ; i++) {
-			Edge connection = (Edge)connections.elementAt(i);
+		for (int i=0 ; i<outs.size() ; i++) {
+			Edge connection = (Edge)outs.elementAt(i);
 			if (hidden && !connection.isActive()) {
 				connectionSequence++;
 			}
@@ -110,7 +115,7 @@ public class Vertex {
 			backColor = Color.WHITE;
 		}
 		
-		switch(owner) {
+		switch(type.getId()) {
 			case 0:	
 				g.setColor(backColor);
 				g.fillOval(x-RADIUS,y-RADIUS,RADIUS*2,RADIUS*2);
@@ -191,7 +196,7 @@ public class Vertex {
 	
 	//-------------------------------------------------------------------------------------
 
-	public void setValue(int value){
+	public void setValue(String value){
 		this.value = value;
 	}
 
@@ -207,13 +212,13 @@ public class Vertex {
 		if (act == this.active) return;
 		this.active = act;
 		if (propagate) {
-			for (int i=0 ; i<connections.size() ; i++) {
-				Edge c = (Edge)connections.elementAt(i);
+			for (int i=0 ; i<outs.size() ; i++) {
+				Edge c = (Edge)outs.elementAt(i);
 				if (act == true && !c.getTarget().isActive()) continue;
 				c.setActive(act, propagate);
 			}
-			for (int i=0 ; i<arrivals.size() ; i++) {
-				Edge c = (Edge)arrivals.elementAt(i);
+			for (int i=0 ; i<ins.size() ; i++) {
+				Edge c = (Edge)ins.elementAt(i);
 				if (act == true && !c.getSource().isActive()) continue;
 				c.setActive(act, propagate);
 			}
@@ -222,8 +227,8 @@ public class Vertex {
 
 	//-------------------------------------------------------------------------------------
 
-	public void setOwner(int owner){
-		this.owner = owner;
+	public void setType(Type type){
+		this.type = type;
 	}
 	//-------------------------------------------------------------------------------------
 
@@ -246,14 +251,14 @@ public class Vertex {
 	
 	//-------------------------------------------------------------------------------------
 
-	public int getValue() {
+	public String getValue() {
 		return value;
 	}
 	
 	//-------------------------------------------------------------------------------------
 
-	public int getOwner() {
-		return owner;
+	public Type getType() {
+		return type;
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -291,53 +296,55 @@ public class Vertex {
 	//-------------------------------------------------------------------------------------
 	
 	public void addConnection(Edge c) {
-		connections.add(c);
-		c.getTarget().arrivals.add(c);
+		outs.add(c);
+		c.getTarget().ins.add(c);
 	}
 
 	//-------------------------------------------------------------------------------------
 	
 	public void addConnection(Vertex target) {
-		for (int c=0;c<getConnections().size();c++){
-			if (getConnections().elementAt(c).getTarget().equals(target)) { 
+		for (int c=0;c<getOuts().size();c++){
+			if (getOuts().elementAt(c).getTarget().equals(target)) { 
 				return;
 			}
 		}
-		Edge c = new Edge(this,target,null);
-		connections.add(c);
-		target.arrivals.add(c);
+		Edge c = new Edge(this,target);
+		outs.add(c);
+		target.ins.add(c);
 		arrangeConnections(target);
 	}
 	
 	//-------------------------------------------------------------------------------------
 	
-	public void addConnection(Vertex target,EdgeType type,int distance,double rotation,int value,boolean active) {
-		for (int c=0;c<getConnections().size();c++){
-			if (getConnections().elementAt(c).getTarget().equals(target)) { 
+	public void addConnection(Vertex target,Type type,int distance,
+		double rotation,String value,boolean active) 
+	{
+		for (int c=0;c<getOuts().size();c++){
+			if (getOuts().elementAt(c).getTarget().equals(target)) { 
 				return;
 			}
 		}
-		Edge c = new Edge(this,target,type,Edge.STILL,distance,rotation,value);
+		Edge c = new Edge(this,target,Edge.STILL,distance,rotation,type,value,"");
 		c.setActive(active);
-		connections.add(c);
+		outs.add(c);
 	}
 	
 	//-------------------------------------------------------------------------------------
 
-	public Vector <Edge>getConnections() {
-		return connections;
+	public Vector <Edge>getOuts() {
+		return outs;
 	}
 	
 	//-------------------------------------------------------------
 
 	public void deleteConnecion(Edge connection){
-		connections.remove(connection);
+		outs.remove(connection);
 	}
 
 	//-------------------------------------------------------------
 
 	public void deleteAllConnecion(){
-		connections.removeAllElements();
+		outs.removeAllElements();
 	}
 	
 	//-------------------------------------------------------------
@@ -348,15 +355,15 @@ public class Vertex {
 		Edge directedConnection	= null;
 		Edge backConnection		=null;
 		
-		for (int c=0;c<getConnections().size();c++){
-			if (getConnections().elementAt(c).getTarget().equals(target)) { 
-				directedConnection	= getConnections().elementAt(c);
+		for (int c=0;c<getOuts().size();c++){
+			if (getOuts().elementAt(c).getTarget().equals(target)) { 
+				directedConnection	= getOuts().elementAt(c);
 			}
 		}
 
-		for (int c=0;c<target.getConnections().size();c++){
-			if (target.getConnections().elementAt(c).getTarget().equals(this)) { 
-				backConnection		= target.getConnections().elementAt(c);
+		for (int c=0;c<target.getOuts().size();c++){
+			if (target.getOuts().elementAt(c).getTarget().equals(this)) { 
+				backConnection		= target.getOuts().elementAt(c);
 			}
 		}
 		

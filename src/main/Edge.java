@@ -19,20 +19,22 @@ public class Edge {
 
 	private	Vertex				source,target;
 	private	int					status;
-	private	EdgeType			type;
+	private String				value;
+	private	Type				type;
+	private String				label;
+	private boolean				active;
+
 	private	QuadCurve2D.Double	curve;
 	private	Point				start,end,middle,control,text,arrowleft,arrowright,arrow;
 	private	int					distance;
 	private	double				rotation;
-	private int					value;
-	private boolean				active;
 	
-	//-------------------------------------------------------------------------------------
+	//-------------------------------------------------------------------------
 
-	public Edge(Vertex source,Vertex target,EdgeType type) {
+	public Edge(Vertex source,Vertex target) {
 		this.source		= source;
 		this.target		= target;
-		this.type		= type;
+		this.type		= null;
 		this.curve		= new QuadCurve2D.Double();
 		this.status		= STILL;
 		this.start		= new Point();
@@ -44,17 +46,20 @@ public class Edge {
 		this.arrowright	= new Point();
 		this.arrow		= new Point();
 		this.rotation	= 0;
-		this.value		= 0;
+		this.value		= "0";
 		this.active		= true;
 		if (source.equals(target))	this.distance =25; else this.distance = 0; 
 	}
 	
-	//-------------------------------------------------------------------------------------
+	//-------------------------------------------------------------------------
 
-	public Edge(Vertex source,Vertex target,EdgeType type,int status,int distance,double rotation,int value) {
+	public Edge(Vertex source,Vertex target,int status,int distance,
+		double rotation,Type type,String value,String label) 
+	{
 		this.source		= source;
 		this.target		= target;
 		this.type		= type;
+		this.label		= label;
 		this.curve		= new QuadCurve2D.Double();
 		this.status		= status;
 		this.start		= new Point();
@@ -71,10 +76,11 @@ public class Edge {
 		this.active		= true;
 	}
 	
-	//-------------------------------------------------------------------------------------
+	//-------------------------------------------------------------------------
 
-	public int draw(Graphics2D g,GrapherSettings settings,int connectionSequence,boolean hidden) {
-
+	public int draw(Graphics2D g,GrapherSettings settings,
+		int connectionSequence,boolean hidden) 
+	{
 		if (hidden && !active) return connectionSequence+1;
 		
 		float[] dashPattern = {6, 4}; // 10 pixels on, 5 pixels off
@@ -252,7 +258,7 @@ public class Edge {
 
 		if (settings.showTypeNames) {
 			if (type!=null && settings.showTypeNames) {
-				if (type.getNumber()==0) {
+				if (type.getId()==0) {
 					lab += getValue();
 				} else {
 					lab += type.getName();
@@ -497,7 +503,7 @@ public class Edge {
 
 	//-------------------------------------------------------------------------------------
 
-	public void setType(EdgeType type) {
+	public void setType(Type type) {
 		this.type	= type;
 	}
 	
@@ -515,7 +521,7 @@ public class Edge {
 
 	//-------------------------------------------------------------
 
-	public void setValue(int value) {
+	public void setValue(String value) {
 		this.value = value;
 	}
 
@@ -558,7 +564,7 @@ public class Edge {
 	
 	//-------------------------------------------------------------
 
-	public EdgeType getType(){
+	public Type getType(){
 		return type;
 	}	
 	
@@ -576,7 +582,7 @@ public class Edge {
 
 	//-------------------------------------------------------------
 
-	public int getValue() {
+	public String getValue() {
 		return value;
 	}
 	

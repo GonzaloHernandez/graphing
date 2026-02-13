@@ -48,9 +48,7 @@ sed -i "s/Graphing-v[0-9]*\.[0-9]*\.[0-9]*\.jar/$JAR_NAME/" "$README_FILE"
 echo "::Updated $README_FILE with the new JAR file name: $JAR_NAME"
 
 # ===============================================================================
-# (DONE) Dragging self loops to move them
-# (DONE) Use of templates (parity games)
-# (DONE) Improved dialogs
-# (DONE) Fixed edge creation after file manager dialog
-# (DONE) Fixed importing GM files
-# (DONE) Shortcuts information
+# Check key numbers over the vertices to set priorities
+# Check comments about scroll numbers using A/Z and mousewheel
+# Check "O" to switch the owner
+# Check eTypes and vTypes in the menu and in the file loading/saving
