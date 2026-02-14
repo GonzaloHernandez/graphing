@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.Vector;
 
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -44,8 +45,8 @@ class GrapherItem extends JMenuItem {
 	public GrapherItem(String label,Font font,String icon) {
 		super(label);
 		setFont(font);
-		ImageIcon img = new ImageIcon(GrapherMain.class.getResource("icons/"+icon));
-		if (icon!=null) setIcon(img);
+		// ImageIcon img = new ImageIcon(GrapherMain.class.getResource("icons/"+icon));
+		// if (icon!=null) setIcon(img);
 	}
 }
 
@@ -56,11 +57,11 @@ public class MenuOptions extends JPopupMenu{
 	protected	GrapherMenu		vertexMenu,edgeMenu,grapherMenu,template;
 	
 	private	GrapherMain		main;
-	private GrapherMenu		edgeTypes;
-	private	GrapherItem		vertexDelete,vertexDeleteAllOutgoings,vertexAccepted,vertexOnwer;
-	private	GrapherItem		edgeDelete,edgeTune,edgeNoType;
+	private GrapherMenu		vertexTypes,edgeTypes;
+	private	GrapherItem		vertexDelete,vertexDeleteAllOutgoings,vertexAccepted;
+	private	GrapherItem		edgeDelete,edgeTune;
 	private	GrapherItem		restart,parityGame,load,loadImport,save,saveAs,print,simulate,help;
-	private	TypeMenuItem	typeItems[];
+	private	TypeMenuItem[]	vertexTypeItems,edgeTypeItems;
 	
 	//-------------------------------------------------------------------------------------
 
@@ -84,13 +85,12 @@ public class MenuOptions extends JPopupMenu{
 		vertexDelete				= new GrapherItem("Delete state",defaultFont,"delete_state.png");
 		vertexDeleteAllOutgoings	= new GrapherItem("Delete all outgoing connections",defaultFont,"delete_connection.png");
 		vertexAccepted			= new GrapherItem("Set final state",defaultFont,"accepted_state.png");
-		vertexOnwer				= new GrapherItem("Switch owner",defaultFont,"owner.png");
+		vertexTypes				= new GrapherMenu("Set type",defaultFont,"owner.png");
 		
-		edgeTypes				= new GrapherMenu("Set state",defaultFont,"type_connection.png");
-		edgeNoType				= new GrapherItem("Unset state",defaultFont,"no_type_connection.png");
 		edgeDelete				= new GrapherItem("Delete connection",defaultFont,"delete_connection.png");
 		edgeTune				= new GrapherItem("Tune arc",defaultFont,"tune_connection.png");
-		
+		edgeTypes				= new GrapherMenu("Set type",defaultFont,"type_connection.png");
+
 		restart					= new GrapherItem("Restar session",defaultFont,"new.png");
 		parityGame				= new GrapherItem("Parity Game",defaultFont,"");
 		load					= new GrapherItem("Load automaton",defaultFont,"open.png");
@@ -108,11 +108,10 @@ public class MenuOptions extends JPopupMenu{
 		vertexMenu.add(vertexDelete);
 		vertexMenu.add(vertexDeleteAllOutgoings);
 		vertexMenu.add(vertexAccepted);
-		vertexMenu.add(vertexOnwer);
-		edgeMenu.add(edgeTypes);
-		edgeMenu.add(edgeNoType);
+		vertexMenu.add(vertexTypes);
 		edgeMenu.add(edgeDelete);
 		edgeMenu.add(edgeTune);
+		edgeMenu.add(edgeTypes);
 		
 		grapherMenu.add(restart);
 		grapherMenu.add(template);
@@ -131,37 +130,23 @@ public class MenuOptions extends JPopupMenu{
 
 	//-------------------------------------------------------------------------------------
 	
-	public void setMenuTypes(JComponent connectionTypes,boolean retype){
-		connectionTypes.removeAll();
-		typeItems	= new TypeMenuItem[main.currentSession.board.eTypes.size()];
-		for (int i=0 ; i<main.currentSession.board.eTypes.size() ; i++) {
-			Type type = (Type)main.currentSession.board.eTypes.elementAt(i); 
-			typeItems[i]= new TypeMenuItem(type.getName(),type);
-			
-			typeItems[i].addActionListener(new ActionListener() {
+	public void setMenuTypes(JComponent menu, Vector<Type> types){
+		menu.removeAll();
+		for (Type type : types) {
+			TypeMenuItem typeItem= new TypeMenuItem(type.getName(),type);
+			typeItem.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					Type t = ((TypeMenuItem)e.getSource()).getType();
-					// if (t.getNumber() == 0) {
-					// 	int currentval = main.currentSession.board.currentConnection.getValue();
-					// 	String val = JOptionPane.showInputDialog("Value:",""+currentval);
-					// 	if (val != null) {
-					// 		try {
-					// 			main.currentSession.board.currentConnection.setValue(Integer.parseInt(val));
-					// 		}
-					// 		catch (NumberFormatException ex) {
-					// 			return;
-					// 		}
-					// 	} else {
-					// 		return;
-					// 	}						
-					// }
-					main.currentSession.board.currentConnection.setType(t);
+					if (main.currentSession.board.vertexTarget != null) {
+						main.currentSession.board.vertexTarget.setType(t);
+					} else {
+						main.currentSession.board.currentConnection.setType(t);
+					}
 					main.currentSession.board.repaint();
 					main.currentSession.setModified(true);
 				}
 			});
-			connectionTypes.add(typeItems[i]);
-			// if (i==0) ((JMenu)connectionTypes).addSeparator();
+			menu.add(typeItem);
 		}
 	}
 	
@@ -188,14 +173,7 @@ public class MenuOptions extends JPopupMenu{
 			else {
 				edgeTune.setEnabled(false);
 			}
-			
-			if (main.currentSession.board.currentConnection.getType()!=null){
-				edgeNoType.setEnabled(true);
-			}
-			else{
-				edgeNoType.setEnabled(false);
-			}
-			
+		
 			edgeMenu.setEnabled(true);
 		}
 		else{
@@ -237,9 +215,9 @@ public class MenuOptions extends JPopupMenu{
 	
 	//-------------------------------------------------------------------------------------
 
-	public void showTypes(boolean retype){
+	public void showTypes(Vector<Type> types){
 		JPopupMenu menu = new JPopupMenu();
-		setMenuTypes(menu,retype);
+		setMenuTypes(menu, types);
 		menu.addPopupMenuListener(new PopupMenuListener(){
 
 			public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
@@ -288,9 +266,9 @@ public class MenuOptions extends JPopupMenu{
 			}
 		});		
 		
-		vertexOnwer.addActionListener(new ActionListener(){
+		vertexTypes.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
-				main.currentSession.board.vertexTarget.setType(1-main.currentSession.board.vertexTarget.getType());
+				main.currentSession.board.vertexTarget.setType(main.currentSession.board.vertexTarget.getType());
 				main.currentSession.setModified(true);
 				main.currentSession.board.repaint();
 			}
@@ -313,13 +291,13 @@ public class MenuOptions extends JPopupMenu{
 			}
 		});	
 		
-		edgeNoType.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e) {
-				main.currentSession.board.currentConnection.setType(null);
-				main.currentSession.setModified(true);
-				main.currentSession.board.repaint();
-			}
-		});	
+		// edgeNoType.addActionListener(new ActionListener(){
+		// 	public void actionPerformed(ActionEvent e) {
+		// 		main.currentSession.board.currentConnection.setType(null);
+		// 		main.currentSession.setModified(true);
+		// 		main.currentSession.board.repaint();
+		// 	}
+		// });	
 		
 		restart.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
@@ -337,12 +315,12 @@ public class MenuOptions extends JPopupMenu{
 				sets.dictionary.vertexValue	= "priors";
 				sets.dictionary.edge		= "edge";
 				sets.dictionary.edgeValue	= "weights";
-				sets.dictionary.graph1		= "g";
-				sets.dictionary.vertex1		= "v";
-				sets.dictionary.vertexType1	= "o";
-				sets.dictionary.vertexValue1= "p";
-				sets.dictionary.edge1		= "e";
-				sets.dictionary.edgeValue1	= "w";
+				sets.dictionary._graph		= "g";
+				sets.dictionary._vertex		= "v";
+				sets.dictionary._vertexType	= "o";
+				sets.dictionary._vertexValue= "p";
+				sets.dictionary._edge		= "e";
+				sets.dictionary._edgeValue	= "w";
 				sets.showVertexSequence		= false;
 				sets.showConnectionSequence	= false;
 				sets.showVertexPriorities	= true;
@@ -405,7 +383,8 @@ public class MenuOptions extends JPopupMenu{
 
 			public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
 				main.currentSession.board.menuBlock = true;
-				setMenuTypes(edgeTypes,false);
+				setMenuTypes(vertexTypes,main.currentSession.board.vTypes);
+				setMenuTypes(edgeTypes,main.currentSession.board.eTypes);
 			}
 
 			public void popupMenuWillBecomeInvisible(PopupMenuEvent arg0) {

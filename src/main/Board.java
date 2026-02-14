@@ -1,10 +1,13 @@
 package main;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FileDialog;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GridLayout;
 import java.awt.RenderingHints;
+import java.awt.event.HierarchyEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -26,10 +29,16 @@ import java.io.RandomAccessFile;
 import java.util.Vector;
 
 import javax.imageio.ImageIO;
+import javax.swing.BoxLayout;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 
 public class Board extends JComponent implements Printable{
 	
@@ -83,9 +92,9 @@ public class Board extends JComponent implements Printable{
 		eTypes.add(new Type(3,"uppercase","ABCDEFGHIJKLMNOPQRSTUVWXYZ"));
 		eTypes.add(new Type(4,"lowercase","abcdefghijklmnopqrstuvwxyz"));
 
-		vTypes.add(new Type(0,"Round", "0"));
-		vTypes.add(new Type(1,"Square", "1"));
-		vTypes.add(new Type(2,"Polygon", "2"));
+		vTypes.add(new Type(0,"Round", "Odd"));
+		vTypes.add(new Type(1,"Square", "Even"));
+		vTypes.add(new Type(2,"Polygon", "Nature"));
 
 		settings	= new GrapherSettings(true,true,"",eTypes);
 		vertices		= new Vector<Vertex>();
@@ -268,6 +277,7 @@ public class Board extends JComponent implements Printable{
 
 				boolean shiftDown = (modifiers & InputEvent.SHIFT_DOWN_MASK) != 0;
 				boolean ctrlDown = (modifiers & InputEvent.CTRL_DOWN_MASK) != 0;
+				boolean altDown = (modifiers & InputEvent.ALT_DOWN_MASK) != 0;
 				
 				// SHIFT + BUTTON1
 				if (shiftDown && button == MouseEvent.BUTTON1) {
@@ -289,8 +299,17 @@ public class Board extends JComponent implements Printable{
 						vertexTarget.setActive(!vertexTarget.isActive(), true);
 						session.setModified(true);
 					}
+					repaint();
+					return;
+				}
+
+				// ALT + BUTTON3
+				if (altDown && button == MouseEvent.BUTTON3) {
+					if (vertexTarget != null) {
+						session.main.menuOptions.showTypes(vTypes);
+					}
 					if (currentConnection != null) {
-						session.main.menuOptions.showTypes(false);
+						session.main.menuOptions.showTypes(eTypes);
 					}
 					repaint();
 					return;
@@ -299,39 +318,119 @@ public class Board extends JComponent implements Printable{
 				// BUTTON1 + Double-click (No CTRL)
 				if (button == MouseEvent.BUTTON1 && e.getClickCount() == 2 && !ctrlDown) {
 					if (vertexTarget != null) {
-						String currentval = vertexTarget.getValue();
-						String val = JOptionPane.showInputDialog(session, settings.dictionary.vertexValue,""+currentval);
-						if (val != null) {
+						JTextField value = new JTextField(vertexTarget.getValue());
+						JTextField label = new JTextField(vertexTarget.getLabel());
+						String[] options = new String[vTypes.size()+1];
+						for (int i=0; i<vTypes.size(); i++) {
+							options[i] = vTypes.elementAt(i).getName();							
+						}
+						options[vTypes.size()] = "<None>";
+						JComboBox<String> type = new JComboBox<>(options);
+						if (vertexTarget.getType() == null) {
+							type.setSelectedIndex(vTypes.size());
+						} else {
+							type.setSelectedIndex(vertexTarget.getType().getId());
+						}
+
+						JPanel info = new JPanel(new GridLayout(3,1));
+						JPanel data = new JPanel(new GridLayout(3,1));
+						JPanel panel = new JPanel(new BorderLayout());
+						panel.add(info,BorderLayout.WEST);
+						panel.add(data,BorderLayout.CENTER);
+						
+						info.add(new JLabel(""+settings.dictionary.vertexValue+" "));
+						data.add(value);
+						info.add(new JLabel(""+settings.dictionary.vertexLabel+" "));
+						data.add(label);
+						info.add(new JLabel(""+settings.dictionary.vertexType+" "));
+						data.add(type);
+
+						panel.setPreferredSize(new Dimension(300, 70));
+						int result = JOptionPane.showConfirmDialog(session, panel, 
+								"Properties for "+settings.dictionary.vertex, JOptionPane.OK_CANCEL_OPTION);
+
+						if (result == JOptionPane.OK_OPTION) {
 							try {
-								double dval = Double.parseDouble(val);
-								vertexTarget.setValue(val);
+								Double.parseDouble(value.getText());
+								vertexTarget.setValue(value.getText());
+								vertexTarget.setLabel(label.getText());
+								if (type.getSelectedIndex() == options.length-1) {
+									vertexTarget.setType(null);
+								} else {
+									vertexTarget.setType(vTypes.elementAt(type.getSelectedIndex()));
+								}
 							}
 							catch (NumberFormatException ex) {
 								return;
 							}
-						} else {
-							return;
 						}
 						repaint();
 						session.setModified(true);						
 						return;
 					}
 					if (currentConnection != null) {
-						Type t = new Type(0,"","");
-						String currentval = currentConnection.getValue();
-						String val = JOptionPane.showInputDialog(session, settings.dictionary.edgeValue,""+currentval);
-						if (val != null) {
+
+						JTextField value = new JTextField(currentConnection.getValue());
+						JTextField label = new JTextField(currentConnection.getLabel());
+						String[] options = new String[eTypes.size()+1];
+						for (int i=0; i<eTypes.size(); i++) {
+							options[i] = eTypes.elementAt(i).getName();							
+						}
+						options[eTypes.size()] = "<None>";
+						JComboBox<String> type = new JComboBox<>(options);
+						if (currentConnection.getType() == null) {
+							type.setSelectedIndex(eTypes.size());
+						} else {
+							type.setSelectedIndex(currentConnection.getType().getId());
+						}
+
+						JPanel info = new JPanel(new GridLayout(3,1));
+						JPanel data = new JPanel(new GridLayout(3,1));
+						JPanel panel = new JPanel(new BorderLayout());
+						panel.add(info,BorderLayout.WEST);
+						panel.add(data,BorderLayout.CENTER);
+						
+						info.add(new JLabel(""+settings.dictionary.edgeValue+" "));
+						data.add(value);
+						info.add(new JLabel(""+settings.dictionary.edgeLabel+" "));
+						data.add(label);
+						info.add(new JLabel(""+settings.dictionary.edgeType+" "));
+						data.add(type);
+
+						panel.setPreferredSize(new Dimension(300, 70));
+						int result = JOptionPane.showConfirmDialog(session, panel, 
+								"Properties for "+settings.dictionary.edge, JOptionPane.OK_CANCEL_OPTION);
+
+						if (result == JOptionPane.OK_OPTION) {
 							try {
-								double dval = Double.parseDouble(val);
-								currentConnection.setValue(val);
+								Double.parseDouble(value.getText());
+								currentConnection.setValue(value.getText());
+								currentConnection.setLabel(label.getText());
+								if (type.getSelectedIndex() == options.length-1) {
+									currentConnection.setType(null);
+								} else {
+									currentConnection.setType(eTypes.elementAt(type.getSelectedIndex()));
+								}
 							}
 							catch (NumberFormatException ex) {
 								return;
 							}
-						} else {
-							return;
 						}						
-						currentConnection.setType(t);
+						// Type t = new Type(0,"","");
+						// String currentval = currentConnection.getValue();
+						// String val = JOptionPane.showInputDialog(session, settings.dictionary.edgeValue,""+currentval);
+						// if (val != null) {
+						// 	try {
+						// 		Double.parseDouble(val);
+						// 		currentConnection.setValue(val);
+						// 	}
+						// 	catch (NumberFormatException ex) {
+						// 		return;
+						// 	}
+						// } else {
+						// 	return;
+						// }						
+						// currentConnection.setType(t);
 						repaint();
 						session.setModified(true);						
 						return;
@@ -645,17 +744,17 @@ public class Board extends JComponent implements Printable{
 
 			Dictionary dict = settings.dictionary;
 			dict.graph			= file.readUTF();
-			dict.graph1			= file.readUTF();
+			dict._graph			= file.readUTF();
 			dict.vertex			= file.readUTF();
-			dict.vertex1		= file.readUTF();
+			dict._vertex		= file.readUTF();
 			dict.vertexType		= file.readUTF();
-			dict.vertexType1	= file.readUTF();
+			dict._vertexType	= file.readUTF();
 			dict.vertexValue	= file.readUTF();
-			dict.vertexValue1	= file.readUTF();
+			dict._vertexValue	= file.readUTF();
 			dict.edge			= file.readUTF();
-			dict.edge1			= file.readUTF();
+			dict._edge			= file.readUTF();
 			dict.edgeValue		= file.readUTF();
-			dict.edgeValue1		= file.readUTF();
+			dict._edgeValue		= file.readUTF();
 
 	        file.close(); 
 	        repaint();
@@ -885,17 +984,17 @@ public class Board extends JComponent implements Printable{
 			Dictionary dict = settings.dictionary;
 			
 			file.writeUTF(dict.graph);
-			file.writeUTF(dict.graph1);
+			file.writeUTF(dict._graph);
 			file.writeUTF(dict.vertex);
-			file.writeUTF(dict.vertex1);
+			file.writeUTF(dict._vertex);
 			file.writeUTF(dict.vertexType);
-			file.writeUTF(dict.vertexType1);
+			file.writeUTF(dict._vertexType);
 			file.writeUTF(dict.vertexValue);
-			file.writeUTF(dict.vertexValue1);
+			file.writeUTF(dict._vertexValue);
 			file.writeUTF(dict.edge);
-			file.writeUTF(dict.edge1);
+			file.writeUTF(dict._edge);
 			file.writeUTF(dict.edgeValue);
-			file.writeUTF(dict.edgeValue1);
+			file.writeUTF(dict._edgeValue);
 
 	        file.setLength(file.getFilePointer());
 	        file.close();

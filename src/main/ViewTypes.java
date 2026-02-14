@@ -1,33 +1,35 @@
 package main;
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.util.Vector;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.UIManager;
 import javax.swing.event.TableModelListener;
+import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
 public class ViewTypes extends JPanel {
 
 	//-------------------------------------------------------------------------------------
 
-	private	JTable		table;
-	private	JPanel		controls;
-	private	JTextField	name,symbols;
-	private	JButton		add,delete;
+	private	JTable		vTable,eTable;
+	private JButton		vAdd,eAdd;
 	private	GrapherMain	main;
 	
 	//-------------------------------------------------------------------------------------
@@ -41,46 +43,72 @@ public class ViewTypes extends JPanel {
 	//-------------------------------------------------------------------------------------
 	
 	private void initElements(){
-		table		= new JTable();
-		controls	= new JPanel(new GridLayout(3,2));
-		name		= new JTextField();
-		symbols		= new JTextField();
-		add			= new JButton("Save");
-		delete		= new JButton("Delete");
-		setLayout(new BorderLayout());
-		add(new JScrollPane(table),"Center");
-		add(controls,"South");
-		controls.add(new JLabel("Name"));		controls.add(name);
-		controls.add(new JLabel("Symbols"));	controls.add(symbols);
-		controls.add(add);						controls.add(delete);
-		delete.setEnabled(false);
-		table.setRowSelectionAllowed(true);
-		if (main.currentSession!=null) loadTable();		
+		vTable = new JTable();
+		eTable = new JTable();
+		vAdd = new JButton("+");
+		eAdd = new JButton("+");
 
-		Font currentFont	= UIManager.getFont("Label.font");
-		Font defaultFont	= new Font(currentFont.getName(),Font.PLAIN,currentFont.getSize());
-		for (Component component : controls.getComponents()) {
-			component.setFont(defaultFont);			
+		setLayout(new GridBagLayout());
+		GridBagConstraints c = new GridBagConstraints();
+		c.fill = GridBagConstraints.BOTH;
+		c.insets = new Insets(5, 5, 5, 5);
+		c.gridx = 0;
+		c.weightx = 1.0;
+
+		JPanel vTitlePanel = new JPanel(new BorderLayout());
+		vTitlePanel.add(new JLabel("Vertex types"),BorderLayout.CENTER);
+		vTitlePanel.add(vAdd,BorderLayout.EAST);
+		c.gridy = 0;
+		c.weighty = 0.0;
+		add(vTitlePanel, c);
+
+		c.gridy = 1;
+		c.weighty = 1.0;
+		add(new JScrollPane(vTable), c);
+
+		JPanel eTitlePanel = new JPanel(new BorderLayout());
+		eTitlePanel.add(new JLabel("Edge types"),BorderLayout.CENTER);
+		eTitlePanel.add(eAdd,BorderLayout.EAST);
+		c.gridy = 2;
+		c.weighty = 0.0;
+		add(eTitlePanel, c);
+
+		c.gridy = 3;
+		c.weighty = 1.0;
+		add(new JScrollPane(eTable), c);
+
+		if (main.currentSession!=null) {
+			vTable.setModel(loadTable(main.currentSession.board.vTypes));
+			eTable.setModel(loadTable(main.currentSession.board.eTypes));
+
+			TableColumnModel vColumnModel = vTable.getColumnModel();
+			vColumnModel.getColumn(0).setPreferredWidth(30); 
+			vColumnModel.getColumn(0).setMaxWidth(30);
+			TableColumnModel eColumnModel = eTable.getColumnModel();
+			eColumnModel.getColumn(0).setPreferredWidth(30); 
+			eColumnModel.getColumn(0).setMaxWidth(30);
 		}
+
 	}
 	
 	//-------------------------------------------------------------------------------------
 	
-	private void loadTable() {
+	private TableModel loadTable(Vector<Type> types) {
 		TableModel model = new TableModel() {
 
 			public int getRowCount() {
-				return main.currentSession.board.eTypes.size()-1;
+				return types.size();
 			}
 
 			public int getColumnCount() {
-				return 2;
+				return 3;
 			}
 
 			public String getColumnName(int column) {
 				switch (column){
-					case 0:	return "Name";
-					case 1: return "Symbols";
+					case 0:	return "Id";
+					case 1:	return "Name";
+					case 2: return "Symbols";
 				}
 				return null;
 			}
@@ -91,14 +119,15 @@ public class ViewTypes extends JPanel {
 
 			public Object getValueAt(int row, int column) {
 				switch(column) {
-					case 0:	return main.currentSession.board.eTypes.elementAt(row+1).getName();
-					case 1: return main.currentSession.board.eTypes.elementAt(row+1).getDescription();		
+					case 0: return row;
+					case 1:	return types.elementAt(row).getName();
+					case 2: return types.elementAt(row).getDescription();		
 				}
 				return null;
 			}
 
 			public boolean isCellEditable(int arg0, int arg1) {
-				return true;
+				return false;
 			}
 
 			public void setValueAt(Object arg0, int arg1, int arg2) {
@@ -111,112 +140,123 @@ public class ViewTypes extends JPanel {
 			}
 		};
 
-		table.setModel(model);
+		return model;
 	}
 	
 	//-------------------------------------------------------------------------------------
 
 	private void progListeners(){
-		
-		add.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e){
-				for (int i=0;i<main.currentSession.board.eTypes.size();i++){
-					if (main.currentSession.board.eTypes.elementAt(i).getName().equals(name.getText())){
-						main.currentSession.board.session.main.messageBox("Duplicated name of type ≈","Addition error","Accept");
-						return;
-					}
-					for (int c=0;c<symbols.getText().length();c++){
-						if (main.currentSession.board.eTypes.elementAt(i).getDescription().contains(symbols.getText().substring(c,c+1))){
-							main.currentSession.board.session.main.messageBox("The symbol ["+symbols.getText().substring(c,c+1)+"] is dupplicated in type "+main.currentSession.board.eTypes.elementAt(i).getName()+"!","Addition error","Accept");
-							return;
+
+		vTable.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_DELETE && e.isControlDown()) {
+					int row = vTable.getSelectedRow();
+					if (row != -1) {
+						main.currentSession.board.vTypes.remove(row);
+						int index = 0;
+						for (Type type : main.currentSession.board.vTypes) {
+							type.setId(index++);
 						}
+						vTable.revalidate();
+						vTable.repaint();
 					}
 				}
-				if (add.getText().equals("Save")){
-					int n;
-					n = main.currentSession.board.eTypes.size();
-					main.currentSession.board.eTypes.add(new Type(n+1,name.getText(),symbols.getText()));
-				}
-				loadTable();
-				name.setText("");
-				symbols.setText("");
-				main.currentSession.board.session.setModified(true);
 			}
 		});
-		
-		delete.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e){
-				boolean question = false;
-				for (int s=0;s<main.currentSession.board.vertices.size();s++){
-					Vertex state = main.currentSession.board.vertices.elementAt(s);
-					for (int c=0;c<state.getOuts().size();c++){
-						Edge connection = state.getOuts().elementAt(c); 
-						if (connection.getType()!=null && connection.getType().equals(main.currentSession.board.eTypes.elementAt(table.getSelectedRow()+1))){
-							if (!question) {
-								String opc = main.currentSession.board.session.main.messageBox("Type currently used.|Do you want to keep updating the connections?","Warning!","Yes|Cancel");
-								if (opc.equals("Cancel")||opc.equals("")) return;
-								question = true;
-							}							
-							connection.setType(null);
+
+		eTable.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_DELETE && e.isControlDown()) {
+					int row = eTable.getSelectedRow();
+					if (row != -1) {
+						main.currentSession.board.eTypes.remove(row);
+						int index = 0;
+						for (Type type : main.currentSession.board.eTypes) {
+							type.setId(index++);
 						}
+						eTable.revalidate();
+						eTable.repaint();
 					}
 				}
-				main.currentSession.board.repaint();
-				main.currentSession.board.eTypes.remove(table.getSelectedRow()+1);
-				for (int i=1;i<main.currentSession.board.eTypes.size();i++){
-					main.currentSession.board.eTypes.elementAt(i).setId(i+1);
+			}
+		});
+
+		vAdd.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+				JTextField name = new JTextField();
+				JTextField desc = new JTextField();
+
+				JPanel info = new JPanel(new GridLayout(3,1));
+				JPanel data = new JPanel(new GridLayout(3,1));
+				JPanel panel = new JPanel(new BorderLayout());
+				panel.add(info,BorderLayout.WEST);
+				panel.add(data,BorderLayout.CENTER);
+				
+				info.add(new JLabel("Name "));
+				data.add(name);
+				info.add(new JLabel("Description "));
+				data.add(desc);
+
+				panel.setPreferredSize(new Dimension(300, 70));
+				int result = JOptionPane.showConfirmDialog(vTable, panel, 
+						"Vertice types", JOptionPane.OK_CANCEL_OPTION);
+
+				if (result == JOptionPane.OK_OPTION) {
+					Vector<Type> type = main.currentSession.board.vTypes;
+					type.add(new Type(type.size(),name.getText(),desc.getText()));
 				}
-				loadTable();
-				delete.setEnabled(false);
-				name.setText("");
-				symbols.setText("");
-				main.currentSession.board.session.setModified(true);
+				main.currentSession.setModified(true);
+				vTable.revalidate();
+				vTable.repaint();
 			}
 		});
-		
-		table.addMouseListener(new MouseListener(){
 
-			public void mouseClicked(MouseEvent e) {
-				delete.setEnabled(true);
-			}
+		eAdd.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 
-			public void mousePressed(MouseEvent arg0) {
-			}
+				JTextField name = new JTextField();
+				JTextField desc = new JTextField();
 
-			public void mouseReleased(MouseEvent arg0) {
-			}
+				JPanel info = new JPanel(new GridLayout(3,1));
+				JPanel data = new JPanel(new GridLayout(3,1));
+				JPanel panel = new JPanel(new BorderLayout());
+				panel.add(info,BorderLayout.WEST);
+				panel.add(data,BorderLayout.CENTER);
+				
+				info.add(new JLabel("Name "));
+				data.add(name);
+				info.add(new JLabel("Description "));
+				data.add(desc);
 
-			public void mouseEntered(MouseEvent arg0) {
-			}
+				panel.setPreferredSize(new Dimension(300, 70));
+				int result = JOptionPane.showConfirmDialog(eTable, panel, 
+						"Vertice types", JOptionPane.OK_CANCEL_OPTION);
 
-			public void mouseExited(MouseEvent arg0) {
+				if (result == JOptionPane.OK_OPTION) {
+					Vector<Type> type = main.currentSession.board.eTypes;
+					type.add(new Type(type.size(),name.getText(),desc.getText()));
+				}
+				main.currentSession.setModified(true);
+				eTable.revalidate();
+				eTable.repaint();
 			}
-			
 		});
-		
-		table.addKeyListener(new KeyListener(){
-
-			public void keyTyped(KeyEvent arg0) {
-				//System.out.println("typed");
-			}
-
-			public void keyPressed(KeyEvent arg0) {
-				//System.out.println("pressed");
-			}
-
-			public void keyReleased(KeyEvent e) {
-				//System.out.println("released:"+e.toString());
-			}
-			
-		});
-		
-
 	}
 	
 	//-------------------------------------------------------------------------------------
 
 	public void refresh(){
-		loadTable();
+		vTable.setModel(loadTable(main.currentSession.board.vTypes));
+		eTable.setModel(loadTable(main.currentSession.board.eTypes));
+		TableColumnModel vColumnModel = vTable.getColumnModel();
+		vColumnModel.getColumn(0).setPreferredWidth(30); 
+		vColumnModel.getColumn(0).setMaxWidth(30);
+		TableColumnModel eColumnModel = eTable.getColumnModel();
+		eColumnModel.getColumn(0).setPreferredWidth(30); 
+		eColumnModel.getColumn(0).setMaxWidth(30);
 	}
 	
 }

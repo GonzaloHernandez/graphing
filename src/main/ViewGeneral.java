@@ -3,9 +3,11 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -20,6 +22,8 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.UIManager;
+import javax.swing.border.Border;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.text.DefaultFormatterFactory;
@@ -30,10 +34,8 @@ public class ViewGeneral extends JPanel {
 	//-------------------------------------------------------------------------------------
 
 	protected	GrapherMain	main;
-	protected	JCheckBox	showTypeNames;
-	protected	JCheckBox	showStateNumbers;
-	protected	JCheckBox	showConnectionNumbers;
-	protected	JCheckBox	showStateValues;
+
+	protected	JCheckBox[]	showVertex,showEdge;
 	protected	JCheckBox	allowFirstState;
 	protected	JCheckBox	firstZero;
 	protected	JCheckBox	exportAuto;
@@ -56,27 +58,47 @@ public class ViewGeneral extends JPanel {
 	//-------------------------------------------------------------------------------------
 
 	private void initElements() {
-		setLayout(new BorderLayout());
+		JPanel panelNorth 	= new JPanel(new GridLayout(1,2,10,10));
+		JPanel panelVertex	= new JPanel(new GridLayout(4,1));
+		JPanel panelEdge	= new JPanel(new GridLayout(4,1));
+		JPanel panelGeneral	= new JPanel(new GridLayout(3,1));
 
-		// 1. Use a vertical BoxLayout for the checkboxes so they don't stretch to equal heights
-		JPanel panelChecks = new JPanel();
-		panelChecks.setLayout(new BoxLayout(panelChecks, BoxLayout.Y_AXIS));
+		showVertex		= new JCheckBox[4];
+		showEdge		= new JCheckBox[4];
 
-		showStateNumbers      = new JCheckBox("Show state sequence");
-		showStateValues       = new JCheckBox("Show state priorities");
-		showConnectionNumbers = new JCheckBox("Show connection sequence");
-		showTypeNames         = new JCheckBox("Show connection values");
+		TitledBorder vertexTitle = BorderFactory.createTitledBorder("Vertex show");
+		panelVertex.setBorder(vertexTitle);
+		Border marginVertex = BorderFactory.createEmptyBorder(7,7,7,7);
+		panelVertex.setBorder(BorderFactory.createCompoundBorder(vertexTitle, marginVertex));
+
+		TitledBorder edgeTitle = BorderFactory.createTitledBorder("Edge show");
+		panelEdge.setBorder(edgeTitle);
+		Border marginEdge = BorderFactory.createEmptyBorder(7,7,7,7);
+		panelEdge.setBorder(BorderFactory.createCompoundBorder(edgeTitle, marginEdge));
+
+		Border margin = BorderFactory.createEmptyBorder(10,7,7,9);
+		panelNorth.setBorder(BorderFactory.createCompoundBorder(null, margin));
+
+		String[] l = {"Sequence","Value","Type","Label"};
+		for (int i=0; i<4; i++) {
+			showVertex[i]	= new JCheckBox(l[i]);
+			showEdge[i]		= new JCheckBox(l[i]);
+			panelVertex.add(showVertex[i]);
+			panelEdge.add(showEdge[i]);
+		}
+		panelNorth.add(panelVertex);	panelNorth.add(panelEdge);
+
 		allowFirstState       = new JCheckBox("Allow first state");
 		firstZero             = new JCheckBox("Start at Zero (0)");
 		gridScale             = new JSpinner(new SpinnerNumberModel(10, 1, 100, 1));
 		exportAuto            = new JCheckBox("Export automatically");
 
-		// Grid Scale Panel (FlowLayout.LEFT keeps it tight)
-		JPanel gridScalePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 5));
-		gridScalePanel.add(new JLabel("Grid Scale: "));
+		setLayout(new BorderLayout());
+
+		JPanel gridScalePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+		gridScalePanel.add(new JLabel("  Grid Scale: "));
 		gridScalePanel.add(gridScale);
 
-		// Spinner formatting
 		JComponent editor = gridScale.getEditor();
 		JFormattedTextField tf = ((JSpinner.DefaultEditor) editor).getTextField();
 		tf.setEditable(true);
@@ -85,29 +107,21 @@ public class ViewGeneral extends JPanel {
 		((DefaultFormatterFactory) tf.getFormatterFactory()).getDefaultFormatter()))
 		.setAllowsInvalid(false);
 
-		// Add elements to the vertical panel
-		panelChecks.add(showStateNumbers);
-		panelChecks.add(showStateValues);
-		panelChecks.add(showConnectionNumbers);
-		panelChecks.add(showTypeNames);
-		panelChecks.add(allowFirstState);
-		panelChecks.add(firstZero);
+		JPanel panelChecks = new JPanel();
+		panelChecks.setLayout(new BoxLayout(panelChecks, BoxLayout.Y_AXIS));
+
+		Border marginGeneral = BorderFactory.createEmptyBorder(8,8,8,0);
+		panelGeneral.setBorder(BorderFactory.createCompoundBorder(null, marginGeneral));
+
+		panelGeneral.add(allowFirstState);
+		panelGeneral.add(firstZero);
+
+		panelChecks.add(panelNorth);
+		panelChecks.add(panelGeneral);
 		panelChecks.add(gridScalePanel);
 
-
-		Component[] comps = {showStateNumbers, showStateValues, showConnectionNumbers, 
-							showTypeNames, allowFirstState, firstZero, gridScalePanel};
-		
-		for (Component c : comps) {
-			((JComponent)c).setAlignmentX(Component.LEFT_ALIGNMENT);
-			panelChecks.add(c);
-		}
-
-		// 2. WRAPPER: This prevents the BorderLayout from stretching the panelChecks vertically
 		JPanel northWrapper = new JPanel(new BorderLayout());
-		northWrapper.add(panelChecks, BorderLayout.WEST); 
-
-		info = new JTabbedPane();
+		northWrapper.add(panelChecks, BorderLayout.CENTER); 
 
 		JPanel panelComment = new JPanel(new BorderLayout());
 		comment = new JTextArea();
@@ -126,6 +140,7 @@ public class ViewGeneral extends JPanel {
 		panelExport.add(new JScrollPane(export), BorderLayout.CENTER);
 		panelExport.add(exportAuto, BorderLayout.SOUTH);
 
+		info = new JTabbedPane();
 		info.addTab("Comment", panelComment);
 		info.addTab("Export", panelExport);
 
@@ -146,36 +161,37 @@ public class ViewGeneral extends JPanel {
 	//-------------------------------------------------------------------------------------
 
 	private void progListeneres(){
-		showTypeNames.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e) {
-				settings = main.currentSession.board.settings;
-				settings.showTypeNames	= showTypeNames.isSelected();
-				main.currentSession.setModified(true);
-				main.currentSession.board.repaint();
-			}
-		});
 
-		showStateNumbers.addActionListener(new ActionListener(){
+		showVertex[0].addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
 				settings = main.currentSession.board.settings;
-				settings.showVertexSequence = showStateNumbers.isSelected();
+				settings.showVertexSequence = showVertex[0].isSelected();
 				main.currentSession.setModified(true);
 				main.currentSession.board.repaint();
 			}
 		});
 		
-		showConnectionNumbers.addActionListener(new ActionListener(){
+		showEdge[0].addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
 				settings = main.currentSession.board.settings;
-				settings.showConnectionSequence = showConnectionNumbers.isSelected();
+				settings.showConnectionSequence = showEdge[0].isSelected();
 				main.currentSession.setModified(true);
 				main.currentSession.board.repaint();
 			}
 		});
 
-		showStateValues.addActionListener(new ActionListener(){
+		showEdge[1].addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
-				settings.showVertexPriorities = showStateValues.isSelected();
+				settings = main.currentSession.board.settings;
+				settings.showTypeNames	= showEdge[1].isSelected();
+				main.currentSession.setModified(true);
+				main.currentSession.board.repaint();
+			}
+		});
+
+		showVertex[1].addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				settings.showVertexPriorities = showVertex[1].isSelected();
 				main.currentSession.setModified(true);
 				main.currentSession.board.repaint();
 			}
@@ -238,10 +254,11 @@ public class ViewGeneral extends JPanel {
 
 	public void refresh(){
 		settings = main.currentSession.board.settings;
-		showTypeNames.setSelected(settings.showTypeNames);
-		showStateNumbers.setSelected(settings.showVertexSequence);
-		showConnectionNumbers.setSelected(settings.showConnectionSequence);
-		showStateValues.setSelected(settings.showVertexPriorities);
+		showVertex[0].setSelected(settings.showVertexSequence);
+		showVertex[1].setSelected(settings.showVertexPriorities);
+		showEdge[0].setSelected(settings.showConnectionSequence);
+		showEdge[1].setSelected(settings.showTypeNames);
+
 		allowFirstState.setSelected(settings.allowFirsVertex);
 		firstZero.setSelected(settings.firstZero);
 		gridScale.setValue(settings.gridScale);
@@ -251,10 +268,11 @@ public class ViewGeneral extends JPanel {
 		exportType.setSelectedIndex(settings.exportType);
 		Dictionary dict = main.currentSession.board.settings.dictionary;
 
-		showStateNumbers.setText("Show "+dict.vertex+" sequence");
-		showStateValues.setText("Show "+dict.vertex+"'s "+dict.vertexValue);
-		showConnectionNumbers.setText("Show "+dict.edge+" sequence");
-		showTypeNames.setText("Show "+dict.edge+"'s "+dict.edgeValue);
+		showVertex[0].setText("Sequence");
+		showVertex[1].setText(""+dict.vertexValue);
+		showEdge[0].setText("Sequence");
+		showEdge[1].setText(""+dict.edgeValue);
+
 		allowFirstState.setText("Allow first "+dict.vertex);
 	}
 

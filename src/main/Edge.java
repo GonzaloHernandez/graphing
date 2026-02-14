@@ -273,7 +273,7 @@ public class Edge {
 
 			g.setColor(Color.BLUE);
 			g.setFont(new Font("Arial",Font.ITALIC,9));
-			g.drawString(dict.edge1,text.x-(l*5/2),text.y+5);
+			g.drawString(dict._edge,text.x-(l*5/2),text.y+5);
 
 			if (!lab.isEmpty()) {
 				seq += ":";
@@ -509,6 +509,18 @@ public class Edge {
 	
 	//-------------------------------------------------------------
 
+	public void setValue(String value) {
+		this.value = value;
+	}
+
+	//-------------------------------------------------------------------------------------
+
+	public void setLabel(String label){
+		this.label = label;
+	}
+
+	//-------------------------------------------------------------
+
 	public void setDistance(int distance){
 		this.distance = distance;
 	}
@@ -519,11 +531,7 @@ public class Edge {
 		distance	+=	dif;
 	}
 
-	//-------------------------------------------------------------
-
-	public void setValue(String value) {
-		this.value = value;
-	}
+	//-------------------------------------------------------------------------------------
 
 	public void setActive(boolean act){
 		this.active = act;
@@ -563,12 +571,6 @@ public class Edge {
 	}
 	
 	//-------------------------------------------------------------
-
-	public Type getType(){
-		return type;
-	}	
-	
-	//-------------------------------------------------------------
 	
 	public int getDistance(){
 		return distance;
@@ -582,10 +584,23 @@ public class Edge {
 
 	//-------------------------------------------------------------
 
+	public Type getType(){
+		return type;
+	}	
+	
+	//-------------------------------------------------------------
+
 	public String getValue() {
 		return value;
 	}
+
+	//-------------------------------------------------------------------------------------
+
+	public String getLabel(){
+		return label;
+	}
 	
+
 	//-------------------------------------------------------------
 
 	public boolean isActive() {

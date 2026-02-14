@@ -109,12 +109,12 @@ public class ViewDictionary extends JPanel{
 			dict.vertexValue	= vertexValue.getText();
 			dict.edge			= edge.getText();
 			dict.edgeValue		= edgeValue.getText();
-			dict.graph1			= graph1.getText();
-			dict.vertex1		= vertex1.getText();
-			dict.vertexType1	= vertexType1.getText();
-			dict.vertexValue1	= vertexValue1.getText();
-			dict.edge1			= edge1.getText();
-			dict.edgeValue1		= edgeValue1.getText();
+			dict._graph			= graph1.getText();
+			dict._vertex		= vertex1.getText();
+			dict._vertexType	= vertexType1.getText();
+			dict._vertexValue	= vertexValue1.getText();
+			dict._edge			= edge1.getText();
+			dict._edgeValue		= edgeValue1.getText();
 			main.currentSession.board.repaint();
 			main.properties.generalView.refresh();
 			main.currentSession.setModified(true);
@@ -128,12 +128,12 @@ public class ViewDictionary extends JPanel{
 			edge.setText(dict.edge);
 			edgeValue.setText(dict.edgeValue);
 
-			graph1.setText(dict.graph1);
-			vertex1.setText(dict.vertex1);
-			vertexType1.setText(dict.vertexType1);
-			vertexValue1.setText(dict.vertexValue1);
-			edge1.setText(dict.edge1);
-			edgeValue1.setText(dict.edgeValue1);
+			graph1.setText(dict._graph);
+			vertex1.setText(dict._vertex);
+			vertexType1.setText(dict._vertexType);
+			vertexValue1.setText(dict._vertexValue);
+			edge1.setText(dict._edge);
+			edgeValue1.setText(dict._edgeValue);
 
 			main.currentSession.board.repaint();
 		});
@@ -252,12 +252,12 @@ public class ViewDictionary extends JPanel{
 		vertexValue	.setText(dict.vertexValue);
 		edge		.setText(dict.edge);
 		edgeValue	.setText(dict.edgeValue);
-		graph1		.setText(dict.graph1);
-		vertex1		.setText(dict.vertex1);
-		vertexType1	.setText(dict.vertexType1);
-		vertexValue1.setText(dict.vertexValue1);
-		edge1		.setText(dict.edge1);
-		edgeValue1	.setText(dict.edgeValue1);
+		graph1		.setText(dict._graph);
+		vertex1		.setText(dict._vertex);
+		vertexType1	.setText(dict._vertexType);
+		vertexValue1.setText(dict._vertexValue);
+		edge1		.setText(dict._edge);
+		edgeValue1	.setText(dict._edgeValue);
 	}
 
 }

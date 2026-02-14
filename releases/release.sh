@@ -52,3 +52,5 @@ echo "::Updated $README_FILE with the new JAR file name: $JAR_NAME"
 # Check comments about scroll numbers using A/Z and mousewheel
 # Check "O" to switch the owner
 # Check eTypes and vTypes in the menu and in the file loading/saving
+# Check icons, no_state_connection,
+# Check additional information on vertices and edges

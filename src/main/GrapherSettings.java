@@ -2,26 +2,28 @@ package main;
 import java.util.Vector;
 
 class Dictionary {
-	public String graph,graph1;
-	public String vertex,vertex1;
-	public String vertexType,vertexType1;
-	public String vertexValue,vertexValue1;
-	public String edge,edge1;
-	public String edgeValue,edgeValue1;
+	public String graph,_graph;
+	public String vertex,_vertex;
+	public String vertexType,_vertexType;
+	public String vertexValue,_vertexValue;
+	public String vertexLabel,_vertexLabel;
+	public String edge,_edge;
+	public String edgeValue,_edgeValue;
+	public String edgeType,_edgeType;
+	public String edgeLabel,_edgeLabel;
 
 	public Dictionary(){
-		this.graph			= "graph";
-		this.vertex			= "vertex";
-		this.vertexType		= "type";
-		this.vertexValue	= "value";
-		this.edge			= "edge";
-		this.edgeValue		= "cost";
-		this.graph1			= "g";
-		this.vertex1		= "v";
-		this.vertexType1	= " ";
-		this.vertexValue1	= " ";
-		this.edge1			= "e";
-		this.edgeValue1		= " ";
+		this.graph			= "graph";	this._graph			= "g";
+
+		this.vertex			= "vertex";	this._vertex		= "v";
+		this.vertexType		= "type";	this._vertexType	= " ";
+		this.vertexValue	= "value";	this._vertexValue	= " ";
+		this.vertexLabel	= "label";	this._vertexLabel	= " ";
+
+		this.edge			= "edge";	this._edge			= "e";
+		this.edgeValue		= "cost";	this._edgeValue		= " ";
+		this.edgeType		= "type";	this._edgeType		= " ";
+		this.edgeLabel		= "label";	this._edgeLabel		= " ";
 	}
 }
 

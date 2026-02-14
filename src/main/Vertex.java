@@ -115,7 +115,10 @@ public class Vertex {
 			backColor = Color.WHITE;
 		}
 		
-		switch(type.getId()) {
+		int t=0;
+		if (type != null) t=type.getId(); else t = 0;
+
+		switch(t) {
 			case 0:	
 				g.setColor(backColor);
 				g.fillOval(x-RADIUS,y-RADIUS,RADIUS*2,RADIUS*2);
@@ -150,13 +153,13 @@ public class Vertex {
 			g.setColor(Color.darkGray);
 			if (settings.showVertexPriorities) {
 				g.setFont(new Font("Arial",Font.ITALIC,9));
-				g.drawString(dict.vertex1,x-1-(3*(new String(""+number)).length()),y+RADIUS+9);
+				g.drawString(dict._vertex,x-1-(3*(new String(""+number)).length()),y+RADIUS+9);
 				g.setFont(new Font("Arial",Font.ITALIC,7));
 				g.drawString(""+(number+first),x+3-(3*(new String(""+number)).length()),y+RADIUS+11);
 			}
 			else {
 				g.setFont(new Font("Arial",Font.ITALIC,13));
-				g.drawString(dict.vertex1,x-2-(3*(new String(""+number)).length()),y+4);
+				g.drawString(dict._vertex,x-2-(3*(new String(""+number)).length()),y+4);
 				g.setFont(new Font("Arial",Font.ITALIC,8));
 				g.drawString(""+(number+first),x+3-(3*(new String(""+number)).length()),y+8);
 			}
@@ -196,8 +199,20 @@ public class Vertex {
 	
 	//-------------------------------------------------------------------------------------
 
+	public void setType(Type type){
+		this.type = type;
+	}
+
+	//-------------------------------------------------------------------------------------
+
 	public void setValue(String value){
 		this.value = value;
+	}
+	
+	//-------------------------------------------------------------------------------------
+
+	public void setLabel(String label){
+		this.label = label;
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -227,11 +242,6 @@ public class Vertex {
 
 	//-------------------------------------------------------------------------------------
 
-	public void setType(Type type){
-		this.type = type;
-	}
-	//-------------------------------------------------------------------------------------
-
 	// public void setMouseDiference(int mousex,int mousey) {
 	// 	diferencex	= mousex - x;
 	// 	diferencey	= mousey - y;
@@ -251,14 +261,20 @@ public class Vertex {
 	
 	//-------------------------------------------------------------------------------------
 
-	public String getValue() {
-		return value;
+	public Type getType() {
+		return type;
 	}
 	
 	//-------------------------------------------------------------------------------------
 
-	public Type getType() {
-		return type;
+	public String getValue() {
+		return value;
+	}
+
+	//-------------------------------------------------------------------------------------
+
+	public String getLabel(){
+		return label;
 	}
 	
 	//-------------------------------------------------------------------------------------
