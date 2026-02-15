@@ -151,7 +151,7 @@ public class Vertex {
 
 			int first = settings.firstZero?0:1;
 			g.setColor(Color.darkGray);
-			if (settings.showVertexPriorities) {
+			if (settings.showVertexValue) {
 				g.setFont(new Font("Arial",Font.ITALIC,9));
 				g.drawString(dict._vertex,x-1-(3*(new String(""+number)).length()),y+RADIUS+9);
 				g.setFont(new Font("Arial",Font.ITALIC,7));
@@ -164,7 +164,7 @@ public class Vertex {
 				g.drawString(""+(number+first),x+3-(3*(new String(""+number)).length()),y+8);
 			}
 		}
-		if (settings.showVertexPriorities) {
+		if (settings.showVertexValue) {
 			g.setColor(Color.BLACK);
 			g.setFont(new Font("Arial",Font.PLAIN,13));
 			g.drawString(""+value,x-(3*(new String(""+value)).length()),y+4);

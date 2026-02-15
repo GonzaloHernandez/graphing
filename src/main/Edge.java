@@ -251,13 +251,13 @@ public class Edge {
 		String seq = "";
 		int l = 0;
 
-		if (settings.showConnectionSequence) {
+		if (settings.showEdgeSequence) {
 			seq = ""+connectionSequence;
 			l += seq.length() + 1;
 		}
 
-		if (settings.showTypeNames) {
-			if (type!=null && settings.showTypeNames) {
+		if (settings.showEdgeValue) {
+			if (type!=null && settings.showEdgeValue) {
 				if (type.getId()==0) {
 					lab += getValue();
 				} else {
@@ -268,7 +268,7 @@ public class Edge {
 		}
 
 
-		if (settings.showConnectionSequence) {
+		if (settings.showEdgeSequence) {
 			Dictionary dict = settings.dictionary;
 
 			g.setColor(Color.BLUE);
@@ -284,7 +284,7 @@ public class Edge {
 		}
 
 
-		if (settings.showTypeNames) {
+		if (settings.showEdgeValue) {
 			g.setColor(Color.RED);
 			g.setFont(new Font("Arial",Font.ITALIC,9));
 			g.drawString(lab,text.x-(l*5/2)+(seq.length()*5),text.y+5);

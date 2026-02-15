@@ -92,16 +92,16 @@ public class Board extends JComponent implements Printable{
 		eTypes.add(new Type(3,"uppercase","ABCDEFGHIJKLMNOPQRSTUVWXYZ"));
 		eTypes.add(new Type(4,"lowercase","abcdefghijklmnopqrstuvwxyz"));
 
-		vTypes.add(new Type(0,"Round", "Odd"));
-		vTypes.add(new Type(1,"Square", "Even"));
+		vTypes.add(new Type(0,"Round", "Even"));
+		vTypes.add(new Type(1,"Square", "Odd"));
 		vTypes.add(new Type(2,"Polygon", "Nature"));
 
-		settings	= new GrapherSettings(true,true,"",eTypes);
+		settings		= new GrapherSettings();
 		vertices		= new Vector<Vertex>();
 		vertexSource	= null;
 		vertexTarget	= null;
-		controled	= false;		
-		pageFormat	= new PageFormat();
+		controled		= false;		
+		pageFormat		= new PageFormat();
 		Paper		paper	= new Paper();
 		paper.setSize(8.5*72,11*72); //letter size
 		paper.setImageableArea(72,72,paper.getWidth()-72*2,paper.getHeight()-72*2);
@@ -617,12 +617,12 @@ public class Board extends JComponent implements Printable{
 		if (dialog.getFile()==null) return;
 		session.main.curdir = dialog.getDirectory();
 
-		load(session.main.curdir+dialog.getFile());
+		load_1_2_14(session.main.curdir+dialog.getFile());
 	}
 
 	//-------------------------------------------------------------------------------------
 
-	public boolean load(String fileName){
+	public boolean load_1_2_14(String fileName){
 		try {
 	        RandomAccessFile file = new RandomAccessFile(new File(fileName), "r");
 	        this.fileName = fileName;
@@ -665,7 +665,7 @@ public class Board extends JComponent implements Printable{
 	        	y			= file.readShort();
 	        	accepted	= file.readBoolean();
 
-	        	value		= file.readUTF();
+	        	value		= ""+file.readShort();
 				short type	= file.readShort();
 
 				if (family==1 && version<=1)
@@ -687,7 +687,7 @@ public class Board extends JComponent implements Printable{
 	        	numberType		= file.readShort();
 	        	distance		= file.readShort();
 	        	rotation		= file.readDouble();
-				value			= file.readUTF();
+				value			= ""+file.readShort();
 				if (family==1 && version<=1)
 					active	= true;
 				else
@@ -725,22 +725,22 @@ public class Board extends JComponent implements Printable{
 	        	}
 	        }
 	        
-	        settings.showTypeNames			= file.readBoolean();
-	        settings.showVertexSequence		= file.readBoolean();
-	        settings.showConnectionSequence	= file.readBoolean();
-	        settings.showVertexPriorities	= file.readBoolean();
-	        settings.allowFirsVertex			= file.readBoolean();
-	        settings.firstZero				= file.readBoolean();
+	        settings.showEdgeValue		= file.readBoolean();
+	        settings.showVertexSequence	= file.readBoolean();
+	        settings.showEdgeSequence	= file.readBoolean();
+	        settings.showVertexValue	= file.readBoolean();
+	        settings.allowFirsVertex	= file.readBoolean();
+	        settings.firstZero			= file.readBoolean();
 
-			settings.comment				= file.readUTF();
+			settings.comment			= file.readUTF();
 	        
 			Dimension d = new Dimension(file.readShort(),file.readShort());
 	        session.setSize(d);
 			setPreferredSize(d);
 
-			settings.exportAuto				= file.readBoolean();
-			settings.exportType				= file.readShort();
-			settings.gridScale				= file.readShort();
+			settings.exportAuto			= file.readBoolean();
+			settings.exportType			= file.readShort();
+			settings.gridScale			= file.readShort();
 
 			Dictionary dict = settings.dictionary;
 			dict.graph			= file.readUTF();
@@ -965,10 +965,10 @@ public class Board extends JComponent implements Printable{
 		        }
 	        }
 	        
-	        file.writeBoolean(settings.showTypeNames);
+	        file.writeBoolean(settings.showEdgeValue);
 	        file.writeBoolean(settings.showVertexSequence);
-	        file.writeBoolean(settings.showConnectionSequence);
-			file.writeBoolean(settings.showVertexPriorities);
+	        file.writeBoolean(settings.showEdgeSequence);
+			file.writeBoolean(settings.showVertexValue);
 			file.writeBoolean(settings.allowFirsVertex);
 			file.writeBoolean(settings.firstZero);
 

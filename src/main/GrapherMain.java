@@ -345,7 +345,7 @@ public class GrapherMain extends JFrame{
 		}
 		
 		addSession();
-		currentSession.board.load(fileName);
+		currentSession.board.load_1_2_14(fileName);
 	}
 	
 	//-------------------------------------------------------------------------------------

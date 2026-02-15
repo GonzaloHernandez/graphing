@@ -322,8 +322,8 @@ public class MenuOptions extends JPopupMenu{
 				sets.dictionary._edge		= "e";
 				sets.dictionary._edgeValue	= "w";
 				sets.showVertexSequence		= false;
-				sets.showConnectionSequence	= false;
-				sets.showVertexPriorities	= true;
+				sets.showEdgeSequence	= false;
+				sets.showVertexValue	= true;
 				main.properties.dictionaryView.refresh();
 				main.properties.generalView.refresh();
 				main.currentSession.setModified(true);			}

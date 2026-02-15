@@ -35,7 +35,8 @@ public class ViewGeneral extends JPanel {
 
 	protected	GrapherMain	main;
 
-	protected	JCheckBox[]	showVertex,showEdge;
+	protected	JCheckBox	showVSeq,showVVal,showVTyp,showVLab;
+	protected	JCheckBox	showESeq,showEVal,showETyp,showELab;
 	protected	JCheckBox	allowFirstState;
 	protected	JCheckBox	firstZero;
 	protected	JCheckBox	exportAuto;
@@ -63,9 +64,6 @@ public class ViewGeneral extends JPanel {
 		JPanel panelEdge	= new JPanel(new GridLayout(4,1));
 		JPanel panelGeneral	= new JPanel(new GridLayout(3,1));
 
-		showVertex		= new JCheckBox[4];
-		showEdge		= new JCheckBox[4];
-
 		TitledBorder vertexTitle = BorderFactory.createTitledBorder("Vertex show");
 		panelVertex.setBorder(vertexTitle);
 		Border marginVertex = BorderFactory.createEmptyBorder(7,7,7,7);
@@ -80,18 +78,22 @@ public class ViewGeneral extends JPanel {
 		panelNorth.setBorder(BorderFactory.createCompoundBorder(null, margin));
 
 		String[] l = {"Sequence","Value","Type","Label"};
-		for (int i=0; i<4; i++) {
-			showVertex[i]	= new JCheckBox(l[i]);
-			showEdge[i]		= new JCheckBox(l[i]);
-			panelVertex.add(showVertex[i]);
-			panelEdge.add(showEdge[i]);
-		}
+		panelVertex.add(showVSeq = new JCheckBox("Sequence"));
+		panelVertex.add(showVVal = new JCheckBox("Value"));
+		panelVertex.add(showVTyp = new JCheckBox("Type"));
+		panelVertex.add(showVLab = new JCheckBox("Label"));
+		
+		panelEdge.add(showESeq	= new JCheckBox("Sequence"));
+		panelEdge.add(showEVal	= new JCheckBox("Value"));
+		panelEdge.add(showETyp	= new JCheckBox("Type"));
+		panelEdge.add(showELab	= new JCheckBox("Label"));
+
 		panelNorth.add(panelVertex);	panelNorth.add(panelEdge);
 
-		allowFirstState       = new JCheckBox("Allow first state");
-		firstZero             = new JCheckBox("Start at Zero (0)");
-		gridScale             = new JSpinner(new SpinnerNumberModel(10, 1, 100, 1));
-		exportAuto            = new JCheckBox("Export automatically");
+		allowFirstState	= new JCheckBox("Allow first state");
+		firstZero       = new JCheckBox("Start at Zero (0)");
+		gridScale       = new JSpinner(new SpinnerNumberModel(10, 1, 100, 1));
+		exportAuto      = new JCheckBox("Export automatically");
 
 		setLayout(new BorderLayout());
 
@@ -162,41 +164,41 @@ public class ViewGeneral extends JPanel {
 
 	private void progListeneres(){
 
-		showVertex[0].addActionListener(new ActionListener(){
+		showVSeq.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
 				settings = main.currentSession.board.settings;
-				settings.showVertexSequence = showVertex[0].isSelected();
+				settings.showVertexSequence = showVSeq.isSelected();
 				main.currentSession.setModified(true);
 				main.currentSession.board.repaint();
 			}
 		});
 		
-		showEdge[0].addActionListener(new ActionListener(){
+		showVVal.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
-				settings = main.currentSession.board.settings;
-				settings.showConnectionSequence = showEdge[0].isSelected();
-				main.currentSession.setModified(true);
-				main.currentSession.board.repaint();
-			}
-		});
-
-		showEdge[1].addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e) {
-				settings = main.currentSession.board.settings;
-				settings.showTypeNames	= showEdge[1].isSelected();
-				main.currentSession.setModified(true);
-				main.currentSession.board.repaint();
-			}
-		});
-
-		showVertex[1].addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e) {
-				settings.showVertexPriorities = showVertex[1].isSelected();
+				settings.showVertexValue = showVVal.isSelected();
 				main.currentSession.setModified(true);
 				main.currentSession.board.repaint();
 			}
 		});
 		
+		showESeq.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				settings = main.currentSession.board.settings;
+				settings.showEdgeSequence = showESeq.isSelected();
+				main.currentSession.setModified(true);
+				main.currentSession.board.repaint();
+			}
+		});
+
+		showEVal.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				settings = main.currentSession.board.settings;
+				settings.showEdgeValue	= showEVal.isSelected();
+				main.currentSession.setModified(true);
+				main.currentSession.board.repaint();
+			}
+		});
+
 		allowFirstState.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
 				settings = main.currentSession.board.settings;
@@ -254,10 +256,16 @@ public class ViewGeneral extends JPanel {
 
 	public void refresh(){
 		settings = main.currentSession.board.settings;
-		showVertex[0].setSelected(settings.showVertexSequence);
-		showVertex[1].setSelected(settings.showVertexPriorities);
-		showEdge[0].setSelected(settings.showConnectionSequence);
-		showEdge[1].setSelected(settings.showTypeNames);
+
+		showVSeq.setSelected(settings.showVertexSequence);
+		showVVal.setSelected(settings.showVertexValue);
+		showVTyp.setSelected(settings.showVertexType);
+		showVLab.setSelected(settings.showVertexLabel);
+
+		showESeq.setSelected(settings.showEdgeSequence);
+		showEVal.setSelected(settings.showEdgeValue);
+		showETyp.setSelected(settings.showEdgeType);
+		showELab.setSelected(settings.showEdgeLabel);		
 
 		allowFirstState.setSelected(settings.allowFirsVertex);
 		firstZero.setSelected(settings.firstZero);
@@ -268,10 +276,10 @@ public class ViewGeneral extends JPanel {
 		exportType.setSelectedIndex(settings.exportType);
 		Dictionary dict = main.currentSession.board.settings.dictionary;
 
-		showVertex[0].setText("Sequence");
-		showVertex[1].setText(""+dict.vertexValue);
-		showEdge[0].setText("Sequence");
-		showEdge[1].setText(""+dict.edgeValue);
+		showVSeq.setText("Sequence");
+		showVVal.setText(""+dict.vertexValue);
+		showESeq.setText("Sequence");
+		showEVal.setText(""+dict.edgeValue);
 
 		allowFirstState.setText("Allow first "+dict.vertex);
 	}

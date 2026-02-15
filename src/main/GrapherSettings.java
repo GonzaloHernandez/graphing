@@ -1,5 +1,4 @@
 package main;
-import java.util.Vector;
 
 class Dictionary {
 	public String graph,_graph;
@@ -38,18 +37,21 @@ public class GrapherSettings {
 
 	//---------------------------------------------------------------------------
 	
-	protected	boolean	showTypeNames;
 	protected	boolean	showVertexSequence;
-	protected	boolean	showConnectionSequence;
-	protected	String	comment;
-	protected	Vector	<Type>types;
-	protected	int		measure;
+	protected	boolean showVertexValue;
+	protected	boolean showVertexType;
+	protected	boolean showVertexLabel;
+	protected	boolean	showEdgeSequence;
+	protected	boolean	showEdgeValue;
+	protected	boolean	showEdgeType;
+	protected	boolean	showEdgeLabel;
 
-	protected	boolean showVertexPriorities;
 	protected	boolean allowFirsVertex;
 	protected	boolean firstZero;
 	protected	int		gridScale;
 
+	protected	String	comment;
+	protected	int		measure;
 	protected	boolean exportAuto;
 	protected	int		exportType;
 
@@ -57,18 +59,22 @@ public class GrapherSettings {
 
 	//---------------------------------------------------------------------------
 	
-	public GrapherSettings(boolean nameTypes,boolean numberVertices,String comment,
-	Vector <Type>types){
-		this.showTypeNames			= nameTypes;
-		this.showVertexSequence		= numberVertices;
-		this.showConnectionSequence	= false;
-		this.comment				= comment;
-		this.types					= types;
+	public GrapherSettings(){
+		this.showVertexSequence		= true;
+		this.showVertexValue		= false;
+		this.showVertexType			= false;
+		this.showVertexLabel		= false;
+
+		this.showEdgeSequence		= true;
+		this.showEdgeValue			= false;
+		this.showEdgeType			= false;
+		this.showEdgeLabel			= false;
+
+		this.comment				= "";
 		this.measure				= 1; // 0=Centimeters  1=Inch
-		this.showVertexPriorities	= false;
 		this.allowFirsVertex		= true;
 		this.firstZero				= true;
-		this.gridScale				= 10;
+		this.gridScale				= 15;
 		this.exportAuto				= false;
 		this.exportType				= 0;
 		this.dictionary				= new Dictionary();
