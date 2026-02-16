@@ -7,7 +7,7 @@
         "command": "javac",
         "args": [
           "-g", 
-          "-cp", "${workspaceFolder}/libraries/flatlaf-3.4.jar;${workspaceFolder}/libraries/json-20231013.jar",
+          "-cp", "${workspaceFolder}/libraries/flatlaf-3.4.jar:${workspaceFolder}/libraries/json-20231013.jar",
             // "-cp","${workspaceFolder}/libraries/flatlaf-3.4.jar",
           "-d",
           "build",

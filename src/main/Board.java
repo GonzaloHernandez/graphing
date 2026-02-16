@@ -863,7 +863,8 @@ public class Board extends JComponent implements Printable{
 	//-------------------------------------------------------------------------------------
 
 	public boolean save(boolean saveAs) {
-
+		Persistence persistence = new Persistence(session.main);
+		persistence.save();
 		return true;
 	}
 

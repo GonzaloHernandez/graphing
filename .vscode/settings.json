@@ -2,7 +2,7 @@
     "java.project.sourcePaths": [
         "src"
     ],
-    "java.project.outputPath": "bin",
+    "java.project.outputPath": "build",
     "java.project.referencedLibraries": [
         "libraries/flatlaf-3.4.jar",
         "libraries/json-20231013.jar"
