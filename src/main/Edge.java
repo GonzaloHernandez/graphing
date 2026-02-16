@@ -257,16 +257,17 @@ public class Edge {
 		}
 
 		if (settings.showEdgeValue) {
-			if (type!=null && settings.showEdgeValue) {
-				if (type.getId()==0) {
-					lab += getValue();
-				} else {
-					lab += type.getName();
-				}
-			}
+			lab += getValue();
 			l += lab.length();
 		}
 
+		if (type!=null && settings.showEdgeType) {
+			if (settings.showEdgeValue) {
+				lab += ":";
+			}
+			lab += type.getName();
+			l += lab.length();
+		}
 
 		if (settings.showEdgeSequence) {
 			Dictionary dict = settings.dictionary;

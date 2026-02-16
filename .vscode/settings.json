@@ -4,6 +4,7 @@
     ],
     "java.project.outputPath": "bin",
     "java.project.referencedLibraries": [
-        "libraries/flatlaf-3.4.jar"
+        "libraries/flatlaf-3.4.jar",
+        "libraries/json-20231013.jar"
     ]
 }

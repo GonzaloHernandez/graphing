@@ -46,6 +46,9 @@ public class ViewGeneral extends JPanel {
 	protected	JSpinner	gridScale;
 	protected	JComboBox<String>	exportType;
 
+	protected	TitledBorder vertexTitle;
+	protected	TitledBorder edgeTitle;
+
 	private GrapherSettings settings;
 	
 	//-------------------------------------------------------------------------------------
@@ -64,12 +67,12 @@ public class ViewGeneral extends JPanel {
 		JPanel panelEdge	= new JPanel(new GridLayout(4,1));
 		JPanel panelGeneral	= new JPanel(new GridLayout(3,1));
 
-		TitledBorder vertexTitle = BorderFactory.createTitledBorder("Vertex show");
+		vertexTitle = BorderFactory.createTitledBorder("Vertex show");
 		panelVertex.setBorder(vertexTitle);
 		Border marginVertex = BorderFactory.createEmptyBorder(7,7,7,7);
 		panelVertex.setBorder(BorderFactory.createCompoundBorder(vertexTitle, marginVertex));
 
-		TitledBorder edgeTitle = BorderFactory.createTitledBorder("Edge show");
+		edgeTitle = BorderFactory.createTitledBorder("Edge show");
 		panelEdge.setBorder(edgeTitle);
 		Border marginEdge = BorderFactory.createEmptyBorder(7,7,7,7);
 		panelEdge.setBorder(BorderFactory.createCompoundBorder(edgeTitle, marginEdge));
@@ -181,6 +184,22 @@ public class ViewGeneral extends JPanel {
 			}
 		});
 		
+		showVTyp.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				settings.showVertexType = showVTyp.isSelected();
+				main.currentSession.setModified(true);
+				main.currentSession.board.repaint();
+			}
+		});
+
+		showVLab.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				settings.showVertexLabel = showVLab.isSelected();
+				main.currentSession.setModified(true);
+				main.currentSession.board.repaint();
+			}
+		});
+
 		showESeq.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
 				settings = main.currentSession.board.settings;
@@ -194,6 +213,24 @@ public class ViewGeneral extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				settings = main.currentSession.board.settings;
 				settings.showEdgeValue	= showEVal.isSelected();
+				main.currentSession.setModified(true);
+				main.currentSession.board.repaint();
+			}
+		});
+
+		showETyp.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				settings = main.currentSession.board.settings;
+				settings.showEdgeType	= showETyp.isSelected();
+				main.currentSession.setModified(true);
+				main.currentSession.board.repaint();
+			}
+		});
+
+		showELab.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				settings = main.currentSession.board.settings;
+				settings.showEdgeLabel	= showELab.isSelected();
 				main.currentSession.setModified(true);
 				main.currentSession.board.repaint();
 			}
@@ -276,10 +313,16 @@ public class ViewGeneral extends JPanel {
 		exportType.setSelectedIndex(settings.exportType);
 		Dictionary dict = main.currentSession.board.settings.dictionary;
 
+		vertexTitle.setTitle("Show at "+Dictionary.capitalize(dict.vertex));
+		edgeTitle.setTitle("Show at "+Dictionary.capitalize(dict.edge));
 		showVSeq.setText("Sequence");
-		showVVal.setText(""+dict.vertexValue);
+		showVVal.setText(Dictionary.capitalize(""+dict.vertexValue));
+		showVTyp.setText(Dictionary.capitalize(""+dict.vertexType));
+		showVLab.setText(Dictionary.capitalize(""+dict.vertexLabel));
 		showESeq.setText("Sequence");
-		showEVal.setText(""+dict.edgeValue);
+		showEVal.setText(Dictionary.capitalize(""+dict.edgeValue));
+		showETyp.setText(Dictionary.capitalize(""+dict.edgeType));
+		showELab.setText(Dictionary.capitalize(""+dict.edgeLabel));
 
 		allowFirstState.setText("Allow first "+dict.vertex);
 	}

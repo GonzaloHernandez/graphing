@@ -90,7 +90,7 @@ public class About extends JDialog {
 		g.drawRect(0,0,getWidth()-1,getHeight()-1);
 		g.setColor(Color.WHITE);
 		g.setFont(new Font("Cantarell",Font.PLAIN,11));
-		g.drawString("Version "+main.family+"."+main.version+" construction "+main.construcction,10,20);
+		g.drawString("Version "+main.family+"."+main.version+" construction "+main.construction,10,20);
 		g.setColor(Color.WHITE);
 		g.fillRect(315, 8, 12, 13);
 		g.setColor(new Color(50,100,255));

@@ -21,9 +21,9 @@ find "$RELEASES_DIR" -name "Graphing-*.jar" -type f -exec rm {} \;
 # Step 2: Update the Java file with the new version numbers
 sed -i "s/\(final int\s*family\s*=\s*\)[0-9]\+;/\1$FAMILY;/" "$JAVA_FILE"
 sed -i "s/\(final int\s*version\s*=\s*\)[0-9]\+;/\1$VERSION;/" "$JAVA_FILE"
-sed -i "s/\(final int\s*construcction\s*=\s*\)[0-9]\+;/\1$CONSTRUCTION;/" "$JAVA_FILE"
+sed -i "s/\(final int\s*construction\s*=\s*\)[0-9]\+;/\1$CONSTRUCTION;/" "$JAVA_FILE"
 
-echo "::Updated $JAVA_FILE with family=$FAMILY, version=$VERSION, and construcction=$CONSTRUCTION"
+echo "::Updated $JAVA_FILE with family=$FAMILY, version=$VERSION, and construction=$CONSTRUCTION"
 
 # Step 3: Build process
 rm -r build 2>/dev/null

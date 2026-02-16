@@ -116,8 +116,11 @@ public class Vertex {
 		}
 		
 		int t=0;
-		if (type != null) t=type.getId(); else t = 0;
-
+		if (type != null && settings.showVertexType) {
+			t=type.getId(); 
+		} else{ 
+			t = 0;
+	}
 		switch(t) {
 			case 0:	
 				g.setColor(backColor);

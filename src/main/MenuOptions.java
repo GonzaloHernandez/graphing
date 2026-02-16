@@ -77,8 +77,8 @@ public class MenuOptions extends JPopupMenu{
 		Font currentFont		= UIManager.getFont("Label.font");
 		Font defaultFont		= new Font(currentFont.getName(),Font.PLAIN,currentFont.getSize());
 
-		vertexMenu				= new GrapherMenu("State",defaultFont,"state.png");
-		edgeMenu				= new GrapherMenu("Connection",defaultFont,"connection.png");
+		vertexMenu				= new GrapherMenu("Vertex",defaultFont,"state.png");
+		edgeMenu				= new GrapherMenu("Edge",defaultFont,"connection.png");
 		grapherMenu				= new GrapherMenu("Grapher",defaultFont,"application.png");
 		template				= new GrapherMenu("Use template",defaultFont,"credits.png");
 				
@@ -148,6 +148,20 @@ public class MenuOptions extends JPopupMenu{
 			});
 			menu.add(typeItem);
 		}
+		TypeMenuItem typeItem= new TypeMenuItem("<None>",null);
+		typeItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Type t = ((TypeMenuItem)e.getSource()).getType();
+				if (main.currentSession.board.vertexTarget != null) {
+					main.currentSession.board.vertexTarget.setType(t);
+				} else {
+					main.currentSession.board.currentConnection.setType(t);
+				}
+				main.currentSession.board.repaint();
+				main.currentSession.setModified(true);
+			}
+		});
+		menu.add(typeItem);
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -307,7 +321,7 @@ public class MenuOptions extends JPopupMenu{
 		});
 
 		parityGame.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(ActionEvent ev) {
 				GrapherSettings sets = main.currentSession.board.settings;
 				sets.dictionary.graph		= "game";
 				sets.dictionary.vertex		= "vertex";
@@ -321,12 +335,57 @@ public class MenuOptions extends JPopupMenu{
 				sets.dictionary._vertexValue= "p";
 				sets.dictionary._edge		= "e";
 				sets.dictionary._edgeValue	= "w";
-				sets.showVertexSequence		= false;
-				sets.showEdgeSequence	= false;
+				sets.showVertexSequence	= false;
 				sets.showVertexValue	= true;
+				sets.showVertexType		= true;
+				sets.showVertexLabel	= false;
+				sets.showEdgeSequence	= false;
+				sets.showEdgeValue		= false;
+				sets.showEdgeType		= false;
+				sets.showEdgeLabel		= false;
+				sets.exportType			= 1;
+
+				Vector<Type> vTypes = main.currentSession.board.vTypes;
+				if (vTypes.size()<=0) {
+					vTypes.add(new Type(0,"Even", "Round"));
+				} else {
+					vTypes.elementAt(0).setName("Even");
+					vTypes.elementAt(0).setDescription("Round");
+				}
+
+				if (vTypes.size()<=1) {
+					vTypes.add(new Type(1,"Odd", "Square"));
+				} else {
+					vTypes.elementAt(1).setName("Odd");
+					vTypes.elementAt(1).setDescription("Square");
+				}
+
+				if (vTypes.size()>=2) {
+					for (Vertex v : main.currentSession.board.vertices) {
+						if (v.getType() != null && v.getType().getId() >=2) {
+							v.setType(null);
+						}
+					}
+					for (int i=2;i<vTypes.size();i++) {
+						vTypes.remove(i);
+					}
+				}
+
+				Vector<Type> eTypes = main.currentSession.board.eTypes;
+				for (Vertex v : main.currentSession.board.vertices) {
+					for (Edge e : v.getOuts()) {
+						if (e.getType() != null) {
+							e.setType(null);
+						}
+					}
+				}
+				eTypes.clear();
+
 				main.properties.dictionaryView.refresh();
 				main.properties.generalView.refresh();
-				main.currentSession.setModified(true);			}
+				main.properties.typesView.refresh();
+				main.currentSession.setModified(true);
+			}
 		});
 
 		load.addActionListener(new ActionListener(){

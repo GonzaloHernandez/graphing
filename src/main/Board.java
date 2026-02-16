@@ -86,7 +86,6 @@ public class Board extends JComponent implements Printable{
 		eTypes	= new Vector<Type>();
 		vTypes	= new Vector<Type>();
 
-		eTypes.add(new Type(0,"Free Value", "0"));
 		eTypes.add(new Type(1,"number","0123456789"));
 		eTypes.add(new Type(2,"point","."));
 		eTypes.add(new Type(3,"uppercase","ABCDEFGHIJKLMNOPQRSTUVWXYZ"));
@@ -127,7 +126,7 @@ public class Board extends JComponent implements Printable{
 		g.setColor(Color.WHITE);
 		g.fillRect(0,0,(int)(session.getWidth()/scaleFactor),(int)(session.getHeight()/scaleFactor));
 
-		if (showGrid) {
+		if (showGrid && gridScale >= 5) {
 			for(int gy=0; gy<getHeight()/scaleFactor; gy+=gridScale){
 				g.setColor(new Color(245,245,245));
 				g.drawLine(0,gy,getWidth(),gy);
@@ -183,6 +182,9 @@ public class Board extends JComponent implements Printable{
 						else if (e.getKeyCode() == KeyEvent.VK_DELETE) {
 							Vertex source = currentConnection.getSource();
 							source.deleteConnecion(currentConnection);
+						}
+						else  if (e.getKeyChar() >= '0' && e.getKeyChar() <= '9') {
+							currentConnection.setValue(""+e.getKeyChar());
 						}
 					}
 					else {
@@ -416,21 +418,6 @@ public class Board extends JComponent implements Printable{
 								return;
 							}
 						}						
-						// Type t = new Type(0,"","");
-						// String currentval = currentConnection.getValue();
-						// String val = JOptionPane.showInputDialog(session, settings.dictionary.edgeValue,""+currentval);
-						// if (val != null) {
-						// 	try {
-						// 		Double.parseDouble(val);
-						// 		currentConnection.setValue(val);
-						// 	}
-						// 	catch (NumberFormatException ex) {
-						// 		return;
-						// 	}
-						// } else {
-						// 	return;
-						// }						
-						// currentConnection.setType(t);
 						repaint();
 						session.setModified(true);						
 						return;
@@ -874,8 +861,15 @@ public class Board extends JComponent implements Printable{
 	}
 	
 	//-------------------------------------------------------------------------------------
-	
+
 	public boolean save(boolean saveAs) {
+
+		return true;
+	}
+
+	//-------------------------------------------------------------------------------------
+
+	public boolean save_1_2_14(boolean saveAs) {
 		try {
 			if (saveAs || fileName.equals("")) {
 				FileDialog dialog = new FileDialog(session.main,"Select a file name",FileDialog.SAVE);
