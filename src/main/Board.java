@@ -7,7 +7,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.RenderingHints;
-import java.awt.event.HierarchyEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -29,7 +28,6 @@ import java.io.RandomAccessFile;
 import java.util.Vector;
 
 import javax.imageio.ImageIO;
-import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
@@ -38,7 +36,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
 
 public class Board extends JComponent implements Printable{
 	
@@ -51,7 +48,7 @@ public class Board extends JComponent implements Printable{
 	protected Vector<Vertex>	vertices;
 	protected GrapherSession	session;
 	protected Vector<Type>		eTypes,vTypes;
-	protected Edge				currentConnection;
+	protected Edge				currentEdge;
 	protected Vertex			vertexSource,vertexTarget;
 	protected boolean			menuBlock;
 	protected Compiler			compiler;
@@ -86,14 +83,14 @@ public class Board extends JComponent implements Printable{
 		eTypes	= new Vector<Type>();
 		vTypes	= new Vector<Type>();
 
-		eTypes.add(new Type(1,"number","0123456789"));
-		eTypes.add(new Type(2,"point","."));
-		eTypes.add(new Type(3,"uppercase","ABCDEFGHIJKLMNOPQRSTUVWXYZ"));
-		eTypes.add(new Type(4,"lowercase","abcdefghijklmnopqrstuvwxyz"));
-
 		vTypes.add(new Type(0,"Round", "Even"));
 		vTypes.add(new Type(1,"Square", "Odd"));
 		vTypes.add(new Type(2,"Polygon", "Nature"));
+
+		eTypes.add(new Type(0,"number","0123456789"));
+		eTypes.add(new Type(1,"point","."));
+		eTypes.add(new Type(2,"uppercase","ABCDEFGHIJKLMNOPQRSTUVWXYZ"));
+		eTypes.add(new Type(3,"lowercase","abcdefghijklmnopqrstuvwxyz"));
 
 		settings		= new GrapherSettings();
 		vertices		= new Vector<Vertex>();
@@ -146,12 +143,12 @@ public class Board extends JComponent implements Printable{
 				g.drawLine(vertexSource.getX(),vertexSource.getY(),mousex,mousey);
 			}
 		}
-		int connectionSequence = settings.firstZero?0:1;
+		int edgeSequence = settings.firstZero?0:1;
 		for (int i=0 ; i<vertices.size() ; i++) {
-			connectionSequence = vertices.elementAt(i).draw(g,settings,connectionSequence,hidden);
+			edgeSequence = vertices.elementAt(i).draw(g,settings,edgeSequence,hidden);
 		}
 
-		export();
+		exportView();
 		session.main.properties.elementsView.refresh();
 	}
 	
@@ -171,28 +168,28 @@ public class Board extends JComponent implements Printable{
 		addKeyListener(new KeyListener(){
 
 			public void keyPressed(KeyEvent e) {
-				if (currentConnection != null) {
+				if (currentEdge != null) {
 					if (!e.isControlDown()){
 						if (e.getKeyCode() == KeyEvent.VK_A) {
-							currentConnection.setAmountDistance(2);
+							currentEdge.setAmountDistance(2);
 						}
 						else if (e.getKeyCode() == KeyEvent.VK_Z){
-							currentConnection.setAmountDistance(-2);
+							currentEdge.setAmountDistance(-2);
 						}
 						else if (e.getKeyCode() == KeyEvent.VK_DELETE) {
-							Vertex source = currentConnection.getSource();
-							source.deleteConnecion(currentConnection);
+							Vertex source = currentEdge.getSource();
+							source.deleteEdge(currentEdge);
 						}
 						else  if (e.getKeyChar() >= '0' && e.getKeyChar() <= '9') {
-							currentConnection.setValue(""+e.getKeyChar());
+							currentEdge.setValue(""+e.getKeyChar());
 						}
 					}
 					else {
 						if (e.getKeyCode() == KeyEvent.VK_A) {
-							currentConnection.setAmountRotation((Math.PI/16));
+							currentEdge.setAmountRotation((Math.PI/16));
 						}
 						else if (e.getKeyCode() == KeyEvent.VK_Z){
-							currentConnection.setAmountRotation(-(Math.PI/16));
+							currentEdge.setAmountRotation(-(Math.PI/16));
 						}
 					}
 					session.setModified(true);
@@ -202,24 +199,6 @@ public class Board extends JComponent implements Printable{
 					if (e.getKeyCode() == KeyEvent.VK_DELETE) {
 						deleteVertex(vertexTarget);
 						session.setModified(true);
-					}
-					// else if (e.getKeyCode() == KeyEvent.VK_A) {
-					// 	int value = vertexTarget.getValue();
-					// 	vertexTarget.setValue(+1);
-					// 	session.setModified(true);
-					// } 
-					// else if (e.getKeyCode() == KeyEvent.VK_Z) {
-					// 	vertexTarget.setValue(vertexTarget.getValue()-1);
-					// 	session.setModified(true);
-					// }
-					else if (e.getKeyCode() == KeyEvent.VK_O) {
-						// if (vertexTarget.getType()==2) {
-						// 	vertexTarget.setType(0);
-						// }
-						// else {
-						// 	vertexTarget.setType(vertexTarget.getType()+1);
-						// }
-						// session.setModified(true);
 					}
 					else  if (e.getKeyChar() >= '0' && e.getKeyChar() <= '9') {
 						vertexTarget.setValue(""+e.getKeyChar());
@@ -246,6 +225,11 @@ public class Board extends JComponent implements Printable{
 						Dimension d = getPreferredSize();
 						session.manualResizing = true;
 						session.setSize((int)(d.width*scaleFactor)+session.deltaWidth,(int)(d.height*scaleFactor)+session.deltaHeight);
+					}
+				}
+				else if (e.isControlDown() && e.isShiftDown()) {
+					if (e.getKeyCode() == KeyEvent.VK_S) {
+						save(true);
 					}
 				}
 
@@ -287,8 +271,8 @@ public class Board extends JComponent implements Printable{
 						vertexTarget.setActive(!vertexTarget.isActive());
 						session.setModified(true);
 					}
-					if (currentConnection != null) {
-						currentConnection.setActive(!currentConnection.isActive());
+					if (currentEdge != null) {
+						currentEdge.setActive(!currentEdge.isActive());
 						session.setModified(true);
 					}
 					repaint();
@@ -310,7 +294,7 @@ public class Board extends JComponent implements Printable{
 					if (vertexTarget != null) {
 						session.main.menuOptions.showTypes(vTypes);
 					}
-					if (currentConnection != null) {
+					if (currentEdge != null) {
 						session.main.menuOptions.showTypes(eTypes);
 					}
 					repaint();
@@ -340,16 +324,21 @@ public class Board extends JComponent implements Printable{
 						panel.add(info,BorderLayout.WEST);
 						panel.add(data,BorderLayout.CENTER);
 						
-						info.add(new JLabel(""+settings.dictionary.vertexValue+" "));
+						String val = settings.dictionary.vertexValue;
+						String lab = settings.dictionary.vertexLabel;
+						String typ = settings.dictionary.vertexType;
+						
+						info.add(new JLabel(""+Dictionary.capitalize(val)+" "));
 						data.add(value);
-						info.add(new JLabel(""+settings.dictionary.vertexLabel+" "));
-						data.add(label);
-						info.add(new JLabel(""+settings.dictionary.vertexType+" "));
+						info.add(new JLabel(""+Dictionary.capitalize(typ)+" "));
 						data.add(type);
+						info.add(new JLabel(""+Dictionary.capitalize(lab)+" "));
+						data.add(label);
 
 						panel.setPreferredSize(new Dimension(300, 70));
 						int result = JOptionPane.showConfirmDialog(session, panel, 
-								"Properties for "+settings.dictionary.vertex, JOptionPane.OK_CANCEL_OPTION);
+								"Properties for "+Dictionary.capitalize(settings.dictionary.vertex),
+								JOptionPane.OK_CANCEL_OPTION);
 
 						if (result == JOptionPane.OK_OPTION) {
 							try {
@@ -370,20 +359,20 @@ public class Board extends JComponent implements Printable{
 						session.setModified(true);						
 						return;
 					}
-					if (currentConnection != null) {
+					if (currentEdge != null) {
 
-						JTextField value = new JTextField(currentConnection.getValue());
-						JTextField label = new JTextField(currentConnection.getLabel());
+						JTextField value = new JTextField(currentEdge.getValue());
+						JTextField label = new JTextField(currentEdge.getLabel());
 						String[] options = new String[eTypes.size()+1];
 						for (int i=0; i<eTypes.size(); i++) {
-							options[i] = eTypes.elementAt(i).getName();							
+							options[i] = eTypes.elementAt(i).getName();
 						}
 						options[eTypes.size()] = "<None>";
 						JComboBox<String> type = new JComboBox<>(options);
-						if (currentConnection.getType() == null) {
+						if (currentEdge.getType() == null) {
 							type.setSelectedIndex(eTypes.size());
 						} else {
-							type.setSelectedIndex(currentConnection.getType().getId());
+							type.setSelectedIndex(currentEdge.getType().getId());
 						}
 
 						JPanel info = new JPanel(new GridLayout(3,1));
@@ -392,26 +381,31 @@ public class Board extends JComponent implements Printable{
 						panel.add(info,BorderLayout.WEST);
 						panel.add(data,BorderLayout.CENTER);
 						
-						info.add(new JLabel(""+settings.dictionary.edgeValue+" "));
+						String val = settings.dictionary.edgeValue;
+						String lab = settings.dictionary.edgeLabel;
+						String typ = settings.dictionary.edgeType;
+						
+						info.add(new JLabel(""+Dictionary.capitalize(val)+" "));
 						data.add(value);
-						info.add(new JLabel(""+settings.dictionary.edgeLabel+" "));
-						data.add(label);
-						info.add(new JLabel(""+settings.dictionary.edgeType+" "));
+						info.add(new JLabel(""+Dictionary.capitalize(typ)+" "));
 						data.add(type);
+						info.add(new JLabel(""+Dictionary.capitalize(lab)+" "));
+						data.add(label);
 
 						panel.setPreferredSize(new Dimension(300, 70));
 						int result = JOptionPane.showConfirmDialog(session, panel, 
-								"Properties for "+settings.dictionary.edge, JOptionPane.OK_CANCEL_OPTION);
+								"Properties for "+Dictionary.capitalize(settings.dictionary.edge),
+								JOptionPane.OK_CANCEL_OPTION);
 
 						if (result == JOptionPane.OK_OPTION) {
 							try {
 								Double.parseDouble(value.getText());
-								currentConnection.setValue(value.getText());
-								currentConnection.setLabel(label.getText());
+								currentEdge.setValue(value.getText());
+								currentEdge.setLabel(label.getText());
 								if (type.getSelectedIndex() == options.length-1) {
-									currentConnection.setType(null);
+									currentEdge.setType(null);
 								} else {
-									currentConnection.setType(eTypes.elementAt(type.getSelectedIndex()));
+									currentEdge.setType(eTypes.elementAt(type.getSelectedIndex()));
 								}
 							}
 							catch (NumberFormatException ex) {
@@ -433,11 +427,11 @@ public class Board extends JComponent implements Printable{
 
 				// BUTTON3 without SHIFT
 				if (button == MouseEvent.BUTTON3 && !shiftDown) {
-					if (vertexTarget != null && currentConnection != null) {
+					if (vertexTarget != null && currentEdge != null) {
 						session.main.menuOptions.show(true, true, true);
 					} else if (vertexTarget != null) {
 						session.main.menuOptions.show(true, false, true);
-					} else if (currentConnection != null) {
+					} else if (currentEdge != null) {
 						session.main.menuOptions.show(false, true, true);
 					} else {
 						session.main.menuOptions.show(false, false, true);
@@ -452,9 +446,9 @@ public class Board extends JComponent implements Printable{
 					vertexTarget.setStatus(Vertex.STILL);
 					vertexTarget = null;
 				}
-				if (currentConnection != null) {
-					currentConnection.setStatus(Edge.STILL);
-					currentConnection = null;
+				if (currentEdge != null) {
+					currentEdge.setStatus(Edge.STILL);
+					currentEdge = null;
 				}
 
 				for (int i=0 ; i<vertices.size() ; i++) {
@@ -477,8 +471,8 @@ public class Board extends JComponent implements Printable{
 						for (int j=0 ; j<connections.size() ; j++) {
 							Edge connection = (Edge)connections.elementAt(j); 
 							if (connection.isArea((int)(e.getX()/scaleFactor),(int)(e.getY()/scaleFactor))) {
-								if (currentConnection != null) currentConnection.setStatus(Vertex.STILL);
-								currentConnection = connection;
+								if (currentEdge != null) currentEdge.setStatus(Vertex.STILL);
+								currentEdge = connection;
 								connection.setStatus(Edge.FOCUSED);
 								break;
 							}
@@ -491,7 +485,7 @@ public class Board extends JComponent implements Printable{
 				if (controled) {
 					if (vertexTarget!=null) {
 						if (settings.allowFirsVertex || vertexTarget.getNumber() > 0) {
-							vertexSource.addConnection(vertexTarget);
+							vertexSource.addEdge(vertexTarget);
 							vertexSource.setStatus(Vertex.STILL);
 							session.setModified(true);
 						}
@@ -516,8 +510,8 @@ public class Board extends JComponent implements Printable{
 						vertexTarget.setLocation(mousex,mousey);
 						session.setModified(true);
 					}
-					else if (!controled && currentConnection!=null) {
-						currentConnection.setRotation(mousex, mousey);
+					else if (!controled && currentEdge!=null) {
+						currentEdge.setRotation(mousex, mousey);
 						session.setModified(true);
 					}
 				}
@@ -550,18 +544,12 @@ public class Board extends JComponent implements Printable{
 		addMouseWheelListener(new MouseWheelListener(){
 
 			public void mouseWheelMoved(MouseWheelEvent e) {
-				if (vertexTarget!=null && e.isShiftDown()) {
-					// vertexTarget.setValue(vertexTarget.getValue()-e.getWheelRotation());
-				} 
-				else if (currentConnection != null){
-					if (e.isShiftDown() && currentConnection.getType()!=null && currentConnection.getType().getId() == 0){
-						// currentConnection.setValue(currentConnection.getValue()- e.getWheelRotation());
-					}
-					else if (e.isControlDown()){
-						currentConnection.setAmountRotation((Math.PI/16)*-e.getWheelRotation());
+				if (currentEdge != null){
+					if (e.isControlDown()){
+						currentEdge.setAmountRotation((Math.PI/16)*-e.getWheelRotation());
 					}
 					else if (!e.isShiftDown()){
-						currentConnection.setAmountDistance(-e.getWheelRotation()*2);
+						currentEdge.setAmountDistance(-e.getWheelRotation()*2);
 					}
 					session.setModified(true);
 				}
@@ -581,184 +569,68 @@ public class Board extends JComponent implements Printable{
 
 	//-------------------------------------------------------------------------------------
 
-	public void load(){
-		if (session.isModified()) {
-			String messageReturn = session.main.messageBox(
-						"This session was no saved.|Do you want to close anyway?",
-						"Warning","Yes|No");
-			if (messageReturn.equals("No")||messageReturn.equals("")) return;
-		}
-		FileDialog dialog = new FileDialog(session.main,"Select a file",FileDialog.LOAD);
-        
-		dialog.setFilenameFilter(new FilenameFilter() {
-            @Override
-            public boolean accept(java.io.File dir, String name) {
-                return name.toLowerCase().endsWith(".aut");
-            }
-        });
+	public void load(String fileName){
+		if (fileName.equals("")) {
+			if (session.isModified()) {
+				String messageReturn = session.main.messageBox(
+							"This session was no saved.|Do you want to close anyway?",
+							"Warning","Yes|No");
+				if (messageReturn.equals("No")||messageReturn.equals("")) return;
+			}
 
-		dialog.setDirectory(session.main.curdir);
-		dialog.setFile("*.aut");
-		dialog.setVisible(true);
-		session.main.requestFocus();		
-		if (dialog.getFile()==null) return;
-		session.main.curdir = dialog.getDirectory();
+			FileDialog dialog = new FileDialog(session.main,"Select a file",FileDialog.LOAD);
+			
+			dialog.setFilenameFilter(new FilenameFilter() {
+				@Override
+				public boolean accept(java.io.File dir, String name) {
+					return name.toLowerCase().endsWith(".aut");
+				}
+			});
 
-		load_1_2_14(session.main.curdir+dialog.getFile());
-	}
+			dialog.setDirectory(session.main.curdir);
+			dialog.setFile("*.aut");
+			dialog.setVisible(true);
+			session.main.requestFocus();		
+			if (dialog.getFile()==null) return;
+			session.main.curdir = dialog.getDirectory();
+			fileName = session.main.curdir+dialog.getFile();
+		} 
 
-	//-------------------------------------------------------------------------------------
-
-	public boolean load_1_2_14(String fileName){
 		try {
 	        RandomAccessFile file = new RandomAccessFile(new File(fileName), "r");
-	        this.fileName = fileName;
-	        session.setName(fileName);
 
-	        short	n,number,x,y,numberSource,numberTarget,numberType,distance;
-	        double	rotation;
-	        boolean	accepted,active;
-	        Vertex	source=null,target=null;
-	        // Type	type=null;
-	        String	name,symbols,value;
-	        
-	        vertices.removeAllElements();
-	        eTypes.removeAllElements();
-	        
 	        if (	file.readShort()	!= 7 ||
 	        		file.readShort()	!= 4 ||
 	        		!file.readUTF().equals("GRAPHER")	) {
 	        	file.close();
 	        	session.dispose();
 	        	session.main.messageBox("Invalid file","Warning","Accept");
-	        	return false;
+	        	return;
 	        }
 	        
 	        int family	= file.readShort();
 	        int version	= file.readShort();
-	        
-	        n = file.readShort();
-	        for (int i=0;i<n;i++){
-	        	number	= file.readShort();
-	        	name 	= file.readUTF();
-	        	symbols	= file.readUTF();
-	        	eTypes.add(new Type(number,name,symbols));
-	        }
-	        
-	        n = file.readShort();
-	        for (int i=0;i<n;i++){
-	        	number		= file.readShort();
-	        	x 			= file.readShort();
-	        	y			= file.readShort();
-	        	accepted	= file.readBoolean();
 
-	        	value		= ""+file.readShort();
-				short type	= file.readShort();
+			Persistence persistence = new Persistence(session.main);
+			if (family <= 0 || version <= 2) {
+				persistence.load_1_2(file);
+			} else {
+				persistence.load(file);
+			}
 
-				if (family==1 && version<=1)
-					active	= true;
-				else
-					active	= file.readBoolean();
+			file.close();
+			repaint();
 
-				Vertex s = new Vertex(number,x,y,Vertex.STILL,accepted,
-					value,vTypes.elementAt(type),"");
-				s.setActive(active);
-
-				vertices.add(s);
-	        }
-	        
-	        n = file.readShort();
-	        for (int i=0;i<n;i++){
-	        	numberSource	= file.readShort();
-	        	numberTarget	= file.readShort();
-	        	numberType		= file.readShort();
-	        	distance		= file.readShort();
-	        	rotation		= file.readDouble();
-				value			= ""+file.readShort();
-				if (family==1 && version<=1)
-					active	= true;
-				else
-					active	= file.readBoolean();
-	        	
-	        	for (int s=0;s<vertices.size();s++){
-	        		if (vertices.elementAt(s).getNumber()==numberSource){
-	        			source = vertices.elementAt(s);
-	        			break;
-	        		}
-	        	}
-	        	for (int t=0;t<vertices.size();t++){
-	        		if (vertices.elementAt(t).getNumber()==numberTarget){
-	        			target = vertices.elementAt(t);
-	        			break;
-	        		}
-	        	}
-	        	
-	        	if (numberType>=0) {
-					Type type = null;
-		        	for (int p=0;p<eTypes.size();p++){
-		        		if (eTypes.elementAt(p).getId()==numberType) {
-		        			type = eTypes.elementAt(p);
-		        			break;
-		        		}
-		        	}
-					Edge c = new Edge(source,target,Edge.STILL,distance,rotation,type,value,"");
-					c.setActive(active);
-					source.addConnection(c);
-	        	}
-	        	else {
-					Edge c = new Edge(source,target,Edge.STILL,distance,rotation,null,value,"");
-					c.setActive(active);
-					source.addConnection(c);
-	        	}
-	        }
-	        
-	        settings.showEdgeValue		= file.readBoolean();
-	        settings.showVertexSequence	= file.readBoolean();
-	        settings.showEdgeSequence	= file.readBoolean();
-	        settings.showVertexValue	= file.readBoolean();
-	        settings.allowFirsVertex	= file.readBoolean();
-	        settings.firstZero			= file.readBoolean();
-
-			settings.comment			= file.readUTF();
-	        
-			Dimension d = new Dimension(file.readShort(),file.readShort());
-	        session.setSize(d);
-			setPreferredSize(d);
-
-			settings.exportAuto			= file.readBoolean();
-			settings.exportType			= file.readShort();
-			settings.gridScale			= file.readShort();
-
-			Dictionary dict = settings.dictionary;
-			dict.graph			= file.readUTF();
-			dict._graph			= file.readUTF();
-			dict.vertex			= file.readUTF();
-			dict._vertex		= file.readUTF();
-			dict.vertexType		= file.readUTF();
-			dict._vertexType	= file.readUTF();
-			dict.vertexValue	= file.readUTF();
-			dict._vertexValue	= file.readUTF();
-			dict.edge			= file.readUTF();
-			dict._edge			= file.readUTF();
-			dict.edgeValue		= file.readUTF();
-			dict._edgeValue		= file.readUTF();
-
-	        file.close(); 
-	        repaint();
-	        session.main.properties.refresh();
-	        session.setModified(false);
-	        
-	        session.main.addRecentSession(fileName);
-
-			session.setTitle(fileName.substring(session.main.curdir.length()));
-			return true;
-
-	    } catch (IOException e) {
+			session.setTitle(fileName.substring(session.main.curdir.length()));	        session.setName(fileName);
+			session.main.addRecentSession(fileName);
+			session.main.properties.refresh();
+			session.setModified(false);
+			this.fileName = fileName;
+		} catch (IOException e) {
 	    	session.main.messageBox("The file ["+fileName+"] does not exists","File error","Accept");
-	    	return false;
 	    }
 	}
-	
+
 	//-------------------------------------------------------------------------------------
 
 	public void loadImport(){
@@ -778,99 +650,17 @@ public class Board extends JComponent implements Printable{
 		dialog.setDirectory(session.main.curdir);
 		dialog.setFile("*.gm");
 		dialog.setVisible(true);
-		session.main.requestFocus();		
+		session.main.requestFocus();
 		if (dialog.getFile()==null) return;
 
-		loadImport(dialog.getDirectory()+dialog.getFile());
+		Persistence persistence = new Persistence(session.main);
+
+		persistence.loadImport(dialog.getDirectory()+dialog.getFile());
 	}
 
-	//-------------------------------------------------------------------------------------
-
-	public boolean loadImport(String fileName){
-		try {
-	        RandomAccessFile file = new RandomAccessFile(new File(fileName), "r");
-	        // this.fileName = fileName;
-	        // session.setName(fileName);
-	        
-	        vertices.removeAllElements();
-	        eTypes.removeAllElements();
-	        
-			int nvertices;
-			int x=40,y=40;
-			int index = 0;
-
-			String line;
-			while ((line = file.readLine()) != null) {
-				line = line.trim();
-
-				if (line.isEmpty()) continue;
-
-				// Parse header
-				if (line.startsWith("parity")) {
-					String[] parts = line.split("\\s+|;");
-					nvertices = Integer.parseInt(parts[1])+1;
-					for(int v=0; v<nvertices; v++) {
-						Vertex s = new Vertex(v,x,y,Vertex.STILL,false,"0",null,"");
-						if (x>=250) {
-							x = 40;
-							y += 80;
-						}
-						else {
-							x += 80;
-						}
-						vertices.add(s);
-					}
-					continue;
-				}
-
-				String[] parts = line.split("\\s+");
-                int id = Integer.parseInt(parts[0]);
-				if (id!=index) {
-					session.main.messageBox("Indices of states no consecutives","Importation error","Accept");
-	    			return false;
-				}
-				index++;
-                String value = parts[1];
-                int owner = Integer.parseInt(parts[2]);
-				Vertex source = session.board.vertices.elementAt(id);
-				source.setType(vTypes.elementAt(owner));
-				source.setValue(value);
-                String successorsStr = parts[3].replace(";", "");
-                // List<Integer> successors = new ArrayList<>();
-                for (String tar : successorsStr.split(",")) {
-					Vertex target = session.board.vertices.elementAt(Integer.parseInt(tar));
-                    source.addConnection(new Edge(source, target));
-					source.arrangeConnections(target);
-                }
-	        }
-			file.close(); 
-	        
-	        repaint();
-	        session.main.properties.refresh();
-	        session.setModified(false);
-	        
-	        // session.main.addRecentSession(fileName);
-
-			// session.setTitle(fileName.substring(session.main.curdir.length()));
-			return true;
-
-	    } catch (IOException e) {
-	    	session.main.messageBox("The file ["+fileName+"] does not exists","File error","Accept");
-	    	return false;
-	    }
-	}
-	
 	//-------------------------------------------------------------------------------------
 
 	public boolean save(boolean saveAs) {
-		Persistence persistence = new Persistence(session.main);
-		persistence.save();
-		return true;
-	}
-
-	//-------------------------------------------------------------------------------------
-
-	public boolean save_1_2_14(boolean saveAs) {
 		try {
 			if (saveAs || fileName.equals("")) {
 				FileDialog dialog = new FileDialog(session.main,"Select a file name",FileDialog.SAVE);
@@ -910,126 +700,22 @@ public class Board extends JComponent implements Printable{
 			}
 			
 			RandomAccessFile file = new RandomAccessFile(new File(fileName), "rw");
-	        
+			Persistence persistence = new Persistence(session.main);
+			persistence.save(file);
+	        if (settings.exportAuto) persistence.export();
+			file.close();
+
 	        session.setName(fileName);
-	        
-	        file.writeShort(7);
-	        file.writeShort(4);
-	        file.writeUTF("GRAPHER");
-	        file.writeShort(session.main.family);
-	        file.writeShort(session.main.version);
-	        
-	        short	connectionsCount = 0;
-	        
-	        file.writeShort(eTypes.size());
-	        for (int i=0;i<eTypes.size();i++){
-	        	file.writeShort(eTypes.elementAt(i).getId());
-	        	file.writeUTF(eTypes.elementAt(i).getName());
-	        	file.writeUTF(eTypes.elementAt(i).getDescription());
-	        }
-	        
-	        file.writeShort(vertices.size());
-	        for (int i=0;i<vertices.size();i++){
-	        	file.writeShort(vertices.elementAt(i).getNumber());
-	        	file.writeShort(vertices.elementAt(i).getX());
-	        	file.writeShort(vertices.elementAt(i).getY());
-	        	file.writeBoolean(vertices.elementAt(i).isAccepted());
-
-	        	file.writeUTF(vertices.elementAt(i).getValue());
-	        	file.writeShort(vertices.elementAt(i).getType().getId());
-	        	file.writeBoolean(vertices.elementAt(i).isActive());
-
-				connectionsCount += vertices.elementAt(i).getOuts().size();
-	        }
-	        
-	        file.writeShort(connectionsCount);
-	        for (int s=0;s<vertices.size();s++){
-	        	for (int i=0;i<vertices.elementAt(s).getOuts().size();i++){
-		        	file.writeShort(vertices.elementAt(s).getOuts().elementAt(i).getSource().getNumber());
-		        	file.writeShort(vertices.elementAt(s).getOuts().elementAt(i).getTarget().getNumber());
-		        	if (vertices.elementAt(s).getOuts().elementAt(i).getType()!=null) {
-		        		file.writeShort(vertices.elementAt(s).getOuts().elementAt(i).getType().getId());
-		        	}
-		        	else {
-		        		file.writeShort(-1);
-		        	}
-		        	file.writeShort (vertices.elementAt(s).getOuts().elementAt(i).getDistance());
-		        	file.writeDouble(vertices.elementAt(s).getOuts().elementAt(i).getRotation());
-		        	file.writeUTF (vertices.elementAt(s).getOuts().elementAt(i).getValue());
-					file.writeBoolean(vertices.elementAt(s).getOuts().elementAt(i).isActive());
-		        }
-	        }
-	        
-	        file.writeBoolean(settings.showEdgeValue);
-	        file.writeBoolean(settings.showVertexSequence);
-	        file.writeBoolean(settings.showEdgeSequence);
-			file.writeBoolean(settings.showVertexValue);
-			file.writeBoolean(settings.allowFirsVertex);
-			file.writeBoolean(settings.firstZero);
-
-			file.writeUTF(settings.comment);	        
-
-	        file.writeShort(session.getWidth());
-	        file.writeShort(session.getHeight());
-
-			file.writeBoolean(settings.exportAuto);
-			file.writeShort(settings.exportType);
-			file.writeShort(settings.gridScale);
-
-			Dictionary dict = settings.dictionary;
-			
-			file.writeUTF(dict.graph);
-			file.writeUTF(dict._graph);
-			file.writeUTF(dict.vertex);
-			file.writeUTF(dict._vertex);
-			file.writeUTF(dict.vertexType);
-			file.writeUTF(dict._vertexType);
-			file.writeUTF(dict.vertexValue);
-			file.writeUTF(dict._vertexValue);
-			file.writeUTF(dict.edge);
-			file.writeUTF(dict._edge);
-			file.writeUTF(dict.edgeValue);
-			file.writeUTF(dict._edgeValue);
-
-	        file.setLength(file.getFilePointer());
-	        file.close();
-
-	        session.setModified(false);
-
-			//----------------------------------------------------------
-
-			if (settings.exportAuto) {
-		
-				String fileContent = session.main.properties.generalView.export.getText();
-				String extension = "";
-				switch (settings.exportType) {
-					case  0: extension = ".json";	break;
-					case  1: extension = ".dzn";	break;
-					default: extension = ".txt";	break;
-				}
-
-				String dznFileName = fileName.substring(0, fileName.length()-4)+extension;
-	
-				RandomAccessFile dznFile = new RandomAccessFile(new File(dznFileName), "rw");
-				dznFile.setLength(0);
-				dznFile.writeBytes(fileContent);
-				dznFile.close();
-			}
-
-			session.setTitle(fileName.substring(session.main.curdir.length()));
-			
-			//----------------------------------------------------------
-
-	    } catch (IOException e) {
-	    	e.printStackTrace();
+			session.setModified(false);
+		} catch (IOException e) {
+			e.printStackTrace();
 	    }
-		
-	    return true;
+		return true;
 	}
 
 	//-------------------------------------------------------------------------------------
 
-	public boolean export() {
+	public boolean exportView() {
 		if (session.main.currentSession == null) {
 			session.main.properties.generalView.export.setText(
 					"\n"
@@ -1110,7 +796,8 @@ public class Board extends JComponent implements Printable{
 					vertexTypes += ",";
 				}
 				vertexValues += vertices.elementAt(v).getValue();
-				vertexTypes += vertices.elementAt(v).getType();
+				Type type = vertices.elementAt(v).getType();
+				vertexTypes += type==null?0:type.getId();
 				for (Edge e : vertices.elementAt(v).getOuts()) {
 					if (edgeValues.length()>0)  edgeValues += ",";
 					edgeValues += e.getValue();
@@ -1170,7 +857,6 @@ public class Board extends JComponent implements Printable{
 					}
 				}
 			}
-			int digits = String.valueOf(Math.abs(max)).length();
 
 			String matrix = "[";
 			for (int v=0;v<size;v++){

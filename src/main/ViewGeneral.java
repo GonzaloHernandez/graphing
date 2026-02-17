@@ -49,7 +49,7 @@ public class ViewGeneral extends JPanel {
 	protected	TitledBorder vertexTitle;
 	protected	TitledBorder edgeTitle;
 
-	private GrapherSettings settings;
+	private 	GrapherSettings settings;
 	
 	//-------------------------------------------------------------------------------------
 
@@ -80,7 +80,6 @@ public class ViewGeneral extends JPanel {
 		Border margin = BorderFactory.createEmptyBorder(10,7,7,9);
 		panelNorth.setBorder(BorderFactory.createCompoundBorder(null, margin));
 
-		String[] l = {"Sequence","Value","Type","Label"};
 		panelVertex.add(showVSeq = new JCheckBox("Sequence"));
 		panelVertex.add(showVVal = new JCheckBox("Value"));
 		panelVertex.add(showVTyp = new JCheckBox("Type"));
@@ -149,11 +148,9 @@ public class ViewGeneral extends JPanel {
 		info.addTab("Comment", panelComment);
 		info.addTab("Export", panelExport);
 
-		// Add components to main container
 		add(northWrapper, BorderLayout.NORTH);
 		add(info, BorderLayout.CENTER);
 
-		// 3. Apply font recursively
 		Font currentFont = UIManager.getFont("Label.font");
 		Font defaultFont = new Font(currentFont.getName(), Font.PLAIN, currentFont.getSize());
 

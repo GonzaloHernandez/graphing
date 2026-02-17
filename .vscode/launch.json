@@ -9,7 +9,6 @@
             "classPaths": [
               "${workspaceFolder}/build",
               "${workspaceFolder}/libraries/flatlaf-3.4.jar",
-              "${workspaceFolder}/libraries/json-20231013.jar"
             ]
           }
     ]

@@ -2,8 +2,8 @@
 
 # Define versioning variables
 FAMILY=1
-VERSION=2
-CONSTRUCTION=14
+VERSION=3
+CONSTRUCTION=0
 
 # File paths
 JAVA_FILE="src/main/GrapherMain.java"
@@ -48,9 +48,8 @@ sed -i "s/Graphing-v[0-9]*\.[0-9]*\.[0-9]*\.jar/$JAR_NAME/" "$README_FILE"
 echo "::Updated $README_FILE with the new JAR file name: $JAR_NAME"
 
 # ===============================================================================
-# Check key numbers over the vertices to set priorities
-# Check comments about scroll numbers using A/Z and mousewheel
-# Check "O" to switch the owner
-# Check eTypes and vTypes in the menu and in the file loading/saving
-# Check icons, no_state_connection,
-# Check additional information on vertices and edges
+# (DONE) Changes in some shortcuts
+# (DONE) Standarization of type for vertex and edges
+# (DONE) New properties for every element (value,type,label)
+# (DONE) Changes in persistence structure
+

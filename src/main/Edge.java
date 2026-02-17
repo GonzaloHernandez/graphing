@@ -34,7 +34,10 @@ public class Edge {
 	public Edge(Vertex source,Vertex target) {
 		this.source		= source;
 		this.target		= target;
+		this.value		= "0";
 		this.type		= null;
+		this.label		= "";
+		this.active		= true;
 		this.curve		= new QuadCurve2D.Double();
 		this.status		= STILL;
 		this.start		= new Point();
@@ -46,8 +49,6 @@ public class Edge {
 		this.arrowright	= new Point();
 		this.arrow		= new Point();
 		this.rotation	= 0;
-		this.value		= "0";
-		this.active		= true;
 		if (source.equals(target))	this.distance =25; else this.distance = 0; 
 	}
 	
@@ -58,8 +59,10 @@ public class Edge {
 	{
 		this.source		= source;
 		this.target		= target;
+		this.value		= value;
 		this.type		= type;
 		this.label		= label;
+		this.active		= true;
 		this.curve		= new QuadCurve2D.Double();
 		this.status		= status;
 		this.start		= new Point();
@@ -72,8 +75,6 @@ public class Edge {
 		this.arrow		= new Point();
 		this.distance	= distance;
 		this.rotation	= rotation;
-		this.value		= value;
-		this.active		= true;
 	}
 	
 	//-------------------------------------------------------------------------
@@ -285,7 +286,7 @@ public class Edge {
 		}
 
 
-		if (settings.showEdgeValue) {
+		if (settings.showEdgeValue || settings.showEdgeType) {
 			g.setColor(Color.RED);
 			g.setFont(new Font("Arial",Font.ITALIC,9));
 			g.drawString(lab,text.x-(l*5/2)+(seq.length()*5),text.y+5);

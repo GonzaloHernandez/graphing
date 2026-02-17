@@ -16,7 +16,7 @@ public class Vertex {
 	
 	//-------------------------------------------------------------------------------------
 	
-	private	int		x,y,number;
+	private	int		number,x,y;
 	private	int		status;
 	private String	value;
 	private Type	type;
@@ -37,6 +37,7 @@ public class Vertex {
 		this.accepted	= false;
 		this.value		= "0";
 		this.type		= null;
+		this.label		= "";
 		this.active		= true;
 		this.outs		= new Vector<Edge>();
 		this.ins		= new Vector<Edge>();
@@ -52,6 +53,7 @@ public class Vertex {
 		this.accepted	= accepted;
 		this.value		= "0";
 		this.type		= null;
+		this.label		= "";
 		this.active		= true;
 		this.outs		= new Vector<Edge>();
 		this.ins		= new Vector<Edge>();
@@ -78,17 +80,17 @@ public class Vertex {
 	//-------------------------------------------------------------------------
 	
 	public int draw(Graphics2D g,GrapherSettings settings,
-					int connectionSequence,boolean hidden) 
+					int edgeSequence,boolean hidden) 
 	{		
-		if (hidden && !active) return connectionSequence + outs.size();
+		if (hidden && !active) return edgeSequence + outs.size();
 
 		for (int i=0 ; i<outs.size() ; i++) {
-			Edge connection = (Edge)outs.elementAt(i);
-			if (hidden && !connection.isActive()) {
-				connectionSequence++;
+			Edge edge = (Edge)outs.elementAt(i);
+			if (hidden && !edge.isActive()) {
+				edgeSequence++;
 			}
 			else {
-				connectionSequence = connection.draw(g,settings,connectionSequence,hidden);
+				edgeSequence = edge.draw(g,settings,edgeSequence,hidden);
 			}
 		}
 
@@ -172,7 +174,7 @@ public class Vertex {
 			g.setFont(new Font("Arial",Font.PLAIN,13));
 			g.drawString(""+value,x-(3*(new String(""+value)).length()),y+4);
 		}
-		return connectionSequence;
+		return edgeSequence;
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -314,14 +316,14 @@ public class Vertex {
 	
 	//-------------------------------------------------------------------------------------
 	
-	public void addConnection(Edge c) {
+	public void addEdge(Edge c) {
 		outs.add(c);
 		c.getTarget().ins.add(c);
 	}
 
 	//-------------------------------------------------------------------------------------
 	
-	public void addConnection(Vertex target) {
+	public void addEdge(Vertex target) {
 		for (int c=0;c<getOuts().size();c++){
 			if (getOuts().elementAt(c).getTarget().equals(target)) { 
 				return;
@@ -330,12 +332,12 @@ public class Vertex {
 		Edge c = new Edge(this,target);
 		outs.add(c);
 		target.ins.add(c);
-		arrangeConnections(target);
+		arrangeEdges(target);
 	}
 	
 	//-------------------------------------------------------------------------------------
 	
-	public void addConnection(Vertex target,Type type,int distance,
+	public void addEdge(Vertex target,Type type,int distance,
 		double rotation,String value,boolean active) 
 	{
 		for (int c=0;c<getOuts().size();c++){
@@ -356,45 +358,45 @@ public class Vertex {
 	
 	//-------------------------------------------------------------
 
-	public void deleteConnecion(Edge connection){
-		outs.remove(connection);
+	public void deleteEdge(Edge edge){
+		outs.remove(edge);
 	}
 
 	//-------------------------------------------------------------
 
-	public void deleteAllConnecion(){
+	public void deleteAllEdges(){
 		outs.removeAllElements();
 	}
 	
 	//-------------------------------------------------------------
 
-	public void arrangeConnections (Vertex target){
+	public void arrangeEdges (Vertex target){
 		if (target.equals(this)) return;
 		
-		Edge directedConnection	= null;
-		Edge backConnection		=null;
+		Edge directedEdge	= null;
+		Edge backEdge		=null;
 		
 		for (int c=0;c<getOuts().size();c++){
 			if (getOuts().elementAt(c).getTarget().equals(target)) { 
-				directedConnection	= getOuts().elementAt(c);
+				directedEdge	= getOuts().elementAt(c);
 			}
 		}
 
 		for (int c=0;c<target.getOuts().size();c++){
 			if (target.getOuts().elementAt(c).getTarget().equals(this)) { 
-				backConnection		= target.getOuts().elementAt(c);
+				backEdge		= target.getOuts().elementAt(c);
 			}
 		}
 		
-		if (directedConnection != null && backConnection == null){
-			directedConnection.setDistance(0);
+		if (directedEdge != null && backEdge == null){
+			directedEdge.setDistance(0);
 		}
-		else if (directedConnection == null && backConnection != null){
-			backConnection.setDistance(0);
+		else if (directedEdge == null && backEdge != null){
+			backEdge.setDistance(0);
 		}
 		else {
-			directedConnection.setDistance(15);
-			backConnection.setDistance(15);
+			directedEdge.setDistance(15);
+			backEdge.setDistance(15);
 		}
 	}
 }

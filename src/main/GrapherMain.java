@@ -35,8 +35,8 @@ public class GrapherMain extends JFrame{
 
 	//-------------------------------------------------------------------------------------
 	final int	family			= 1;
-	final int	version			= 2;
-	final int	construction	= 14;
+	final int	version			= 3;
+	final int	construction	= 0;
 	
 	//-------------------------------------------------------------------------------------
 
@@ -84,18 +84,18 @@ public class GrapherMain extends JFrame{
 		menuBar			= new JMenuBar();
 		desktop			= new JDesktopPane();
 		system			= new GrapherMenu("System",defaultFont,"system.png");
-		newSession		= new GrapherItem("New session",defaultFont,"new.png");
-		open			= new GrapherItem("Open session",defaultFont,"open.png");
-		importSession	= new GrapherItem("Import session",defaultFont,"open.png");
-		recent			= new GrapherMenu("Resent session",defaultFont,"recent.png");
+		newSession		= new GrapherItem("New Session",defaultFont,"new.png");
+		open			= new GrapherItem("Open Session",defaultFont,"open.png");
+		importSession	= new GrapherItem("Import Graph",defaultFont,"open.png");
+		recent			= new GrapherMenu("Recent Sessions",defaultFont,"recent.png");
 		exit			= new GrapherItem("Exit",defaultFont,"exit.png");
 		
 		help			= new GrapherMenu("Help",defaultFont,"help.png");
 		contents		= new GrapherItem("Content",defaultFont,"contents.png");
 		shortcuts		= new GrapherItem("Short cuts",defaultFont,"shortcut.png");
-		relatedTopics	= new GrapherMenu("Related topics",defaultFont,"related_topics.png");
+		relatedTopics	= new GrapherMenu("Related Topics",defaultFont,"related_topics.png");
 		samples			= new GrapherMenu("Samples",defaultFont,"samples.png");
-		about			= new GrapherItem("About of Graphing'",defaultFont,"about.png");
+		about			= new GrapherItem("About of Graphing",defaultFont,"about.png");
 		credits			= new GrapherItem("Copyright",defaultFont,"credits.png");
 		
 		properties		= new ViewProperties(this);
@@ -117,7 +117,7 @@ public class GrapherMain extends JFrame{
 		help.add(contents);
 		help.add(shortcuts);
 		help.add(relatedTopics);
-		help.add(samples);
+		// help.add(samples);
 		help.addSeparator();
 		help.add(about);
 		help.add(credits);
@@ -228,7 +228,8 @@ public class GrapherMain extends JFrame{
 					"<body style='width: 300px; padding: 5px;'>" +
 					"<b>General:</b>" +
 					"<ul>" +
-					"  <li><b>Ctrl + S:</b> Save project</li>" +
+					"  <li><b>Ctrl + S:</b> Save session</li>" +
+					"  <li><b>Ctrl +Shift + S:</b> Save session as</li>" +
 					"  <li><b>G:</b> Toggle grid</li>" +
 					"  <li><b>H (Hold):</b> Hide elements</li>" +
 					"  <li><b>Ctrl + (+/-):</b> Zoom in/out</li>" +
@@ -236,27 +237,27 @@ public class GrapherMain extends JFrame{
 					"<b>When a Vertex is selected:</b>" +
 					"<ul>" +
 					"  <li><b>Delete:</b> Remove vertex</li>" +
-					"  <li><b>A / Z:</b> Increase / Decrease value</li>" +
-					"  <li><b>Shift + Scroll:</b> Increase / Decrease value</li>" +
 					"  <li><b>0-9:</b> Set value directly</li>" +
-					"  <li><b>O:</b> Switch type</li>" +
+					"  <li><b>Drag:</b> Move vertex</li>" +
 					"</ul>" +
 					"<b>When an Edge is selected:</b>" +
 					"<ul>" +
 					"  <li><b>Delete:</b> Remove edge</li>" +
+					"  <li><b>0-9:</b> Set value directly</li>" +
+					"  <li><b>Drag:</b> Move self-loop edge</li>" +
 					"  <li><b>A / Z:</b> Adjust distance</li>" +
 					"  <li><b>Ctrl + A / Z:</b> Rotate edge</li>" +
 					"  <li><b>Scroll:</b> Adjust distance</li>" +
 					"  <li><b>Ctrl + Scroll:</b> Rotate edge</li>" +
-					"  <li><b>Shift + Scroll:</b> Adjust value</li>" +
 					"</ul>" +
-					"<b>Mouse Controls:</b>" +
+					"<b>Other Mouse Controls:</b>" +
 					"<ul>" +
-					"  <li><b>Double-Click:</b> Add vertex / Edit value</li>" +
+					"  <li><b>Double-Click:</b> Add vertex / Edit properties</li>" +
 					"  <li><b>Ctrl + Drag:</b> Create new edge</li>" +
-					"  <li><b>Shift + Click:</b> Toggle active state</li>" +
-					"  <li><b>Shift + Right-Click:</b> Toggle active state propagating</li>" +
+					"  <li><b>Shift + Click:</b> Toggle active</li>" +
+					"  <li><b>Shift + Right-Click:</b> Toggle active propagating</li>" +
 					"  <li><b>Right-Click:</b> Open context menu</li>" +
+					"  <li><b>Alt + Right-Click:</b> Open context type menu</li>" +
 					"</ul>" +
 					"</body></html>";
 
@@ -334,10 +335,10 @@ public class GrapherMain extends JFrame{
 			if (iframes[i].getClass().getName().equals("main.GrapherSession")){
 				GrapherSession	session = (GrapherSession)iframes[i];
 				if (session.getName() != null && session.getName().equals(fileName)){
-					messageBox("This session is opened|It is no possible to open again.","Warning","Accept");
 					try {
 						session.setSelected(true);
 					} catch (PropertyVetoException e) {
+						messageBox("This session is alredy opened.","Warning","Accept");
 					}
 					return;
 				}
@@ -345,7 +346,7 @@ public class GrapherMain extends JFrame{
 		}
 		
 		addSession();
-		currentSession.board.load_1_2_14(fileName);
+		currentSession.board.load(fileName);
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -409,7 +410,7 @@ public class GrapherMain extends JFrame{
 	public String messageBox(String info,String title,String buttons){
 		messageReturn = "";
 		new MessageBox(this,info,title,buttons);
-		return messageReturn;		
+		return messageReturn;
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -427,7 +428,10 @@ public class GrapherMain extends JFrame{
 				file.writeUTF(item.getText());
 			}
 			file.writeBoolean(showAbout);
-	        
+			file.writeShort(getLocation().x);
+			file.writeShort(getLocation().y);
+			file.writeShort(getSize().width);
+	        file.writeShort(getSize().height);
 	        file.close();
 	        
 	    } catch (IOException e) {
@@ -450,6 +454,12 @@ public class GrapherMain extends JFrame{
 			}
 	        
 			showAbout = file.readBoolean();
+			short	x	= file.readShort();
+			short	y	= file.readShort();
+			short	w	= file.readShort();
+			short	h	= file.readShort();
+			setLocation(x, y);
+			setSize(w,h);
 	        file.close();
 	        
 	    } catch (IOException e) {

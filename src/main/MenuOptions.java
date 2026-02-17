@@ -11,7 +11,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.UIManager;
 import javax.swing.event.PopupMenuEvent;
@@ -45,8 +44,8 @@ class GrapherItem extends JMenuItem {
 	public GrapherItem(String label,Font font,String icon) {
 		super(label);
 		setFont(font);
-		// ImageIcon img = new ImageIcon(GrapherMain.class.getResource("icons/"+icon));
-		// if (icon!=null) setIcon(img);
+		ImageIcon img = new ImageIcon(GrapherMain.class.getResource("icons/"+icon));
+		if (icon!=null) setIcon(img);
 	}
 }
 
@@ -61,7 +60,6 @@ public class MenuOptions extends JPopupMenu{
 	private	GrapherItem		vertexDelete,vertexDeleteAllOutgoings,vertexAccepted;
 	private	GrapherItem		edgeDelete,edgeTune;
 	private	GrapherItem		restart,parityGame,load,loadImport,save,saveAs,print,simulate,help;
-	private	TypeMenuItem[]	vertexTypeItems,edgeTypeItems;
 	
 	//-------------------------------------------------------------------------------------
 
@@ -80,23 +78,23 @@ public class MenuOptions extends JPopupMenu{
 		vertexMenu				= new GrapherMenu("Vertex",defaultFont,"state.png");
 		edgeMenu				= new GrapherMenu("Edge",defaultFont,"connection.png");
 		grapherMenu				= new GrapherMenu("Grapher",defaultFont,"application.png");
-		template				= new GrapherMenu("Use template",defaultFont,"credits.png");
+		template				= new GrapherMenu("Use Template",defaultFont,"credits.png");
 				
-		vertexDelete				= new GrapherItem("Delete state",defaultFont,"delete_state.png");
-		vertexDeleteAllOutgoings	= new GrapherItem("Delete all outgoing connections",defaultFont,"delete_connection.png");
-		vertexAccepted			= new GrapherItem("Set final state",defaultFont,"accepted_state.png");
-		vertexTypes				= new GrapherMenu("Set type",defaultFont,"owner.png");
+		vertexDelete			= new GrapherItem("Delete Vertex",defaultFont,"delete_state.png");
+		vertexDeleteAllOutgoings= new GrapherItem("Delete all Outgoing Edges",defaultFont,"delete_connection.png");
+		vertexAccepted			= new GrapherItem("Set as Final State",defaultFont,"accepted_state.png");
+		vertexTypes				= new GrapherMenu("Set Type",defaultFont,"owner.png");
 		
-		edgeDelete				= new GrapherItem("Delete connection",defaultFont,"delete_connection.png");
-		edgeTune				= new GrapherItem("Tune arc",defaultFont,"tune_connection.png");
+		edgeDelete				= new GrapherItem("Delete Edge",defaultFont,"delete_connection.png");
+		edgeTune				= new GrapherItem("Tuning the edge",defaultFont,"tune_connection.png");
 		edgeTypes				= new GrapherMenu("Set type",defaultFont,"type_connection.png");
 
-		restart					= new GrapherItem("Restar session",defaultFont,"new.png");
+		restart					= new GrapherItem("Restar Session",defaultFont,"new.png");
 		parityGame				= new GrapherItem("Parity Game",defaultFont,"");
-		load					= new GrapherItem("Load automaton",defaultFont,"open.png");
-		loadImport				= new GrapherItem("Import automaton",defaultFont,"open.png");
-		save					= new GrapherItem("Save automaton",defaultFont,"save.png");
-		saveAs					= new GrapherItem("Save automaton as ...",defaultFont,"saveas.png");
+		load					= new GrapherItem("Load Session",defaultFont,"open.png");
+		loadImport				= new GrapherItem("Import graph (*.gm)",defaultFont,"open.png");
+		save					= new GrapherItem("Save Session",defaultFont,"save.png");
+		saveAs					= new GrapherItem("Save Session as ...",defaultFont,"saveas.png");
 		print					= new GrapherItem("Export as PNG",defaultFont,"print.png");
 		simulate				= new GrapherItem("Simulate",defaultFont,"simulate.png");
 		help					= new GrapherItem("Help",defaultFont,"help.png");
@@ -122,7 +120,7 @@ public class MenuOptions extends JPopupMenu{
 		grapherMenu.addSeparator();
 		grapherMenu.add(print);
 		grapherMenu.addSeparator();
-		grapherMenu.add(simulate);
+		// grapherMenu.add(simulate);
 		grapherMenu.add(help);
 
 		template.add(parityGame);
@@ -140,7 +138,7 @@ public class MenuOptions extends JPopupMenu{
 					if (main.currentSession.board.vertexTarget != null) {
 						main.currentSession.board.vertexTarget.setType(t);
 					} else {
-						main.currentSession.board.currentConnection.setType(t);
+						main.currentSession.board.currentEdge.setType(t);
 					}
 					main.currentSession.board.repaint();
 					main.currentSession.setModified(true);
@@ -155,7 +153,7 @@ public class MenuOptions extends JPopupMenu{
 				if (main.currentSession.board.vertexTarget != null) {
 					main.currentSession.board.vertexTarget.setType(t);
 				} else {
-					main.currentSession.board.currentConnection.setType(t);
+					main.currentSession.board.currentEdge.setType(t);
 				}
 				main.currentSession.board.repaint();
 				main.currentSession.setModified(true);
@@ -166,8 +164,8 @@ public class MenuOptions extends JPopupMenu{
 	
 	//-------------------------------------------------------------------------------------
 
-	public void show(boolean state,boolean connection,boolean grapher){
-		if (state){
+	public void show(boolean vertex,boolean edge,boolean grapher){
+		if (vertex){
 			if (main.currentSession.board.vertexTarget.isAccepted()) { 
 				vertexAccepted.setText("Unset as a final state");
 			}
@@ -180,8 +178,9 @@ public class MenuOptions extends JPopupMenu{
 			vertexMenu.setEnabled(false);
 		}
 		//----------------------------------------------------------------------
-		if (connection){
-			if (!main.currentSession.board.currentConnection.getSource().equals(main.currentSession.board.currentConnection.getTarget()) && main.currentSession.board.currentConnection.getDistance()!=0) {
+		if (edge){
+			Edge current = main.currentSession.board.currentEdge;
+			if (!current.getSource().equals(current.getTarget()) && current.getDistance()!=0) {
 				edgeTune.setEnabled(true);
 			}
 			else {
@@ -246,8 +245,8 @@ public class MenuOptions extends JPopupMenu{
 				main.currentSession.board.menuBlock = false;
 			}
 		});
-		
-		menu.show(main.currentSession.board,(int)main.currentSession.board.getMousePosition().getX(),(int)main.currentSession.board.getMousePosition().getY());
+		Board board = main.currentSession.board;
+		menu.show(board,(int)board.getMousePosition().getX(),(int)board.getMousePosition().getY());
 		
 	}
 
@@ -266,7 +265,7 @@ public class MenuOptions extends JPopupMenu{
 		
 		vertexDeleteAllOutgoings.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
-				main.currentSession.board.vertexTarget.deleteAllConnecion();
+				main.currentSession.board.vertexTarget.deleteAllEdges();
 				main.currentSession.setModified(true);
 				main.currentSession.board.repaint();
 			}
@@ -274,24 +273,17 @@ public class MenuOptions extends JPopupMenu{
 		
 		vertexAccepted.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
-				main.currentSession.board.vertexTarget.setAccepted(!main.currentSession.board.vertexTarget.isAccepted());
+				Vertex vertex = main.currentSession.board.vertexTarget;
+				vertex.setAccepted(!vertex.isAccepted());
 				main.currentSession.setModified(true);
 				main.currentSession.board.repaint();
 			}
 		});		
 		
-		vertexTypes.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e) {
-				main.currentSession.board.vertexTarget.setType(main.currentSession.board.vertexTarget.getType());
-				main.currentSession.setModified(true);
-				main.currentSession.board.repaint();
-			}
-		});
-
 		edgeDelete.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
-				Vertex source = main.currentSession.board.currentConnection.getSource();
-				source.deleteConnecion(main.currentSession.board.currentConnection);
+				Vertex source = main.currentSession.board.currentEdge.getSource();
+				source.deleteEdge(main.currentSession.board.currentEdge);
 				main.currentSession.setModified(true);
 				main.currentSession.board.repaint();
 			}
@@ -299,20 +291,12 @@ public class MenuOptions extends JPopupMenu{
 		
 		edgeTune.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
-				main.currentSession.board.currentConnection.setDistance(0);
+				main.currentSession.board.currentEdge.setDistance(0);
 				main.currentSession.setModified(true);
 				main.currentSession.board.repaint();
 			}
 		});	
-		
-		// edgeNoType.addActionListener(new ActionListener(){
-		// 	public void actionPerformed(ActionEvent e) {
-		// 		main.currentSession.board.currentConnection.setType(null);
-		// 		main.currentSession.setModified(true);
-		// 		main.currentSession.board.repaint();
-		// 	}
-		// });	
-		
+	
 		restart.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
 				main.currentSession.board.restart();
@@ -390,7 +374,7 @@ public class MenuOptions extends JPopupMenu{
 
 		load.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
-				main.currentSession.board.load();
+				main.currentSession.board.load("");
 			}
 		});
 
