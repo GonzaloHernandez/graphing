@@ -3,7 +3,7 @@
 # Define versioning variables
 FAMILY=1
 VERSION=3
-CONSTRUCTION=0
+CONSTRUCTION=1
 
 # File paths
 JAVA_FILE="src/main/GrapherMain.java"
@@ -49,7 +49,3 @@ echo "::Updated $README_FILE with the new JAR file name: $JAR_NAME"
 
 # ===============================================================================
 # 
-# To Check:
-# Re title the window when saving is not working
-# Size of window session is not stored properly when it was zoomed
-# Persistence of show different to ...

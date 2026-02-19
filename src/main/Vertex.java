@@ -144,22 +144,22 @@ public class Vertex {
 				g.setColor(foreColor);
 				g.drawPolygon(xs,ys,4);
 			}	break;
-			// case 3:	{
-			// 	int[] xs = {x,x+RADIUS,x-RADIUS};
-			// 	int[] ys = {y-RADIUS,y+RADIUS,y-RADIUS};
-			// 	g.setColor(backColor);
-			// 	g.fillPolygon(xs,ys,3);
-			// 	g.setColor(foreColor);
-			// 	g.drawPolygon(xs,ys,3);
-			// }	break;
-			// case 2:	{
-			// 	int[] xs = {x-RADIUS/2,x+RADIUS/2,x+RADIUS,x+RADIUS,x+RADIUS/2,x-RADIUS/2,x-RADIUS,x-RADIUS};
-			// 	int[] ys = {y-RADIUS,y-RADIUS,y-RADIUS/2,y+RADIUS/2,y+RADIUS,y+RADIUS,y+RADIUS/2,y-RADIUS/2};
-			// 	g.setColor(backColor);
-			// 	g.fillPolygon(xs,ys,8);
-			// 	g.setColor(foreColor);
-			// 	g.drawPolygon(xs,ys,8);
-			// } break;
+			case 3:	{
+				int[] xs = {x-RADIUS,x,x+RADIUS};
+				int[] ys = {y+RADIUS,y-RADIUS,y+RADIUS};
+				g.setColor(backColor);
+				g.fillPolygon(xs,ys,3);
+				g.setColor(foreColor);
+				g.drawPolygon(xs,ys,3);
+			}	break;
+			default: {
+				int[] xs = {x-RADIUS/2,x+RADIUS/2,x+RADIUS,x+RADIUS,x+RADIUS/2,x-RADIUS/2,x-RADIUS,x-RADIUS};
+				int[] ys = {y-RADIUS,y-RADIUS,y-RADIUS/2,y+RADIUS/2,y+RADIUS,y+RADIUS,y+RADIUS/2,y-RADIUS/2};
+				g.setColor(backColor);
+				g.fillPolygon(xs,ys,8);
+				g.setColor(foreColor);
+				g.drawPolygon(xs,ys,8);
+			} break;
 		}
 
 		if (accepted) {
@@ -172,7 +172,7 @@ public class Vertex {
 
 			int first = settings.firstZero?0:1;
 			g.setColor(Color.darkGray);
-			if (settings.showVertexValue) {
+			if (settings.showVertexValue || settings.showVertexLabel) {
 				g.setFont(new Font("Arial",Font.ITALIC,9));
 				g.drawString(dict._vertex,x-1-(3*(new String(""+number)).length()),y+RADIUS+9);
 				g.setFont(new Font("Arial",Font.ITALIC,7));
@@ -186,9 +186,18 @@ public class Vertex {
 			}
 		}
 		if (settings.showVertexValue) {
-			g.setColor(Color.BLACK);
-			g.setFont(new Font("Arial",Font.PLAIN,13));
-			g.drawString(""+value,x-(3*(new String(""+value)).length()),y+4);
+			if (!value.equals(settings.showVertexValueDiff)){
+				g.setColor(Color.BLACK);
+				g.setFont(new Font("Arial",Font.PLAIN,13));
+				g.drawString(""+value,x-(3*(new String(""+value)).length()),y+4);
+			}
+		} 
+		else if (settings.showVertexLabel) {
+			if (!label.equals(settings.showVertexLabelDiff)){
+				g.setColor(Color.BLACK);
+				g.setFont(new Font("Arial",Font.PLAIN,9));
+				g.drawString(""+label,x-(2*(new String(""+label)).length()),y+4);
+			}
 		}
 		return edgeSequence;
 	}

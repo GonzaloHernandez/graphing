@@ -23,8 +23,9 @@ class TypeMenuItem extends JMenuItem {
 		this.type	= type;
 		Font currentFont	= UIManager.getFont("Label.font");
 		Font defaultFont	= new Font(currentFont.getName(),Font.PLAIN,currentFont.getSize());
+		ImageIcon img = new ImageIcon(GrapherMain.class.getResource("icons/type.png"));
 		setFont(defaultFont);
-		setIcon(new ImageIcon("icons/type.png"));
+		setIcon(img);
 	}
 	public Type getType() {
 		return type;
@@ -309,8 +310,9 @@ public class MenuOptions extends JPopupMenu{
 				GrapherSettings sets = main.currentSession.board.settings;
 				sets.dictionary.graph		= "game";
 				sets.dictionary.vertex		= "vertex";
-				sets.dictionary.vertexType	= "owners";
 				sets.dictionary.vertexValue	= "priors";
+				sets.dictionary.vertexType	= "owners";
+				sets.dictionary.vertexLabel	= "player";
 				sets.dictionary.edge		= "edge";
 				sets.dictionary.edgeValue	= "weights";
 				sets.dictionary._graph		= "g";

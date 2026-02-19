@@ -389,6 +389,22 @@ public class ViewGeneral extends JPanel {
 			main.currentSession.setModified(true);
 			main.currentSession.board.repaint();
 		});
+
+		comment.addFocusListener(new FocusListener() {
+
+			@Override
+			public void focusGained(FocusEvent e) {
+			}
+
+			@Override
+			public void focusLost(FocusEvent e) {
+				if (comment.getText().length()>1000) {
+					comment.setText(comment.getText().substring(0,1000));
+					main.messageBox("Only 1,000 characters are permitted for comments.| The remainder has been removed.", "Warning", "Ok");
+				}
+			}
+			
+		});
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -400,11 +416,15 @@ public class ViewGeneral extends JPanel {
 		showVVal.setSelected(settings.showVertexValue);
 		showVTyp.setSelected(settings.showVertexType);
 		showVLab.setSelected(settings.showVertexLabel);
+		showVValDiff.setText(settings.showVertexValueDiff);
+		showVLabDiff.setText(settings.showVertexLabelDiff);
 
 		showESeq.setSelected(settings.showEdgeSequence);
 		showEVal.setSelected(settings.showEdgeValue);
 		showETyp.setSelected(settings.showEdgeType);
 		showELab.setSelected(settings.showEdgeLabel);		
+		showEValDiff.setText(settings.showEdgeValueDiff);
+		showELabDiff.setText(settings.showEdgeLabelDiff);
 
 		allowFirstState.setSelected(settings.allowFirsVertex);
 		firstZero.setSelected(settings.firstZero);

@@ -68,18 +68,25 @@ public class Persistence {
         file.writeBoolean   (s.showVertexValue);
         file.writeBoolean   (s.showVertexType);
         file.writeBoolean   (s.showVertexLabel);
+        file.writeUTF       (s.showVertexValueDiff);
+        file.writeUTF       (s.showVertexLabelDiff);
         file.writeBoolean   (s.showEdgeSequence);
         file.writeBoolean   (s.showEdgeValue);
         file.writeBoolean   (s.showEdgeType);
         file.writeBoolean   (s.showEdgeLabel);
+        file.writeUTF       (s.showEdgeValueDiff);
+        file.writeUTF       (s.showEdgeLabelDiff);
         file.writeBoolean   (s.allowFirsVertex);
         file.writeBoolean   (s.firstZero);
         file.writeShort     (s.gridScale);
         file.writeUTF       (s.comment);
         file.writeShort     (s.exportType);
         file.writeBoolean   (s.exportAuto);
-        file.writeShort     (main.currentSession.getWidth());
-        file.writeShort     (main.currentSession.getHeight());
+
+        int width   = (int)(main.currentSession.getWidth()/board.scaleFactor);
+        int height  = (int)(main.currentSession.getHeight()/board.scaleFactor);
+        file.writeShort     (width);
+        file.writeShort     (height);
 
         short edgesCount = 0;
 
@@ -167,25 +174,32 @@ public class Persistence {
 
         // --- Reading Settings ---
         GrapherSettings s = board.settings;
-        s.showVertexSequence = file.readBoolean();
-        s.showVertexValue    = file.readBoolean();
-        s.showVertexType     = file.readBoolean();
-        s.showVertexLabel    = file.readBoolean();
-        s.showEdgeSequence   = file.readBoolean();
-        s.showEdgeValue      = file.readBoolean();
-        s.showEdgeType       = file.readBoolean();
-        s.showEdgeLabel      = file.readBoolean();
-        s.allowFirsVertex    = file.readBoolean();
-        s.firstZero          = file.readBoolean();
-        s.gridScale          = file.readShort();
-        s.comment            = file.readUTF();
-        s.exportType         = file.readShort();
-        s.exportAuto         = file.readBoolean();
+        s.showVertexSequence    = file.readBoolean();
+        s.showVertexValue       = file.readBoolean();
+        s.showVertexType        = file.readBoolean();
+        s.showVertexLabel       = file.readBoolean();
+        s.showVertexValueDiff   = file.readUTF();
+        s.showVertexLabelDiff   = file.readUTF();
+        s.showEdgeSequence      = file.readBoolean();
+        s.showEdgeValue         = file.readBoolean();
+        s.showEdgeType          = file.readBoolean();
+        s.showEdgeLabel         = file.readBoolean();
+        s.showEdgeValueDiff     = file.readUTF();
+        s.showEdgeLabelDiff     = file.readUTF();
+        s.allowFirsVertex       = file.readBoolean();
+        s.firstZero             = file.readBoolean();
+        s.gridScale             = file.readShort();
+        s.comment               = file.readUTF();
+        s.exportType            = file.readShort();
+        s.exportAuto            = file.readBoolean();
 
-        short sessionWidth   = file.readShort();
-        short sessionHeight  = file.readShort();
+        short sessionWidth      = file.readShort();
+        short sessionHeight     = file.readShort();
         
-        Dimension size = new Dimension(sessionWidth,sessionHeight);
+        int width   = (int)(sessionWidth*board.scaleFactor);
+        int height  = (int)(sessionHeight*board.scaleFactor);
+
+        Dimension size = new Dimension(width,height);
         main.currentSession.setSize(size);
         board.setPreferredSize(size);
 

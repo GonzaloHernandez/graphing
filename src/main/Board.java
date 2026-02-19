@@ -595,7 +595,7 @@ public class Board extends JComponent implements Printable{
 			if (dialog.getFile()==null) return;
 			session.main.curdir = dialog.getDirectory();
 			fileName = session.main.curdir+dialog.getFile();
-		} 
+		}
 
 		try {
 	        RandomAccessFile file = new RandomAccessFile(new File(fileName), "r");
@@ -622,7 +622,8 @@ public class Board extends JComponent implements Printable{
 			file.close();
 			repaint();
 
-			session.setTitle(fileName.substring(session.main.curdir.length()));	        session.setName(fileName);
+			session.setTitle(fileName.substring(session.main.curdir.length()));
+			session.setName(fileName);
 			session.main.addRecentSession(fileName);
 			session.main.properties.refresh();
 			session.setModified(false);
@@ -706,6 +707,7 @@ public class Board extends JComponent implements Printable{
 	        if (settings.exportAuto) persistence.export();
 			file.close();
 
+			session.setTitle(fileName.substring(session.main.curdir.length()));
 	        session.setName(fileName);
 			session.setModified(false);
 		} catch (IOException e) {
