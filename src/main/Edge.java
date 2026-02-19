@@ -248,7 +248,7 @@ public class Edge {
 
 		//--- draw label ---
 		
-		String lab = "";
+		String tag = "";
 		String seq = "";
 		int l = 0;
 
@@ -258,18 +258,20 @@ public class Edge {
 		}
 
 		if (settings.showEdgeValue) {
-			lab += getValue();
-			l += lab.length();
+			if (!settings.showEdgeValueDiff.equals(getValue())) {
+				tag += getValue();
+				l += tag.length();
+			}
 		}
 
 		if (type!=null && settings.showEdgeType) {
 			if (settings.showEdgeValue) {
-				lab += ":";
+				tag += ":";
 			}
-			lab += type.getName();
-			l += lab.length();
+			tag += type.getName();
+			l += tag.length();
 		}
-
+		
 		if (settings.showEdgeSequence) {
 			Dictionary dict = settings.dictionary;
 
@@ -277,19 +279,28 @@ public class Edge {
 			g.setFont(new Font("Arial",Font.ITALIC,9));
 			g.drawString(dict._edge,text.x-(l*5/2),text.y+5);
 
-			if (!lab.isEmpty()) {
+			if (!tag.isEmpty()) {
 				seq += ":";
 			}
 
 			g.setFont(new Font("Arial",Font.ITALIC,7));
-			g.drawString(seq,text.x-(l*5/2)+5,text.y+7);
+			g.drawString(seq,text.x-(l*5/2)+5,text.y+6);
 		}
 
 
 		if (settings.showEdgeValue || settings.showEdgeType) {
 			g.setColor(Color.RED);
 			g.setFont(new Font("Arial",Font.ITALIC,9));
-			g.drawString(lab,text.x-(l*5/2)+(seq.length()*5),text.y+5);
+			g.drawString(tag,text.x-(l*5/2)+(seq.length()*5),text.y+5);
+		}
+
+		if (settings.showEdgeLabel) {
+			if (!settings.showEdgeLabelDiff.equals(label)) {
+				g.setColor(Color.BLACK);
+				g.setFont(new Font("Arial",Font.ITALIC,7));
+				l = label.length();
+				g.drawString(label,text.x-(l*5/2),text.y+13);
+			}
 		}
 
 		return connectionSequence+1;

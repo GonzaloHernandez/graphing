@@ -343,16 +343,17 @@ public class Board extends JComponent implements Printable{
 						if (result == JOptionPane.OK_OPTION) {
 							try {
 								Double.parseDouble(value.getText());
-								vertexTarget.setValue(value.getText());
-								vertexTarget.setLabel(label.getText());
-								if (type.getSelectedIndex() == options.length-1) {
-									vertexTarget.setType(null);
-								} else {
-									vertexTarget.setType(vTypes.elementAt(type.getSelectedIndex()));
-								}
 							}
 							catch (NumberFormatException ex) {
 								return;
+							}
+							Double.parseDouble(value.getText());
+							vertexTarget.setValue(value.getText());
+							vertexTarget.setLabel(label.getText());
+							if (type.getSelectedIndex() == options.length-1) {
+								vertexTarget.setType(null);
+							} else {
+								vertexTarget.setType(vTypes.elementAt(type.getSelectedIndex()));
 							}
 						}
 						repaint();
@@ -400,16 +401,16 @@ public class Board extends JComponent implements Printable{
 						if (result == JOptionPane.OK_OPTION) {
 							try {
 								Double.parseDouble(value.getText());
-								currentEdge.setValue(value.getText());
-								currentEdge.setLabel(label.getText());
-								if (type.getSelectedIndex() == options.length-1) {
-									currentEdge.setType(null);
-								} else {
-									currentEdge.setType(eTypes.elementAt(type.getSelectedIndex()));
-								}
 							}
 							catch (NumberFormatException ex) {
 								return;
+							} 
+							currentEdge.setValue(value.getText());
+							currentEdge.setLabel(label.getText());
+							if (type.getSelectedIndex() == options.length-1) {
+								currentEdge.setType(null);
+							} else {
+								currentEdge.setType(eTypes.elementAt(type.getSelectedIndex()));
 							}
 						}						
 						repaint();
@@ -789,18 +790,24 @@ public class Board extends JComponent implements Printable{
 			String vertexTypes = "";
 			String vertexValues = "";
 			String edgeValues = "";
+			String edgeLabels = "";
 
-			for (int v=0;v<vertices.size();v++){
+			for (int v=0;v<vertices.size();v++){ 
+				Vertex vertex = vertices.elementAt(v);
 				if (v>0){
 					vertexValues += ",";
 					vertexTypes += ",";
 				}
-				vertexValues += vertices.elementAt(v).getValue();
-				Type type = vertices.elementAt(v).getType();
+				vertexValues += vertex.getValue();
+				Type type = vertex.getType();
 				vertexTypes += type==null?0:type.getId();
-				for (Edge e : vertices.elementAt(v).getOuts()) {
-					if (edgeValues.length()>0)  edgeValues += ",";
+				for (Edge e : vertex.getOuts()) {
+					if (edgeValues.length()>0)  {
+						edgeValues += ",";
+						edgeLabels += ",";
+					}
 					edgeValues += e.getValue();
+					edgeLabels += e.getLabel().trim().isEmpty()?0:e.getLabel();
 				}
 			}
 
@@ -813,7 +820,8 @@ public class Board extends JComponent implements Printable{
 				"nedges = " + nConections + ";\n" +
 				"sources = [" + from + "];\n" +
 				"targets = [" + to + "];\n" +
-				settings.dictionary.edgeValue + " = [" + edgeValues + "];\n"
+				settings.dictionary.edgeValue + " = [" + edgeValues + "];\n" +
+				settings.dictionary.edgeLabel + " = [" + edgeLabels + "];\n"
 			);
 			return true;
 

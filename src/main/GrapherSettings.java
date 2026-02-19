@@ -58,10 +58,15 @@ public class GrapherSettings {
 	protected	boolean showVertexValue;
 	protected	boolean showVertexType;
 	protected	boolean showVertexLabel;
+	protected	String	showVertexValueDiff;
+	protected	String	showVertexLabelDiff;
+
 	protected	boolean	showEdgeSequence;
 	protected	boolean	showEdgeValue;
 	protected	boolean	showEdgeType;
 	protected	boolean	showEdgeLabel;
+	protected	String	showEdgeValueDiff;
+	protected	String	showEdgeLabelDiff;
 
 	protected	boolean allowFirsVertex;
 	protected	boolean firstZero;
@@ -81,20 +86,24 @@ public class GrapherSettings {
 		this.showVertexValue		= false;
 		this.showVertexType			= false;
 		this.showVertexLabel		= false;
+		this.showVertexValueDiff	= "";
+		this.showVertexLabelDiff	= "";
 
 		this.showEdgeSequence		= true;
 		this.showEdgeValue			= false;
 		this.showEdgeType			= false;
 		this.showEdgeLabel			= false;
+		this.showEdgeValueDiff		= "";
+		this.showEdgeLabelDiff		= "";
 
-		this.comment				= "";
-		this.measure				= 1; // 0=Centimeters  1=Inch
-		this.allowFirsVertex		= true;
-		this.firstZero				= true;
-		this.gridScale				= 15;
-		this.exportAuto				= false;
-		this.exportType				= 0;
-		this.dictionary				= new Dictionary();
+		this.comment			= "";
+		this.measure			= 1; // 0=Centimeters  1=Inch
+		this.allowFirsVertex	= true;
+		this.firstZero			= true;
+		this.gridScale			= 15;
+		this.exportAuto			= false;
+		this.exportType			= 0;
+		this.dictionary			= new Dictionary();
 	}
 
 }

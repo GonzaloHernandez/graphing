@@ -6,6 +6,8 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -37,6 +39,8 @@ public class ViewGeneral extends JPanel {
 
 	protected	JCheckBox	showVSeq,showVVal,showVTyp,showVLab;
 	protected	JCheckBox	showESeq,showEVal,showETyp,showELab;
+	protected	JTextField	showVValDiff,showVLabDiff;
+	protected	JTextField	showEValDiff,showELabDiff;
 	protected	JCheckBox	allowFirstState;
 	protected	JCheckBox	firstZero;
 	protected	JCheckBox	exportAuto;
@@ -81,14 +85,32 @@ public class ViewGeneral extends JPanel {
 		panelNorth.setBorder(BorderFactory.createCompoundBorder(null, margin));
 
 		panelVertex.add(showVSeq = new JCheckBox("Sequence"));
-		panelVertex.add(showVVal = new JCheckBox("Value"));
+
+		JPanel temp1 = new JPanel(new BorderLayout());
+		temp1.add(showVVal = new JCheckBox("Value ≠ "),BorderLayout.WEST);
+		temp1.add(showVValDiff = new JTextField(2));
+		panelVertex.add(temp1);
+
 		panelVertex.add(showVTyp = new JCheckBox("Type"));
-		panelVertex.add(showVLab = new JCheckBox("Label"));
+
+		JPanel temp2 = new JPanel(new BorderLayout());
+		temp2.add(showVLab = new JCheckBox("Label ≠ "),BorderLayout.WEST);
+		temp2.add(showVLabDiff = new JTextField(2));
+		panelVertex.add(temp2);
 		
 		panelEdge.add(showESeq	= new JCheckBox("Sequence"));
-		panelEdge.add(showEVal	= new JCheckBox("Value"));
+
+		JPanel temp3 = new JPanel(new BorderLayout());
+		temp3.add(showEVal = new JCheckBox("Value ≠ "),BorderLayout.WEST);
+		temp3.add(showEValDiff = new JTextField(2));
+		panelEdge.add(temp3);
+
 		panelEdge.add(showETyp	= new JCheckBox("Type"));
-		panelEdge.add(showELab	= new JCheckBox("Label"));
+
+		JPanel temp4 = new JPanel(new BorderLayout());
+		temp4.add(showELab = new JCheckBox("Label ≠ "),BorderLayout.WEST);
+		temp4.add(showELabDiff = new JTextField(2));
+		panelEdge.add(temp4);
 
 		panelNorth.add(panelVertex);	panelNorth.add(panelEdge);
 
@@ -197,6 +219,44 @@ public class ViewGeneral extends JPanel {
 			}
 		});
 
+		showVValDiff.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				settings.showVertexValueDiff = showVValDiff.getText();
+				main.currentSession.setModified(true);
+				main.currentSession.board.repaint();
+			}
+		});
+		showVValDiff.addFocusListener(new FocusListener() {
+			public void focusGained(FocusEvent e) {
+				showVValDiff.selectAll();
+			}
+			@Override
+			public void focusLost(FocusEvent e) {
+				settings.showVertexValueDiff = showVValDiff.getText();
+				main.currentSession.setModified(true);
+				main.currentSession.board.repaint();
+			}
+		});
+
+		showVLabDiff.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				settings.showVertexLabelDiff = showVLabDiff.getText();
+				main.currentSession.setModified(true);
+				main.currentSession.board.repaint();
+			}
+		});
+		showVLabDiff.addFocusListener(new FocusListener() {
+			public void focusGained(FocusEvent e) {
+				showVLabDiff.selectAll();
+			}
+			@Override
+			public void focusLost(FocusEvent e) {
+				settings.showVertexLabelDiff = showVLabDiff.getText();
+				main.currentSession.setModified(true);
+				main.currentSession.board.repaint();
+			}
+		});
+
 		showESeq.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
 				settings = main.currentSession.board.settings;
@@ -224,13 +284,58 @@ public class ViewGeneral extends JPanel {
 			}
 		});
 
-		showELab.addActionListener(new ActionListener(){
+		showEVal.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
 				settings = main.currentSession.board.settings;
-				settings.showEdgeLabel	= showELab.isSelected();
+				settings.showEdgeValue	= showEVal.isSelected();
 				main.currentSession.setModified(true);
 				main.currentSession.board.repaint();
 			}
+		});
+
+		showELab.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				settings.showEdgeLabel = showELab.isSelected();
+				main.currentSession.setModified(true);
+				main.currentSession.board.repaint();
+			}
+		});
+
+		showEValDiff.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				settings.showEdgeValueDiff = showEValDiff.getText();
+				main.currentSession.setModified(true);
+				main.currentSession.board.repaint();
+			}
+		});
+		showEValDiff.addFocusListener(new FocusListener() {
+			public void focusGained(FocusEvent e) {
+				showEValDiff.selectAll();
+			}
+			public void focusLost(FocusEvent e) {
+				settings.showEdgeValueDiff = showEValDiff.getText();
+				main.currentSession.setModified(true);
+				main.currentSession.board.repaint();
+			}			
+		});
+
+
+		showELabDiff.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				settings.showEdgeLabelDiff = showELabDiff.getText();
+				main.currentSession.setModified(true);
+				main.currentSession.board.repaint();
+			}
+		});
+		showELabDiff.addFocusListener(new FocusListener() {
+			public void focusGained(FocusEvent e) {
+				showELabDiff.selectAll();
+			}
+			public void focusLost(FocusEvent e) {
+				settings.showEdgeLabelDiff = showELabDiff.getText();
+				main.currentSession.setModified(true);
+				main.currentSession.board.repaint();
+			}			
 		});
 
 		allowFirstState.addActionListener(new ActionListener(){
@@ -313,13 +418,13 @@ public class ViewGeneral extends JPanel {
 		vertexTitle.setTitle("Show at "+Dictionary.capitalize(dict.vertex));
 		edgeTitle.setTitle("Show at "+Dictionary.capitalize(dict.edge));
 		showVSeq.setText("Sequence");
-		showVVal.setText(Dictionary.capitalize(""+dict.vertexValue));
+		showVVal.setText(Dictionary.capitalize(""+dict.vertexValue)+" ≠ ");
 		showVTyp.setText(Dictionary.capitalize(""+dict.vertexType));
-		showVLab.setText(Dictionary.capitalize(""+dict.vertexLabel));
+		showVLab.setText(Dictionary.capitalize(""+dict.vertexLabel)+" ≠ ");
 		showESeq.setText("Sequence");
-		showEVal.setText(Dictionary.capitalize(""+dict.edgeValue));
+		showEVal.setText(Dictionary.capitalize(""+dict.edgeValue)+" ≠ ");
 		showETyp.setText(Dictionary.capitalize(""+dict.edgeType));
-		showELab.setText(Dictionary.capitalize(""+dict.edgeLabel));
+		showELab.setText(Dictionary.capitalize(""+dict.edgeLabel+" ≠ "));
 
 		allowFirstState.setText("Allow first "+dict.vertex);
 	}

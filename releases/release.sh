@@ -48,8 +48,8 @@ sed -i "s/Graphing-v[0-9]*\.[0-9]*\.[0-9]*\.jar/$JAR_NAME/" "$README_FILE"
 echo "::Updated $README_FILE with the new JAR file name: $JAR_NAME"
 
 # ===============================================================================
-# (DONE) Changes in some shortcuts
-# (DONE) Standarization of type for vertex and edges
-# (DONE) New properties for every element (value,type,label)
-# (DONE) Changes in persistence structure
-
+# 
+# To Check:
+# Re title the window when saving is not working
+# Size of window session is not stored properly when it was zoomed
+# Persistence of show different to ...

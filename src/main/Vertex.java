@@ -136,14 +136,30 @@ public class Vertex {
 				g.setColor(foreColor);
 				g.drawRect(x-RADIUS,y-RADIUS,RADIUS*2,RADIUS*2);
 				break;
-			case 2:	
-				int[] xs = {x-RADIUS/2,x+RADIUS/2,x+RADIUS,x+RADIUS,x+RADIUS/2,x-RADIUS/2,x-RADIUS,x-RADIUS};
-				int[] ys = {y-RADIUS,y-RADIUS,y-RADIUS/2,y+RADIUS/2,y+RADIUS,y+RADIUS,y+RADIUS/2,y-RADIUS/2};
+			case 2:	{
+				int[] xs = {x,x+RADIUS,x,x-RADIUS};
+				int[] ys = {y-RADIUS,y,y+RADIUS,y};
 				g.setColor(backColor);
-				g.fillPolygon(xs,ys,8);
+				g.fillPolygon(xs,ys,4);
 				g.setColor(foreColor);
-				g.drawPolygon(xs,ys,8);
-				break;
+				g.drawPolygon(xs,ys,4);
+			}	break;
+			// case 3:	{
+			// 	int[] xs = {x,x+RADIUS,x-RADIUS};
+			// 	int[] ys = {y-RADIUS,y+RADIUS,y-RADIUS};
+			// 	g.setColor(backColor);
+			// 	g.fillPolygon(xs,ys,3);
+			// 	g.setColor(foreColor);
+			// 	g.drawPolygon(xs,ys,3);
+			// }	break;
+			// case 2:	{
+			// 	int[] xs = {x-RADIUS/2,x+RADIUS/2,x+RADIUS,x+RADIUS,x+RADIUS/2,x-RADIUS/2,x-RADIUS,x-RADIUS};
+			// 	int[] ys = {y-RADIUS,y-RADIUS,y-RADIUS/2,y+RADIUS/2,y+RADIUS,y+RADIUS,y+RADIUS/2,y-RADIUS/2};
+			// 	g.setColor(backColor);
+			// 	g.fillPolygon(xs,ys,8);
+			// 	g.setColor(foreColor);
+			// 	g.drawPolygon(xs,ys,8);
+			// } break;
 		}
 
 		if (accepted) {
