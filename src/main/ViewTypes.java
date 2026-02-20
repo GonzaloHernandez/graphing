@@ -1,8 +1,6 @@
 package main;
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -11,11 +9,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.Vector;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -189,8 +188,8 @@ public class ViewTypes extends JPanel {
 				JTextField name = new JTextField();
 				JTextField desc = new JTextField();
 
-				JPanel info = new JPanel(new GridLayout(3,1));
-				JPanel data = new JPanel(new GridLayout(3,1));
+				JPanel info = new JPanel(new GridLayout(2,1));
+				JPanel data = new JPanel(new GridLayout(2,1));
 				JPanel panel = new JPanel(new BorderLayout());
 				panel.add(info,BorderLayout.WEST);
 				panel.add(data,BorderLayout.CENTER);
@@ -200,14 +199,13 @@ public class ViewTypes extends JPanel {
 				info.add(new JLabel("Description "));
 				data.add(desc);
 
-				panel.setPreferredSize(new Dimension(300, 70));
-				int result = JOptionPane.showConfirmDialog(vTable, panel, 
-						"Vertice types", JOptionPane.OK_CANCEL_OPTION);
-
-				if (result == JOptionPane.OK_OPTION) {
+				panel.setPreferredSize(new Dimension(300, 75));
+				String result = main.grapherDialog("Vertices types",panel,"Ok|Cancel");
+				if (result.equals("Ok")) {
 					Vector<Type> type = main.currentSession.board.vTypes;
 					type.add(new Type(type.size(),name.getText(),desc.getText()));
 				}
+
 				main.currentSession.setModified(true);
 				vTable.revalidate();
 				vTable.repaint();
@@ -220,8 +218,8 @@ public class ViewTypes extends JPanel {
 				JTextField name = new JTextField();
 				JTextField desc = new JTextField();
 
-				JPanel info = new JPanel(new GridLayout(3,1));
-				JPanel data = new JPanel(new GridLayout(3,1));
+				JPanel info = new JPanel(new GridLayout(2,1));
+				JPanel data = new JPanel(new GridLayout(2,1));
 				JPanel panel = new JPanel(new BorderLayout());
 				panel.add(info,BorderLayout.WEST);
 				panel.add(data,BorderLayout.CENTER);
@@ -231,11 +229,9 @@ public class ViewTypes extends JPanel {
 				info.add(new JLabel("Description "));
 				data.add(desc);
 
-				panel.setPreferredSize(new Dimension(300, 70));
-				int result = JOptionPane.showConfirmDialog(eTable, panel, 
-						"Vertice types", JOptionPane.OK_CANCEL_OPTION);
-
-				if (result == JOptionPane.OK_OPTION) {
+				panel.setPreferredSize(new Dimension(300, 75));
+				String result = main.grapherDialog("Vertices types",panel,"Ok|Cancel");
+				if (result.equals("Ok")) {
 					Vector<Type> type = main.currentSession.board.eTypes;
 					type.add(new Type(type.size(),name.getText(),desc.getText()));
 				}
@@ -243,6 +239,92 @@ public class ViewTypes extends JPanel {
 				eTable.revalidate();
 				eTable.repaint();
 			}
+		});
+
+		vTable.addMouseListener(new MouseListener() {
+			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() == 2) { // Detection of Double Click
+					int row = vTable.getSelectedRow();
+					if (row != -1) {
+						Type type = main.currentSession.board.vTypes.elementAt(row);
+
+						JTextField name = new JTextField(type.getName());
+						JTextField desc = new JTextField(type.getDescription());
+
+						JPanel info = new JPanel(new GridLayout(2,1));
+						JPanel data = new JPanel(new GridLayout(2,1));
+						JPanel panel = new JPanel(new BorderLayout());
+						panel.add(info,BorderLayout.WEST);
+						panel.add(data,BorderLayout.CENTER);
+						
+						info.add(new JLabel("Name "));
+						data.add(name);
+						info.add(new JLabel("Description "));
+						data.add(desc);
+
+						panel.setPreferredSize(new Dimension(300, 75));
+						String result = main.grapherDialog("Vertices types",panel,"Ok|Cancel");
+						if (result.equals("Ok")) {
+							type.setName(name.getText());
+							type.setDescription(desc.getText());
+							main.currentSession.setModified(true);
+							eTable.revalidate();
+							eTable.repaint();
+						}
+					}
+				}			
+			}
+			public void mouseEntered(MouseEvent e) {
+			}
+			public void mouseExited(MouseEvent e) {
+			}
+			public void mousePressed(MouseEvent e) {
+			}
+			public void mouseReleased(MouseEvent e) {
+			}			
+		});
+
+		eTable.addMouseListener(new MouseListener() {
+			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() == 2) { // Detection of Double Click
+					int row = eTable.getSelectedRow();
+					if (row != -1) {
+						Type type = main.currentSession.board.eTypes.elementAt(row);
+
+						JTextField name = new JTextField(type.getName());
+						JTextField desc = new JTextField(type.getDescription());
+
+						JPanel info = new JPanel(new GridLayout(2,1));
+						JPanel data = new JPanel(new GridLayout(2,1));
+						JPanel panel = new JPanel(new BorderLayout());
+						panel.add(info,BorderLayout.WEST);
+						panel.add(data,BorderLayout.CENTER);
+						
+						info.add(new JLabel("Name "));
+						data.add(name);
+						info.add(new JLabel("Description "));
+						data.add(desc);
+
+						panel.setPreferredSize(new Dimension(300, 75));
+						String result = main.grapherDialog("Vertices types",panel,"Ok|Cancel");
+						if (result.equals("Ok")) {
+							type.setName(name.getText());
+							type.setDescription(desc.getText());
+							main.currentSession.setModified(true);
+							eTable.revalidate();
+							eTable.repaint();
+						}
+					}
+				}			
+			}
+			public void mouseEntered(MouseEvent e) {
+			}
+			public void mouseExited(MouseEvent e) {
+			}
+			public void mousePressed(MouseEvent e) {
+			}
+			public void mouseReleased(MouseEvent e) {
+			}			
 		});
 	}
 	
@@ -258,5 +340,5 @@ public class ViewTypes extends JPanel {
 		eColumnModel.getColumn(0).setPreferredWidth(30); 
 		eColumnModel.getColumn(0).setMaxWidth(30);
 	}
-	
+
 }

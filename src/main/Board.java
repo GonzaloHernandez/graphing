@@ -15,7 +15,6 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.awt.image.BufferedImage;
 import java.awt.print.PageFormat;
 import java.awt.print.Paper;
 import java.awt.print.Printable;
@@ -27,12 +26,10 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Vector;
 
-import javax.imageio.ImageIO;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
@@ -85,7 +82,7 @@ public class Board extends JComponent implements Printable{
 
 		vTypes.add(new Type(0,"Round", "Even"));
 		vTypes.add(new Type(1,"Square", "Odd"));
-		vTypes.add(new Type(2,"Polygon", "Nature"));
+		vTypes.add(new Type(2,"Diamond", "Nature"));
 
 		eTypes.add(new Type(0,"number","0123456789"));
 		eTypes.add(new Type(1,"point","."));
@@ -208,7 +205,7 @@ public class Board extends JComponent implements Printable{
 
 				if (e.isControlDown()){
 					if (e.getKeyCode() == KeyEvent.VK_S) {
-						save(false);
+						session.main.persistence.saveSession(false,null);
 					}
 					else if (e.getKeyChar() == '+' || e.getKeyChar() == '=' || 
 							e.getKeyChar() == '*' || e.getKeyCode() == KeyEvent.VK_PLUS) {
@@ -229,7 +226,7 @@ public class Board extends JComponent implements Printable{
 				}
 				else if (e.isControlDown() && e.isShiftDown()) {
 					if (e.getKeyCode() == KeyEvent.VK_S) {
-						save(true);
+						session.main.persistence.saveSession(true,null);
 					}
 				}
 
@@ -308,7 +305,7 @@ public class Board extends JComponent implements Printable{
 						JTextField label = new JTextField(vertexTarget.getLabel());
 						String[] options = new String[vTypes.size()+1];
 						for (int i=0; i<vTypes.size(); i++) {
-							options[i] = vTypes.elementAt(i).getName();							
+							options[i] = vTypes.elementAt(i).getName();
 						}
 						options[vTypes.size()] = "<None>";
 						JComboBox<String> type = new JComboBox<>(options);
@@ -335,12 +332,12 @@ public class Board extends JComponent implements Printable{
 						info.add(new JLabel(""+Dictionary.capitalize(lab)+" "));
 						data.add(label);
 
-						panel.setPreferredSize(new Dimension(300, 70));
-						int result = JOptionPane.showConfirmDialog(session, panel, 
-								"Properties for "+Dictionary.capitalize(settings.dictionary.vertex),
-								JOptionPane.OK_CANCEL_OPTION);
+						panel.setPreferredSize(new Dimension(300, 100));
 
-						if (result == JOptionPane.OK_OPTION) {
+						String title = "Properties for "+
+							Dictionary.capitalize(settings.dictionary.vertex);
+						String result = session.main.grapherDialog(title,panel,"Ok|Cancel");
+						if (result.equals("Ok")) {
 							try {
 								Double.parseDouble(value.getText());
 							}
@@ -393,12 +390,13 @@ public class Board extends JComponent implements Printable{
 						info.add(new JLabel(""+Dictionary.capitalize(lab)+" "));
 						data.add(label);
 
-						panel.setPreferredSize(new Dimension(300, 70));
-						int result = JOptionPane.showConfirmDialog(session, panel, 
-								"Properties for "+Dictionary.capitalize(settings.dictionary.edge),
-								JOptionPane.OK_CANCEL_OPTION);
+						panel.setPreferredSize(new Dimension(300, 100));
 
-						if (result == JOptionPane.OK_OPTION) {
+						String title = "Properties for "+
+							Dictionary.capitalize(settings.dictionary.edge);
+						String result = session.main.grapherDialog(title,panel,"Ok|Cancel");
+
+						if (result.equals("Ok")) {
 							try {
 								Double.parseDouble(value.getText());
 							}
@@ -570,151 +568,147 @@ public class Board extends JComponent implements Printable{
 
 	//-------------------------------------------------------------------------------------
 
-	public void load(String fileName){
-		if (fileName.equals("")) {
-			if (session.isModified()) {
-				String messageReturn = session.main.messageBox(
-							"This session was no saved.|Do you want to close anyway?",
-							"Warning","Yes|No");
-				if (messageReturn.equals("No")||messageReturn.equals("")) return;
-			}
+	// public void load(String fileName){
+	// 	if (fileName.equals("")) {
+	// 		if (session.isModified()) {
+	// 			String messageReturn = session.main.messageBox(
+	// 						"This session was no saved.|Do you want to close anyway?",
+	// 						"Warning","Yes|No");
+	// 			if (messageReturn.equals("No")||messageReturn.equals("")) return;
+	// 		}
 
-			FileDialog dialog = new FileDialog(session.main,"Select a file",FileDialog.LOAD);
+	// 		FileDialog dialog = new FileDialog(session.main,"Select a file",FileDialog.LOAD);
 			
-			dialog.setFilenameFilter(new FilenameFilter() {
-				@Override
-				public boolean accept(java.io.File dir, String name) {
-					return name.toLowerCase().endsWith(".aut");
-				}
-			});
+	// 		dialog.setFilenameFilter(new FilenameFilter() {
+	// 			@Override
+	// 			public boolean accept(java.io.File dir, String name) {
+	// 				return name.toLowerCase().endsWith(".aut");
+	// 			}
+	// 		});
 
-			dialog.setDirectory(session.main.curdir);
-			dialog.setFile("*.aut");
-			dialog.setVisible(true);
-			session.main.requestFocus();		
-			if (dialog.getFile()==null) return;
-			session.main.curdir = dialog.getDirectory();
-			fileName = session.main.curdir+dialog.getFile();
-		}
+	// 		dialog.setDirectory(session.main.curdir);
+	// 		dialog.setFile("*.aut");
+	// 		dialog.setVisible(true);
+	// 		session.main.requestFocus();		
+	// 		if (dialog.getFile()==null) return;
+	// 		session.main.curdir = dialog.getDirectory();
+	// 		fileName = session.main.curdir+dialog.getFile();
+	// 	}
 
-		try {
-	        RandomAccessFile file = new RandomAccessFile(new File(fileName), "r");
+	// 	try {
+	//         RandomAccessFile file = new RandomAccessFile(new File(fileName), "r");
 
-	        if (	file.readShort()	!= 7 ||
-	        		file.readShort()	!= 4 ||
-	        		!file.readUTF().equals("GRAPHER")	) {
-	        	file.close();
-	        	session.dispose();
-	        	session.main.messageBox("Invalid file","Warning","Accept");
-	        	return;
-	        }
+	//         if (	file.readShort()	!= 7 ||
+	//         		file.readShort()	!= 4 ||
+	//         		!file.readUTF().equals("GRAPHER")	) {
+	//         	file.close();
+	//         	session.dispose();
+	//         	session.main.messageBox("Invalid file","Warning","Accept");
+	//         	return;
+	//         }
 	        
-	        int family	= file.readShort();
-	        int version	= file.readShort();
+	//         int family	= file.readShort();
+	//         int version	= file.readShort();
 
-			Persistence persistence = new Persistence(session.main);
-			if (family <= 0 || version <= 2) {
-				persistence.load_1_2(file);
-			} else {
-				persistence.load(file);
-			}
+	// 		if (family <= 0 || version <= 2) {
+	// 			session.main.persistence.load_1_2(file);
+	// 		} else {
+	// 			session.main.persistence.load(file);
+	// 		}
 
-			file.close();
-			repaint();
+	// 		file.close();
+	// 		repaint();
 
-			session.setTitle(fileName.substring(session.main.curdir.length()));
-			session.setName(fileName);
-			session.main.addRecentSession(fileName);
-			session.main.properties.refresh();
-			session.setModified(false);
-			this.fileName = fileName;
-		} catch (IOException e) {
-	    	session.main.messageBox("The file ["+fileName+"] does not exists","File error","Accept");
-	    }
-	}
+	// 		session.setTitle(fileName.substring(session.main.curdir.length()));
+	// 		session.setName(fileName);
+	// 		session.main.addRecentSession(fileName);
+	// 		session.main.properties.refresh();
+	// 		session.setModified(false);
+	// 		this.fileName = fileName;
+	// 	} catch (IOException e) {
+	//     	session.main.messageBox("The file ["+fileName+"] does not exists","File error","Accept");
+	//     }
+	// }
 
 	//-------------------------------------------------------------------------------------
 
-	public void loadImport(){
-		if (session.isModified()) {
-			String messageReturn = session.main.messageBox("This session was no saved.|Do you want to close anyway?","Warning","Yes|No");
-			if (messageReturn.equals("No")||messageReturn.equals("")) return;
-		}
-		FileDialog dialog = new FileDialog(session.main,"Select a file",FileDialog.LOAD);
+	// public void loadImport(){
+	// 	if (session.isModified()) {
+	// 		String messageReturn = session.main.messageBox("This session was no saved.|Do you want to close anyway?","Warning","Yes|No");
+	// 		if (messageReturn.equals("No")||messageReturn.equals("")) return;
+	// 	}
+	// 	FileDialog dialog = new FileDialog(session.main,"Select a file",FileDialog.LOAD);
         
-		dialog.setFilenameFilter(new FilenameFilter() {
-            @Override
-            public boolean accept(java.io.File dir, String name) {
-                return name.toLowerCase().endsWith(".gm");
-            }
-        });
+	// 	dialog.setFilenameFilter(new FilenameFilter() {
+    //         @Override
+    //         public boolean accept(java.io.File dir, String name) {
+    //             return name.toLowerCase().endsWith(".gm");
+    //         }
+    //     });
 
-		dialog.setDirectory(session.main.curdir);
-		dialog.setFile("*.gm");
-		dialog.setVisible(true);
-		session.main.requestFocus();
-		if (dialog.getFile()==null) return;
+	// 	dialog.setDirectory(session.main.curdir);
+	// 	dialog.setFile("*.gm");
+	// 	dialog.setVisible(true);
+	// 	session.main.requestFocus();
+	// 	if (dialog.getFile()==null) return;
 
-		Persistence persistence = new Persistence(session.main);
-
-		persistence.loadImport(dialog.getDirectory()+dialog.getFile());
-	}
+	// 	session.main.persistence.loadImport(dialog.getDirectory()+dialog.getFile());
+	// }
 
 	//-------------------------------------------------------------------------------------
 
-	public boolean save(boolean saveAs) {
-		try {
-			if (saveAs || fileName.equals("")) {
-				FileDialog dialog = new FileDialog(session.main,"Select a file name",FileDialog.SAVE);
+	// public boolean save(boolean saveAs) {
+	// 	try {
+	// 		if (saveAs || fileName.equals("")) {
+	// 			FileDialog dialog = new FileDialog(session.main,"Select a file name",FileDialog.SAVE);
 
-				dialog.setFilenameFilter(new FilenameFilter() {
-					@Override
-					public boolean accept(java.io.File dir, String name) {
-						return name.endsWith(".aut");
-					}
-				});
-				dialog.setDirectory(session.main.curdir);
-				dialog.setFile("*.aut");
+	// 			dialog.setFilenameFilter(new FilenameFilter() {
+	// 				@Override
+	// 				public boolean accept(java.io.File dir, String name) {
+	// 					return name.endsWith(".aut");
+	// 				}
+	// 			});
+	// 			dialog.setDirectory(session.main.curdir);
+	// 			dialog.setFile("*.aut");
 
-				dialog.pack();
-				int x = session.main.getX() + 100;
-				int y = session.main.getY() + 100;
-				dialog.setLocation(x, y);
+	// 			dialog.pack();
+	// 			int x = session.main.getX() + 100;
+	// 			int y = session.main.getY() + 100;
+	// 			dialog.setLocation(x, y);
 
-				dialog.setVisible(true);
-				session.main.requestFocus();
-				if (dialog.getFile()==null) return false;
-				session.main.curdir = dialog.getDirectory();
-				fileName = session.main.curdir+dialog.getFile();
-			}
+	// 			dialog.setVisible(true);
+	// 			session.main.requestFocus();
+	// 			if (dialog.getFile()==null) return false;
+	// 			session.main.curdir = dialog.getDirectory();
+	// 			fileName = session.main.curdir+dialog.getFile();
+	// 		}
 			
-			JInternalFrame iframes[] =  session.main.desktop.getAllFrames();
-			for (int i=0;i<iframes.length;i++){
-				if (iframes[i].getClass().getName().equals("GrapherSession")){
-					GrapherSession	session = (GrapherSession)iframes[i];
-					if (session.equals(this.session)) continue;
-					if (session.getName().equals(fileName)){
-						session.main.messageBox("Name invalid.|There exists a session opened with the same indentifier","Warning","Accept");
-						fileName = "";
-						return false;
-					}
-				}
-			}
+	// 		JInternalFrame iframes[] =  session.main.desktop.getAllFrames();
+	// 		for (int i=0;i<iframes.length;i++){
+	// 			if (iframes[i].getClass().getName().equals("GrapherSession")){
+	// 				GrapherSession	session = (GrapherSession)iframes[i];
+	// 				if (session.equals(this.session)) continue;
+	// 				if (session.getName().equals(fileName)){
+	// 					session.main.messageBox("Name invalid.|There exists a session opened with the same indentifier","Warning","Accept");
+	// 					fileName = "";
+	// 					return false;
+	// 				}
+	// 			}
+	// 		}
 			
-			RandomAccessFile file = new RandomAccessFile(new File(fileName), "rw");
-			Persistence persistence = new Persistence(session.main);
-			persistence.save(file);
-	        if (settings.exportAuto) persistence.export();
-			file.close();
+	// 		RandomAccessFile file = new RandomAccessFile(new File(fileName), "rw");
+	// 		session.main.persistence.save(file);
+	//         if (settings.exportAuto) session.main.persistence.export();
+	// 		file.close();
 
-			session.setTitle(fileName.substring(session.main.curdir.length()));
-	        session.setName(fileName);
-			session.setModified(false);
-		} catch (IOException e) {
-			e.printStackTrace();
-	    }
-		return true;
-	}
+	// 		session.setTitle(fileName.substring(session.main.curdir.length()));
+	//         session.setName(fileName);
+	// 		session.setModified(false);
+	// 	} catch (IOException e) {
+	// 		e.printStackTrace();
+	//     }
+	// 	return true;
+	// }
 
 	//-------------------------------------------------------------------------------------
 
@@ -1064,41 +1058,5 @@ public class Board extends JComponent implements Printable{
 		}
 		return 0;
 	}
-
-	public void screenshot(Graphics g1) {
-        int width	= (int)(getWidth() * Math.max(scaleFactor,2));
-        int height	= (int)(getHeight() * Math.max(scaleFactor,2));
-
-        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-        
-        Graphics2D g2 = image.createGraphics();
-		g2.scale(Math.max(scaleFactor,2),Math.max(scaleFactor,2));
-        paint(g2);
-        g2.dispose();
-
-        try {
-			FileDialog dialog = new FileDialog(session.main,"Select a file name",FileDialog.SAVE);
-
-			dialog.setFilenameFilter(new FilenameFilter() {
-				@Override
-				public boolean accept(java.io.File dir, String name) {
-					return name.endsWith(".png");
-				}
-			});
-
-			dialog.setDirectory(session.main.curdir);
-			dialog.setFile("*.png");
-			dialog.setVisible(true);
-			session.main.requestFocus();
-			if (dialog.getFile()==null) return;
-			String pngFileName = dialog.getDirectory()+dialog.getFile();
-
-
-			ImageIO.write(image, "png", new File(pngFileName));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }		
-	}
-
 	
 }

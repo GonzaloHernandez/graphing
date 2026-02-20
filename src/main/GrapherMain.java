@@ -2,8 +2,6 @@ package main;
 import java.awt.Desktop;
 import java.awt.FileDialog;
 import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -16,7 +14,6 @@ import java.beans.PropertyVetoException;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.net.URI;
 
 import javax.swing.JDesktopPane;
@@ -26,6 +23,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.UIManager;
 
@@ -41,13 +39,14 @@ public class GrapherMain extends JFrame{
 	//-------------------------------------------------------------------------------------
 
 	protected	JDesktopPane	desktop;
+	protected	Persistence		persistence;
 	
 	private	JSplitPane		split;
 	private	JMenuBar		menuBar;
 	private	JMenu			system,help,relatedTopics,samples;
-	private	JMenuItem		newSession,open,importSession,exit,contents,shortcuts,about,credits;
+	private	JMenuItem		newSession,open,importGame,exit,contents,shortcuts,about,credits;
 	
-	protected	String			messageReturn;
+	protected	String			dialogReturn;
 	protected	MenuOptions		menuOptions;
 	protected	GrapherSession	currentSession;
 	protected	ViewProperties	properties;
@@ -60,7 +59,7 @@ public class GrapherMain extends JFrame{
 
 	public GrapherMain() {
 		super("Graphing");
-		
+		persistence = new Persistence(this);		
 		setSize(1200,800);
 		initElements();
 		progListeners();
@@ -74,7 +73,7 @@ public class GrapherMain extends JFrame{
 	private void initElements(){
 		Font currentFont	= UIManager.getFont("Label.font");
 		Font defaultFont	= new Font(currentFont.getName(),Font.PLAIN,currentFont.getSize());
-		messageReturn		= null;
+		dialogReturn		= null;
 						
 		Image icon = Toolkit.getDefaultToolkit().getImage("icons/grapher.png");
 	    setIconImage(icon);
@@ -86,7 +85,7 @@ public class GrapherMain extends JFrame{
 		system			= new GrapherMenu("System",defaultFont,"system.png");
 		newSession		= new GrapherItem("New Session",defaultFont,"new.png");
 		open			= new GrapherItem("Open Session",defaultFont,"open.png");
-		importSession	= new GrapherItem("Import Graph",defaultFont,"open.png");
+		importGame	= new GrapherItem("Import Graph",defaultFont,"open.png");
 		recent			= new GrapherMenu("Recent Sessions",defaultFont,"recent.png");
 		exit			= new GrapherItem("Exit",defaultFont,"exit.png");
 		
@@ -107,7 +106,7 @@ public class GrapherMain extends JFrame{
 		menuBar.add(system);
 		system.add(newSession);
 		system.add(open);
-		system.add(importSession);
+		system.add(importGame);
 		system.addSeparator();
 		system.add(recent);
 		system.addSeparator();
@@ -131,7 +130,7 @@ public class GrapherMain extends JFrame{
 
 		UIManager.put("InternalFrame.titleFont",defaultFont);
 		curdir = System.getProperty("user.dir");
-		load();
+		persistence.loadGrapher();
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -151,7 +150,7 @@ public class GrapherMain extends JFrame{
 		addWindowListener(new WindowAdapter(){
 			public void windowClosing(WindowEvent e){
 				if (verify()){
-					save();
+					persistence.saveGrapher();
 					dispose();
 					System.exit(0);
 				}
@@ -186,13 +185,13 @@ public class GrapherMain extends JFrame{
 		
 		open.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
-				openSession(null);
+				persistence.loadSession("",true);
 			}
 		});
 		
-		importSession.addActionListener(new ActionListener(){
+		importGame.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
-				importSession(null);
+				persistence.importGame();
 			}
 		});
 		
@@ -269,7 +268,7 @@ public class GrapherMain extends JFrame{
 
 	//-------------------------------------------------------------------------------------
 	
-	private void addSession(){
+	protected void addSession(){
 		GrapherSession session = new GrapherSession(this);
 		session.setSessionNumber(findLastSessionNumber()+1);
 		desktop.add(session);
@@ -310,89 +309,6 @@ public class GrapherMain extends JFrame{
 	
 	//-------------------------------------------------------------------------------------
 
-	private void openSession(String fileName){
-		if (fileName == null) {
-			FileDialog dialog = new FileDialog(this,"Select a file",FileDialog.LOAD);
-
-			dialog.setFilenameFilter(new FilenameFilter() {
-				@Override
-				public boolean accept(java.io.File dir, String name) {
-					return name.toLowerCase().endsWith(".aut");
-				}
-			});
-
-			dialog.setDirectory(curdir);
-			dialog.setFile("*.aut");
-			dialog.setVisible(true);
-		
-			if (dialog.getFile()==null) return;
-			curdir = dialog.getDirectory();
-			fileName = curdir+dialog.getFile(); 
-		}
-		
-		JInternalFrame iframes[] = desktop.getAllFrames();
-		for (int i=0;i<iframes.length;i++){
-			if (iframes[i].getClass().getName().equals("main.GrapherSession")){
-				GrapherSession	session = (GrapherSession)iframes[i];
-				if (session.getName() != null && session.getName().equals(fileName)){
-					try {
-						session.setSelected(true);
-					} catch (PropertyVetoException e) {
-						messageBox("This session is alredy opened.","Warning","Accept");
-					}
-					return;
-				}
-			}
-		}
-		
-		addSession();
-		currentSession.board.load(fileName);
-	}
-	
-	//-------------------------------------------------------------------------------------
-
-	private void importSession(String fileName){
-		// if (fileName == null) {
-		// 	FileDialog dialog = new FileDialog(this,"Select a file",FileDialog.LOAD);
-
-		// 	dialog.setFilenameFilter(new FilenameFilter() {
-		// 		@Override
-		// 		public boolean accept(java.io.File dir, String name) {
-		// 			return name.toLowerCase().endsWith(".gm");
-		// 		}
-		// 	});
-
-		// 	dialog.setDirectory(curdir);
-		// 	dialog.setFile("*.gm");
-		// 	dialog.setVisible(true);
-		
-		// 	if (dialog.getFile()==null) return;
-		// 	curdir = dialog.getDirectory();
-		// 	fileName = curdir+dialog.getFile(); 
-		// }
-		
-
-		// JInternalFrame iframes[] = desktop.getAllFrames();
-		// for (int i=0;i<iframes.length;i++){
-		// 	if (iframes[i].getClass().getName().equals("main.GrapherSession")){
-		// 		GrapherSession	session = (GrapherSession)iframes[i];
-		// 		if (session.getName() != null && session.getName().equals(fileName)){
-		// 			messageBox("This session is opened|It is no possible to open again.","Warning","Accept");
-		// 			try {
-		// 				session.setSelected(true);
-		// 			} catch (PropertyVetoException e) {
-		// 			}
-		// 			return;
-		// 		}
-		// 	}
-		// }
-		
-		addSession();
-		currentSession.board.loadImport();
-	}
-	
-	//-------------------------------------------------------------------------------------
-
 	public void openCompiler(Board b){
 		Compiler compilador = new Compiler(b);
 		desktop.add(compilador);
@@ -408,63 +324,15 @@ public class GrapherMain extends JFrame{
 	//-------------------------------------------------------------------------------------
 
 	public String messageBox(String info,String title,String buttons){
-		messageReturn = "";
+		dialogReturn = "";
 		new MessageBox(this,info,title,buttons);
-		return messageReturn;
+		return dialogReturn;
 	}
 
-	//-------------------------------------------------------------------------------------
-
-	public void save() {
-		String fileName	= "graphing.cnf";
-		try {
-			RandomAccessFile file = new RandomAccessFile(new File(fileName), "rw");
-	        
-			file.writeUTF(curdir);
-			file.writeInt(recent.getItemCount());
-			
-			for (int i=0;i<recent.getItemCount();i++){
-				JMenuItem item = recent.getItem(i);
-				file.writeUTF(item.getText());
-			}
-			file.writeBoolean(showAbout);
-			file.writeShort(getLocation().x);
-			file.writeShort(getLocation().y);
-			file.writeShort(getSize().width);
-	        file.writeShort(getSize().height);
-	        file.close();
-	        
-	    } catch (IOException e) {
-	    	e.printStackTrace();
-	    }
-	}
-
-	//-------------------------------------------------------------------------------------
-
-	public void load() {
-		String fileName	= "graphing.cnf";
-		try {
-			RandomAccessFile file = new RandomAccessFile(new File(fileName), "r");
-	        
-			curdir = file.readUTF();
-			int count = file.readInt();
-			
-			for (int i=0;i<count;i++){
-				addRecentSession(file.readUTF());
-			}
-	        
-			showAbout = file.readBoolean();
-			short	x	= file.readShort();
-			short	y	= file.readShort();
-			short	w	= file.readShort();
-			short	h	= file.readShort();
-			setLocation(x, y);
-			setSize(w,h);
-	        file.close();
-	        
-	    } catch (IOException e) {
-	    	System.out.println("Creating configuration (CNF) file.");
-	    }
+	public String grapherDialog(String info,JPanel panel,String buttons){
+		dialogReturn = "";
+		new GrapherDialog(this,info,panel,buttons);
+		return dialogReturn;
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -488,7 +356,7 @@ public class GrapherMain extends JFrame{
 
 		item.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
-				openSession(item.getText());
+				persistence.loadSession(item.getText(),true);
 			}
 		});
 	}
@@ -562,7 +430,7 @@ public class GrapherMain extends JFrame{
 			samples.add(item);
 			item.addActionListener(new ActionListener(){
 				public void actionPerformed(ActionEvent e) {
-					openSession("samples/"+((JMenuItem)e.getSource()).getText()+".aut");
+					persistence.loadSession("samples/"+((JMenuItem)e.getSource()).getText()+".aut",true);
 				}
 			});
 		}
@@ -573,7 +441,7 @@ public class GrapherMain extends JFrame{
 	private boolean verify(){
 		JInternalFrame frames[] = desktop.getAllFrames();
 		for (int i=0;i<frames.length;i++){
-			if (frames[i].getClass().toString().equals("class GrapherSession")){
+			if (frames[i].getClass().getName().equals("main.GrapherSession")){
 				GrapherSession session = (GrapherSession)frames[i];
 				if (session.modified) {
 					if (!session.save()) return false;
@@ -581,17 +449,5 @@ public class GrapherMain extends JFrame{
 			}
 		}
 		return true;
-	}
-
-	//-------------------------------------------------------------------------------------
-	// Free functions
-	//-------------------------------------------------------------------------------------
-
-	public static void drawCenterString(Graphics g,String s,int x,int y){
-		FontMetrics metrics			= g.getFontMetrics();
-		int			widthString		= metrics.stringWidth(s);//charsWidth(s.toCharArray(),0,s.length());
-		int			heightString	= metrics.getAscent();
-		
-		g.drawString(s,x-widthString/2,y+heightString/2);		
 	}
 }

@@ -54,13 +54,15 @@ public class MenuOptions extends JPopupMenu{
 
 	//-------------------------------------------------------------------------------------
 
-	protected	GrapherMenu		vertexMenu,edgeMenu,grapherMenu,template;
+	protected	GrapherMenu	vertexMenu,edgeMenu,grapherMenu,template;
 	
 	private	GrapherMain		main;
 	private GrapherMenu		vertexTypes,edgeTypes;
 	private	GrapherItem		vertexDelete,vertexDeleteAllOutgoings,vertexAccepted;
 	private	GrapherItem		edgeDelete,edgeTune;
-	private	GrapherItem		restart,parityGame,load,loadImport,save,saveAs,print,simulate,help;
+	private	GrapherItem		restart,parityGame,load,loadGame,save,saveAs;
+	private GrapherItem		exportPNG,exportPDF,exportSVG,simulate,help;
+
 	
 	//-------------------------------------------------------------------------------------
 
@@ -93,10 +95,12 @@ public class MenuOptions extends JPopupMenu{
 		restart					= new GrapherItem("Restar Session",defaultFont,"new.png");
 		parityGame				= new GrapherItem("Parity Game",defaultFont,"");
 		load					= new GrapherItem("Load Session",defaultFont,"open.png");
-		loadImport				= new GrapherItem("Import graph (*.gm)",defaultFont,"open.png");
+		loadGame				= new GrapherItem("Import Game (gm)",defaultFont,"open.png");
 		save					= new GrapherItem("Save Session",defaultFont,"save.png");
 		saveAs					= new GrapherItem("Save Session as ...",defaultFont,"saveas.png");
-		print					= new GrapherItem("Export as PNG",defaultFont,"print.png");
+		exportPNG				= new GrapherItem("Export as Image PNG",defaultFont,"print.png");
+		exportSVG				= new GrapherItem("Export as Drawing SVG",defaultFont,"print.png");
+		exportPDF				= new GrapherItem("Export as Document PDF",defaultFont,"print.png");
 		simulate				= new GrapherItem("Simulate",defaultFont,"simulate.png");
 		help					= new GrapherItem("Help",defaultFont,"help.png");
 		
@@ -115,11 +119,13 @@ public class MenuOptions extends JPopupMenu{
 		grapherMenu.add(restart);
 		grapherMenu.add(template);
 		grapherMenu.add(load);
-		grapherMenu.add(loadImport);
+		grapherMenu.add(loadGame);
 		grapherMenu.add(save);
 		grapherMenu.add(saveAs);
 		grapherMenu.addSeparator();
-		grapherMenu.add(print);
+		grapherMenu.add(exportPNG);
+		grapherMenu.add(exportSVG);
+		grapherMenu.add(exportPDF);
 		grapherMenu.addSeparator();
 		// grapherMenu.add(simulate);
 		grapherMenu.add(help);
@@ -376,35 +382,49 @@ public class MenuOptions extends JPopupMenu{
 
 		load.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
-				main.currentSession.board.load("");
+				// main.currentSession.board.load("");
+				main.persistence.loadSession("",false);
 			}
 		});
 
-		loadImport.addActionListener(new ActionListener(){
+		loadGame.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
-				main.currentSession.board.loadImport();
+				main.persistence.importGame();
 			}
 		});
 
 		save.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
-				main.currentSession.board.save(false);
+				main.persistence.saveSession(false,null);
+				// main.currentSession.board.save(false);
 			}
 		});
 		
 		saveAs.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
-				main.currentSession.board.save(true);
+				main.persistence.saveSession(true,null);
+				// main.currentSession.board.save(true);
 			}
 		});
 		
-		print.addActionListener(new ActionListener(){
+		exportPNG.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
-				// main.currentSession.board.print();
-				main.currentSession.board.screenshot(getGraphics());
+				main.persistence.exportPNG();
 			}
 		});
 		
+		exportPDF.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				main.persistence.exportPDF();
+			}
+		});
+
+		exportSVG.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				main.persistence.exportSVG();
+			}
+		});
+
 		simulate.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
 				main.openCompiler(main.currentSession.board);

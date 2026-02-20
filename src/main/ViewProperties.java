@@ -15,7 +15,6 @@ public class ViewProperties extends JPanel{
 	protected	GrapherMain		main;
 	protected	ViewGeneral		generalView;
 	protected	ViewTypes		typesView;
-	// protected	ViewPrint		printView;
 	protected	ViewElements	elementsView;
 	protected	ViewDictionary	dictionaryView;
 	protected	int				selectedTab;
@@ -35,7 +34,6 @@ public class ViewProperties extends JPanel{
 		tab				= new JTabbedPane();
 		generalView		= new ViewGeneral(main);
 		typesView		= new ViewTypes(main);
-		// printView		= new ViewPrint(main);
 		elementsView	= new ViewElements(main);
 		dictionaryView	= new ViewDictionary(main);
 		add(tab,"Center");
@@ -54,13 +52,11 @@ public class ViewProperties extends JPanel{
 			int aux = selectedTab;
 			tab.addTab("General",generalView);
 			tab.addTab("Types",typesView);
-			// tab.addTab("Printing",printView);
 			tab.addTab("Elements",elementsView);
 			tab.addTab("Dictionary",dictionaryView);
 			selectedTab = aux;
 			generalView.refresh();
 			typesView.refresh();
-			// printView.refresh();
 			elementsView.refresh();
 			dictionaryView.refresh();
 			tab.setSelectedIndex(selectedTab);

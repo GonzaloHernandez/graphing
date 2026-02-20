@@ -11,85 +11,72 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.border.Border;
 
-public class MessageBox extends JDialog{
+public class GrapherDialog extends JDialog{
 
-	private	String	message;
+	private	JPanel	panelControls;
 	private	String	buttons;
 	
-	private	JLabel		info[];
 	private	JButton		controls[];
 	private	GrapherMain	main;
 	
-	public MessageBox(GrapherMain main,String message,String title,String buttons) {
+	public GrapherDialog(GrapherMain main,String title,JPanel panel,String buttons) {
 		super(main,true);
-		this.main		= main;
-		this.message	= message;
-		this.buttons	= buttons;
+		this.main			= main;
+		this.panelControls	= panel;
+		this.buttons		= buttons;
 		setTitle(title);
-		setSize(300,120);
+		// setSize(300,100);
 		initElements();
 		setResizable(false);
 		center();
+		pack();
 		setVisible(true);
 	}
 	
 	private void initElements(){
 		StringTokenizer s; 
 		String token;
-		int buttonsCount,labelsCount;
+		int buttonsCount;
 		
-		s = new StringTokenizer(message,"|");
-		for (labelsCount=0;s.hasMoreTokens();labelsCount++) s.nextToken();
 		s = new StringTokenizer(buttons,"|");
 		for (buttonsCount=0;s.hasMoreTokens();buttonsCount++) s.nextToken();
 		
 		controls	= new JButton[buttonsCount];
-		JPanel ps	= new JPanel(new GridLayout(labelsCount,1));
-		JPanel pb	= new JPanel(new GridLayout(1,buttonsCount));
-		
-		info		= new JLabel[labelsCount];
-		
-		s = new StringTokenizer(message,"|");
-		
-		for (int i=0;i<labelsCount;i++){
-			token = s.nextToken();
-			info[i] = new JLabel(token,JLabel.CENTER);
-			ps.add(info[i]);
-		}
+		JPanel panelButtons	= new JPanel(new GridLayout(1,buttonsCount));
 		
 		s = new StringTokenizer(buttons,"|");
 		
 		for (int i=0;i<buttonsCount;i++){
 			token = s.nextToken();
 			controls[i] = new JButton(token);
-			pb.add(controls[i]);
+			panelButtons.add(controls[i]);
 			controls[i].addActionListener(new ActionListener(){
 				public void actionPerformed(ActionEvent e){
-					main.dialogReturn  = ((JButton)e.getSource()).getText();
+					main.dialogReturn = ((JButton)e.getSource()).getText();;
 					dispose();
 				}
 			});
 		}
+		getRootPane().setDefaultButton(controls[0]);
+
+		Border marginControls = BorderFactory.createEmptyBorder(15,15,15,15);
+		panelControls.setBorder(marginControls);
 		
-		Border margin = BorderFactory.createEmptyBorder(10,10,10,10);
-		pb.setBorder(margin);
+		Border marginButtons = BorderFactory.createEmptyBorder(0,15,15,15);
+		panelButtons.setBorder(marginButtons);
 
 		Font defaultFont	= new Font("Cantarell",Font.PLAIN,11);
-		for (JLabel component : info) {
-			component.setFont(defaultFont);			
-		}
 		for (JButton component : controls) {
 			component.setFont(defaultFont);			
 		}
 		
-		add(ps,"Center");
-		add(pb,"South");
-		
+		add(panelControls,"Center");
+		add(panelButtons,"South");
+
 		KeyStroke escapeKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
         this.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
                           .put(escapeKeyStroke, "dispose");
@@ -98,7 +85,7 @@ public class MessageBox extends JDialog{
             public void actionPerformed(ActionEvent e) {
                 dispose();
             }
-        });	
+        });
 	}
 
 	private void center(){
@@ -107,4 +94,6 @@ public class MessageBox extends JDialog{
 		y = main.getY()+(main.getHeight()/2)-getHeight()/2;
 		setLocation(x,y);
 	}
+
+
 }

@@ -119,10 +119,6 @@ public class GrapherSession extends JInternalFrame{
 	//-------------------------------------------------------------------------------------
 	
 	public boolean save(){
-		if (board.compiler!=null){
-			main.messageBox("Simulation running, Do not close","Warning","Accept");
-			return false;
-		}
 		if (!modified) {
 			dispose();
 			return true;
@@ -135,7 +131,8 @@ public class GrapherSession extends JInternalFrame{
 				return true;
 			}
 			else if (messageReturn.equals("Yes")){
-				if (!board.save(false)) return false;
+				// if (!board.save(false)) return false;
+				if (main.persistence.saveSession(false, board)) return false;
 				dispose();
 				return true;
 			}

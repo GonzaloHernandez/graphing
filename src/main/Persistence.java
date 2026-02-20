@@ -1,10 +1,30 @@
 package main;
 
 import java.awt.Dimension;
+import java.awt.FileDialog;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.beans.PropertyVetoException;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.RandomAccessFile;
+import java.io.Writer;
+
+import javax.imageio.ImageIO;
+import javax.swing.JInternalFrame;
+import javax.swing.JMenuItem;
+
+import com.lowagie.text.Document;
+import com.lowagie.text.Rectangle;
+import com.lowagie.text.pdf.PdfContentByte;
+import com.lowagie.text.pdf.PdfWriter;
+
+import org.apache.batik.svggen.SVGGeneratorContext;
+import org.apache.batik.svggen.SVGGraphics2D;
 
 public class Persistence {
     protected GrapherMain main;
@@ -12,6 +32,121 @@ public class Persistence {
     public Persistence(GrapherMain main) {
         this.main = main;
     }
+
+
+	//-------------------------------------------------------------------------
+
+	public void saveGrapher() {
+		String fileName	= "graphing.cnf";
+		try {
+			RandomAccessFile file = new RandomAccessFile(new File(fileName), "rw");
+	        
+			file.writeUTF(main.curdir);
+			file.writeInt(main.recent.getItemCount());
+			
+			for (int i=0;i<main.recent.getItemCount();i++){
+				JMenuItem item = main.recent.getItem(i);
+				file.writeUTF(item.getText());
+			}
+			file.writeBoolean(main.showAbout);
+			file.writeShort(main.getLocation().x);
+			file.writeShort(main.getLocation().y);
+			file.writeShort(main.getSize().width);
+	        file.writeShort(main.getSize().height);
+	        file.close();
+	        
+	    } catch (IOException e) {
+	    	e.printStackTrace();
+	    }
+	}
+
+	//-------------------------------------------------------------------------
+
+	public void loadGrapher() {
+		String fileName	= "graphing.cnf";
+		try {
+			RandomAccessFile file = new RandomAccessFile(new File(fileName), "r");
+	        
+			main.curdir = file.readUTF();
+			int count = file.readInt();
+			
+			for (int i=0;i<count;i++){
+				main.addRecentSession(file.readUTF());
+			}
+	        
+			main.showAbout = file.readBoolean();
+			short	x	= file.readShort();
+			short	y	= file.readShort();
+			short	w	= file.readShort();
+			short	h	= file.readShort();
+			main.setLocation(x, y);
+			main.setSize(w,h);
+	        file.close();
+	        
+	    } catch (IOException e) {
+	    	System.out.println("Creating configuration (CNF) file.");
+	    }
+	}
+
+    //-------------------------------------------------------------------------
+
+    public boolean saveSession(boolean saveAs,Board pBoard) {
+        Board board = main.currentSession.board;
+        
+        if (pBoard==null) board = pBoard;
+
+		try {
+			if (saveAs || board.fileName.equals("")) {
+				FileDialog dialog = new FileDialog(main,"Select a file name",FileDialog.SAVE);
+
+				dialog.setFilenameFilter(new FilenameFilter() {
+					@Override
+					public boolean accept(java.io.File dir, String name) {
+						return name.endsWith(".aut");
+					}
+				});
+				dialog.setDirectory(main.curdir);
+				dialog.setFile("*.aut");
+
+				dialog.pack();
+				int x = main.getX() + 100;
+				int y = main.getY() + 100;
+				dialog.setLocation(x, y);
+
+				dialog.setVisible(true);
+				main.requestFocus();
+				if (dialog.getFile()==null) return false;
+				main.curdir = dialog.getDirectory();
+				board.fileName = main.curdir+dialog.getFile();
+			}
+			
+			JInternalFrame iframes[] =  main.desktop.getAllFrames();
+			for (int i=0;i<iframes.length;i++){
+				if (iframes[i].getClass().getName().equals("GrapherSession")){
+					GrapherSession	session = (GrapherSession)iframes[i];
+					if (session.equals(main.currentSession)) continue;
+					if (session.getName().equals(board.fileName)){
+						session.main.messageBox("Name invalid.|There exists a session opened with the same indentifier","Warning","Accept");
+						board.fileName = "";
+						return false;
+					}
+				}
+			}
+			
+			RandomAccessFile file = new RandomAccessFile(new File(board.fileName), "rw");
+			save(file);
+	        if (board.settings.exportAuto) main.persistence.export();
+			file.close();
+
+			main.currentSession.setTitle(board.fileName.substring(main.curdir.length()));
+	        main.currentSession.setName(board.fileName);
+			main.currentSession.setModified(false);
+		} catch (IOException e) {
+			e.printStackTrace();
+	    }
+		return true;
+    }
+
 
     //-------------------------------------------------------------------------
 
@@ -119,6 +254,91 @@ public class Persistence {
         
         // End of file
         file.setLength(file.getFilePointer());
+    }
+
+    //-------------------------------------------------------------------------
+
+    public void loadSession(String fileName,boolean newSession){
+        if (main.currentSession != null && !newSession &&
+            main.currentSession.isModified()) 
+        {
+            String messageReturn = main.messageBox(
+                        "This session was no saved.|Do you want to close anyway?",
+                        "Warning","Yes|No");
+            if (messageReturn.equals("No")||messageReturn.equals("")) return;
+        }
+
+        // --- Get file name ---
+        if (fileName.equals("")) {
+			FileDialog dialog = new FileDialog(main,"Select a file",FileDialog.LOAD);
+			
+			dialog.setFilenameFilter(new FilenameFilter() {
+				@Override
+				public boolean accept(java.io.File dir, String name) {
+					return name.toLowerCase().endsWith(".aut");
+				}
+			});
+
+			dialog.setDirectory(main.curdir);
+			dialog.setFile("*.aut");
+			dialog.setVisible(true);
+			main.requestFocus();		
+			if (dialog.getFile()==null) return;
+			main.curdir = dialog.getDirectory();
+			fileName = main.curdir+dialog.getFile();
+		}
+
+        // --- Check if is already oppened ---
+		JInternalFrame[] iframes = main.desktop.getAllFrames();
+		for (int i=0;i<iframes.length;i++){
+			if (iframes[i].getClass().getName().equals("main.GrapherSession")){
+				GrapherSession	session = (GrapherSession)iframes[i];
+				if (session.getName() != null && session.getName().equals(fileName)){
+					try {
+						session.setSelected(true);
+					} catch (PropertyVetoException e) {
+						main.messageBox("This session is alredy opened.","Warning","Accept");
+					}
+					return;
+				}
+			}
+		}
+
+        if (main.currentSession == null || newSession) main.addSession();
+
+		try {
+	        RandomAccessFile file = new RandomAccessFile(new File(fileName), "r");
+
+	        if (	file.readShort()	!= 7 ||
+	        		file.readShort()	!= 4 ||
+	        		!file.readUTF().equals("GRAPHER")	) {
+	        	file.close();
+	        	main.currentSession.dispose();
+	        	main.messageBox("Invalid file","Warning","Accept");
+	        	return;
+	        }
+	        
+	        int family	= file.readShort();
+	        int version	= file.readShort();
+
+			if (family <= 0 || version <= 2) {
+				load_1_2(file);
+			} else {
+				load(file);
+			}
+
+			file.close();
+			main.currentSession.repaint();
+
+			main.currentSession.setTitle(fileName.substring(main.curdir.length()));
+			main.currentSession.setName(fileName);
+			main.addRecentSession(fileName);
+			main.properties.refresh();
+			main.currentSession.setModified(false);
+			main.currentSession.board.fileName = fileName;
+		} catch (IOException e) {
+	    	main.messageBox("The file ["+fileName+"] does not exists","File error","Accept");
+	    }        
     }
 
     //-------------------------------------------------------------------------
@@ -271,10 +491,150 @@ public class Persistence {
 
     //-------------------------------------------------------------------------
 
-	//-------------------------------------------------------------------------------------
+    public void exportPNG() {
+        try {
+			FileDialog dialog = new FileDialog(main,"Select a file name",FileDialog.SAVE);
 
-	public boolean loadImport(String fileName){
-		try {
+			dialog.setFilenameFilter(new FilenameFilter() {
+				@Override
+				public boolean accept(java.io.File dir, String name) {
+					return name.endsWith(".png");
+				}
+			});
+			dialog.setDirectory(main.curdir);
+			dialog.setFile("*.png");
+			dialog.setVisible(true);
+			main.requestFocus();            
+			if (dialog.getFile()==null) return;
+            Board board = main.currentSession.board;
+
+            int width	= (int)(board.getWidth() * Math.max(board.scaleFactor,2));
+            int height	= (int)(board.getHeight() * Math.max(board.scaleFactor,2));
+
+            BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+            
+            Graphics2D g2 = image.createGraphics();
+            g2.scale(Math.max(board.scaleFactor,2),Math.max(board.scaleFactor,2));
+            board.paint(g2);
+            g2.dispose();
+
+			String pngFileName = dialog.getDirectory()+dialog.getFile();
+			ImageIO.write(image, "png", new File(pngFileName));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }		
+    }
+
+    //-------------------------------------------------------------------------
+
+    public void exportSVG() {
+        try {
+			FileDialog dialog = new FileDialog(main,"Select a file name",FileDialog.SAVE);
+
+			dialog.setFilenameFilter(new FilenameFilter() {
+				@Override
+				public boolean accept(java.io.File dir, String name) {
+					return name.endsWith(".svg");
+				}
+			});
+			dialog.setDirectory(main.curdir);
+			dialog.setFile("*.svg");
+			dialog.setVisible(true);
+			main.requestFocus();
+			if (dialog.getFile()==null) return;
+            String svgFileName = dialog.getDirectory()+dialog.getFile();
+
+            Board board = main.currentSession.board;
+            org.apache.batik.dom.GenericDOMImplementation domImpl = 
+                (org.apache.batik.dom.GenericDOMImplementation) org.apache.batik.dom.GenericDOMImplementation.getDOMImplementation();
+            
+            String svgNS = "http://www.w3.org/2000/svg";
+            org.w3c.dom.Document mySvgDoc = domImpl.createDocument(svgNS, "svg", null);
+
+            SVGGraphics2D svgGenerator = new SVGGraphics2D(mySvgDoc);
+            SVGGeneratorContext ctx = svgGenerator.getGeneratorContext();
+            ctx.setEmbeddedFontsOn(true); 
+            ctx.setComment("Generated by MyGrapher");
+
+            board.paint(svgGenerator);
+
+            boolean useCSS = true;
+            try (Writer out = new OutputStreamWriter(new FileOutputStream(svgFileName), "UTF-8")) {
+                svgGenerator.stream(out, useCSS);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+    }
+
+    //-------------------------------------------------------------------------
+
+    public void exportPDF() {
+        try {
+			FileDialog dialog = new FileDialog(main,"Select a file name",FileDialog.SAVE);
+
+			dialog.setFilenameFilter(new FilenameFilter() {
+				@Override
+				public boolean accept(java.io.File dir, String name) {
+					return name.endsWith(".pdf");
+				}
+			});
+			dialog.setDirectory(main.curdir);
+			dialog.setFile("*.pdf");
+			dialog.setVisible(true);
+			main.requestFocus();
+			if (dialog.getFile()==null) return;
+
+            Board board = main.currentSession.board;
+            int width = board.getWidth();
+            int height = board.getHeight();
+            
+            Document document = new Document(new Rectangle(width, height));
+			String pdfFileName = dialog.getDirectory()+dialog.getFile();
+
+            PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(pdfFileName));
+            document.open();
+            PdfContentByte cb = writer.getDirectContent();
+            Graphics2D g2 = cb.createGraphics(width, height);
+
+            board.paint(g2);
+            g2.dispose();
+            document.close();
+            
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    //-------------------------------------------------------------------------
+
+	public boolean importGame(){
+        if (main.currentSession == null) {
+            main.addSession();
+        }
+		if (main.currentSession.isModified()) {
+			String messageReturn = main.messageBox("This session was no saved.|Do you want to close anyway?","Warning","Yes|No");
+			if (messageReturn.equals("No")||messageReturn.equals("")) return false;
+		}
+		FileDialog dialog = new FileDialog(main,"Select a file",FileDialog.LOAD);
+        
+		dialog.setFilenameFilter(new FilenameFilter() {
+            @Override
+            public boolean accept(java.io.File dir, String name) {
+                return name.toLowerCase().endsWith(".gm");
+            }
+        });
+
+		dialog.setDirectory(main.curdir);
+		dialog.setFile("*.gm");
+		dialog.setVisible(true);
+		main.requestFocus();
+		if (dialog.getFile()==null) return false;
+
+        String fileName = dialog.getDirectory()+dialog.getFile();
+
+        try {
 	        RandomAccessFile file = new RandomAccessFile(new File(fileName), "r");
 	        
             Board board = main.currentSession.board;
