@@ -15,8 +15,8 @@ public class ViewProperties extends JPanel{
 	protected	GrapherMain		main;
 	protected	ViewGeneral		generalView;
 	protected	ViewTypes		typesView;
-	protected	ViewElements	elementsView;
-	protected	ViewDictionary	dictionaryView;
+	protected	ViewStock		stockView;
+	protected	ViewLexicon		lexiconView;
 	protected	int				selectedTab;
 	
 	//--------------------------------------------------------------------------
@@ -31,11 +31,11 @@ public class ViewProperties extends JPanel{
 
 	private void initElements(){
 		setLayout(new BorderLayout());
-		tab				= new JTabbedPane();
-		generalView		= new ViewGeneral(main);
-		typesView		= new ViewTypes(main);
-		elementsView	= new ViewElements(main);
-		dictionaryView	= new ViewDictionary(main);
+		tab			= new JTabbedPane();
+		generalView	= new ViewGeneral(main);
+		typesView	= new ViewTypes(main);
+		stockView	= new ViewStock(main);
+		lexiconView	= new ViewLexicon(main);
 		add(tab,"Center");
 		
 		Font currentFont	= UIManager.getFont("Label.font");
@@ -52,13 +52,13 @@ public class ViewProperties extends JPanel{
 			int aux = selectedTab;
 			tab.addTab("General",generalView);
 			tab.addTab("Types",typesView);
-			tab.addTab("Elements",elementsView);
-			tab.addTab("Dictionary",dictionaryView);
+			tab.addTab("Lexicon",lexiconView);
+			tab.addTab("Stock",stockView);
 			selectedTab = aux;
 			generalView.refresh();
 			typesView.refresh();
-			elementsView.refresh();
-			dictionaryView.refresh();
+			stockView.refresh();
+			lexiconView.refresh();
 			tab.setSelectedIndex(selectedTab);
 		}
 		else {

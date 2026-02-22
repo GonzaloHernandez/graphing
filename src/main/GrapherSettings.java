@@ -1,6 +1,6 @@
 package main;
 
-class Dictionary {
+class Lexicon {
 	public String graph,		_graph;
 	public String vertex,		_vertex;
 	public String vertexType,	_vertexType;
@@ -13,7 +13,7 @@ class Dictionary {
 
 	public String[] words;
 
-	public Dictionary(){
+	public Lexicon(){
 		this.graph			= "graph";	this._graph			= "g";
 
 		this.vertex			= "vertex";	this._vertex		= "v";
@@ -77,7 +77,7 @@ public class GrapherSettings {
 	protected	boolean exportAuto;
 	protected	int		exportType;
 
-	protected	Dictionary dictionary;
+	protected	Lexicon lexicon;
 
 	//---------------------------------------------------------------------------
 	
@@ -103,7 +103,7 @@ public class GrapherSettings {
 		this.gridScale			= 15;
 		this.exportAuto			= false;
 		this.exportType			= 0;
-		this.dictionary			= new Dictionary();
+		this.lexicon			= new Lexicon();
 	}
 
 }

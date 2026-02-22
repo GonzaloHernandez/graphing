@@ -87,28 +87,28 @@ public class ViewGeneral extends JPanel {
 		panelVertex.add(showVSeq = new JCheckBox("Sequence"));
 
 		JPanel temp1 = new JPanel(new BorderLayout());
-		temp1.add(showVVal = new JCheckBox("Value ≠ "),BorderLayout.WEST);
+		temp1.add(showVVal = new JCheckBox("Value≠"),BorderLayout.WEST);
 		temp1.add(showVValDiff = new JTextField(2));
 		panelVertex.add(temp1);
 
 		panelVertex.add(showVTyp = new JCheckBox("Type"));
 
 		JPanel temp2 = new JPanel(new BorderLayout());
-		temp2.add(showVLab = new JCheckBox("Label ≠ "),BorderLayout.WEST);
+		temp2.add(showVLab = new JCheckBox("Label≠"),BorderLayout.WEST);
 		temp2.add(showVLabDiff = new JTextField(2));
 		panelVertex.add(temp2);
 		
 		panelEdge.add(showESeq	= new JCheckBox("Sequence"));
 
 		JPanel temp3 = new JPanel(new BorderLayout());
-		temp3.add(showEVal = new JCheckBox("Value ≠ "),BorderLayout.WEST);
+		temp3.add(showEVal = new JCheckBox("Value≠"),BorderLayout.WEST);
 		temp3.add(showEValDiff = new JTextField(2));
 		panelEdge.add(temp3);
 
 		panelEdge.add(showETyp	= new JCheckBox("Type"));
 
 		JPanel temp4 = new JPanel(new BorderLayout());
-		temp4.add(showELab = new JCheckBox("Label ≠ "),BorderLayout.WEST);
+		temp4.add(showELab = new JCheckBox("Label≠"),BorderLayout.WEST);
 		temp4.add(showELabDiff = new JTextField(2));
 		panelEdge.add(temp4);
 
@@ -433,20 +433,20 @@ public class ViewGeneral extends JPanel {
 		exportAuto.setSelected(settings.exportAuto);
 		comment.setText(settings.comment);
 		exportType.setSelectedIndex(settings.exportType);
-		Dictionary dict = main.currentSession.board.settings.dictionary;
+		Lexicon lex = main.currentSession.board.settings.lexicon;
 
-		vertexTitle.setTitle("Show at "+Dictionary.capitalize(dict.vertex));
-		edgeTitle.setTitle("Show at "+Dictionary.capitalize(dict.edge));
+		vertexTitle.setTitle("Show at "+Lexicon.capitalize(lex.vertex));
+		edgeTitle.setTitle("Show at "+Lexicon.capitalize(lex.edge));
 		showVSeq.setText("Sequence");
-		showVVal.setText(Dictionary.capitalize(""+dict.vertexValue)+" ≠ ");
-		showVTyp.setText(Dictionary.capitalize(""+dict.vertexType));
-		showVLab.setText(Dictionary.capitalize(""+dict.vertexLabel)+" ≠ ");
+		showVVal.setText(Lexicon.capitalize(""+lex.vertexValue)+"≠");
+		showVTyp.setText(Lexicon.capitalize(""+lex.vertexType));
+		showVLab.setText(Lexicon.capitalize(""+lex.vertexLabel)+"≠");
 		showESeq.setText("Sequence");
-		showEVal.setText(Dictionary.capitalize(""+dict.edgeValue)+" ≠ ");
-		showETyp.setText(Dictionary.capitalize(""+dict.edgeType));
-		showELab.setText(Dictionary.capitalize(""+dict.edgeLabel+" ≠ "));
+		showEVal.setText(Lexicon.capitalize(""+lex.edgeValue)+"≠");
+		showETyp.setText(Lexicon.capitalize(""+lex.edgeType));
+		showELab.setText(Lexicon.capitalize(""+lex.edgeLabel+"≠"));
 
-		allowFirstState.setText("Allow first "+dict.vertex);
+		allowFirstState.setText("Allow first "+lex.vertex);
 	}
 
 }

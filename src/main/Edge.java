@@ -273,11 +273,11 @@ public class Edge {
 		}
 		
 		if (settings.showEdgeSequence) {
-			Dictionary dict = settings.dictionary;
+			Lexicon lex = settings.lexicon;
 
 			g.setColor(Color.BLUE);
 			g.setFont(new Font("Arial",Font.ITALIC,9));
-			g.drawString(dict._edge,text.x-(l*5/2),text.y+5);
+			g.drawString(lex._edge,text.x-(l*5/2),text.y+5);
 
 			if (!tag.isEmpty()) {
 				seq += ":";

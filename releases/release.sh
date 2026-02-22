@@ -3,7 +3,7 @@
 # Define versioning variables
 FAMILY=1
 VERSION=3
-CONSTRUCTION=1
+CONSTRUCTION=2
 
 # File paths
 JAVA_FILE="src/main/GrapherMain.java"
@@ -58,57 +58,10 @@ echo "---------------------------------------"
 echo ":: Build Success: $OUTPUT_FILE"
 echo ":: Documentation updated in $README_FILE"
 
-
 # # ===============================================================================
-# Check:
-# - Save function
-
-
-# #!/bin/bash
-
-# # Define versioning variables
-# FAMILY=1
-# VERSION=3
-# CONSTRUCTION=1
-
-# # File paths
-# JAVA_FILE="src/main/GrapherMain.java"
-# RELEASES_DIR="releases"
-# README_FILE="README.md"
-# LIB_DIR="libraries"
-# FLATLAF_JAR="$LIB_DIR/flatlaf-3.4.jar"
-# OUTPUT_FILE="$RELEASES_DIR/Graphing-v$FAMILY.$VERSION.$CONSTRUCTION.jar"
-# JAR_NAME="Graphing-v$FAMILY.$VERSION.$CONSTRUCTION.jar"
-
-# # Step 1: Remove previous releases matching the naming pattern
-# echo "::Removing previous releases..."
-# find "$RELEASES_DIR" -name "Graphing-*.jar" -type f -exec rm {} \;
-
-# # Step 2: Update the Java file with the new version numbers
-# sed -i "s/\(final int\s*family\s*=\s*\)[0-9]\+;/\1$FAMILY;/" "$JAVA_FILE"
-# sed -i "s/\(final int\s*version\s*=\s*\)[0-9]\+;/\1$VERSION;/" "$JAVA_FILE"
-# sed -i "s/\(final int\s*construction\s*=\s*\)[0-9]\+;/\1$CONSTRUCTION;/" "$JAVA_FILE"
-
-# echo "::Updated $JAVA_FILE with family=$FAMILY, version=$VERSION, and construction=$CONSTRUCTION"
-
-# # Step 3: Build process
-# rm -r build 2>/dev/null
-
-# # javac -cp "$FLATLAF_JAR" --source-path src/ -d build src/main/*.java --release 9
-# javac -cp "$FLATLAF_JAR" -d build src/main/*.java --release 9
-# cp -r icons/ build/main/
-
-# cd build
-# jar xf ../libraries/flatlaf-3.4.jar
-# cd ../
-
-# cd build || exit
-# jar cfm "../$OUTPUT_FILE" ../releases/Manifest.txt *
-# cd ..
-
-# echo "::Build complete: $OUTPUT_FILE"
-
-# # Step 4: Update the README file with the new JAR file name
-# sed -i "s/Graphing-v[0-9]*\.[0-9]*\.[0-9]*\.jar/$JAR_NAME/" "$README_FILE"
-
-# echo "::Updated $README_FILE with the new JAR file name: $JAR_NAME"
+# (DONE) Several corrections in saving and loading files
+# (DONE) Editing of types
+# (DONE) Updating labels of menu
+# (DONE) Exporting to SVG and PNG
+# (DONE) More updating in Persistence module
+# (DONE) Current dir updated

@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.RandomAccessFile;
 import java.io.Writer;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import javax.imageio.ImageIO;
 import javax.swing.JInternalFrame;
@@ -91,9 +93,12 @@ public class Persistence {
     //-------------------------------------------------------------------------
 
     public boolean saveSession(boolean saveAs,Board pBoard) {
+        if (main.currentSession == null && pBoard == null) 
+            return false;
+
         Board board = main.currentSession.board;
-        
-        if (pBoard==null) board = pBoard;
+
+        if (pBoard!=null) board = pBoard;
 
 		try {
 			if (saveAs || board.fileName.equals("")) {
@@ -141,12 +146,12 @@ public class Persistence {
 			main.currentSession.setTitle(board.fileName.substring(main.curdir.length()));
 	        main.currentSession.setName(board.fileName);
 			main.currentSession.setModified(false);
+            return true;
 		} catch (IOException e) {
 			e.printStackTrace();
 	    }
 		return true;
     }
-
 
     //-------------------------------------------------------------------------
 
@@ -177,7 +182,7 @@ public class Persistence {
         }
 
         // Write dictionary
-        Dictionary d = board.settings.dictionary;
+        Lexicon d = board.settings.lexicon;
         file.writeUTF   (d.graph);
         file.writeUTF   (d.vertex);
         file.writeUTF   (d.vertexValue);
@@ -330,8 +335,15 @@ public class Persistence {
 			file.close();
 			main.currentSession.repaint();
 
-			main.currentSession.setTitle(fileName.substring(main.curdir.length()));
+            Path fullName = Paths.get(fileName);
+            String path = fullName.getParent().toString();
+            String name = fullName.getFileName().toString();
+
+			// main.currentSession.setTitle(fileName.substring(main.curdir.length()));
+            
 			main.currentSession.setName(fileName);
+            main.currentSession.setTitle(name);
+            main.curdir = path;
 			main.addRecentSession(fileName);
 			main.properties.refresh();
 			main.currentSession.setModified(false);
@@ -372,7 +384,7 @@ public class Persistence {
         }
 
         // --- Reading Dictionary ---
-        Dictionary d = board.settings.dictionary;
+        Lexicon d = board.settings.lexicon;
         d.graph         = file.readUTF();
         d.vertex        = file.readUTF();
         d.vertexValue   = file.readUTF();
@@ -610,10 +622,7 @@ public class Persistence {
     //-------------------------------------------------------------------------
 
 	public boolean importGame(){
-        if (main.currentSession == null) {
-            main.addSession();
-        }
-		if (main.currentSession.isModified()) {
+		if (main.currentSession!= null && main.currentSession.isModified()) {
 			String messageReturn = main.messageBox("This session was no saved.|Do you want to close anyway?","Warning","Yes|No");
 			if (messageReturn.equals("No")||messageReturn.equals("")) return false;
 		}
@@ -635,6 +644,8 @@ public class Persistence {
         String fileName = dialog.getDirectory()+dialog.getFile();
 
         try {
+            if (main.currentSession == null) main.addSession();
+
 	        RandomAccessFile file = new RandomAccessFile(new File(fileName), "r");
 	        
             Board board = main.currentSession.board;
@@ -783,7 +794,7 @@ public class Persistence {
         file.writeShort(settings.exportType);
         file.writeShort(settings.gridScale);
 
-        Dictionary dict = settings.dictionary;
+        Lexicon dict = settings.lexicon;
         
         file.writeUTF(dict.graph);
         file.writeUTF(dict._graph);
@@ -813,7 +824,6 @@ public class Persistence {
         Board board = main.currentSession.board;
 
         board.vertices.removeAllElements();
-        // board.vTypes.removeAllElements();
         board.eTypes.removeAllElements();
 
         n = file.readShort();
@@ -822,6 +832,7 @@ public class Persistence {
             name 	= file.readUTF();
             symbols	= file.readUTF();
             if (i==0) continue;
+            number--;
             board.eTypes.add(new Type(number,name,symbols));
         }
 
@@ -869,7 +880,7 @@ public class Persistence {
             if (numberType>=0) {
                 Type type = null;
                 for (int p=0;p<board.eTypes.size();p++){
-                    if (board.eTypes.elementAt(p).getId()==numberType) {
+                    if (board.eTypes.elementAt(p).getId()==(numberType-1)) {
                         type = board.eTypes.elementAt(p);
                         break;
                     }
@@ -903,7 +914,7 @@ public class Persistence {
         settings.exportType			= file.readShort();
         settings.gridScale			= file.readShort();
 
-        Dictionary dict = settings.dictionary;
+        Lexicon dict = settings.lexicon;
         dict.graph			= file.readUTF();
         dict._graph			= file.readUTF();
         dict.vertex			= file.readUTF();

@@ -58,9 +58,9 @@ public class MenuOptions extends JPopupMenu{
 	
 	private	GrapherMain		main;
 	private GrapherMenu		vertexTypes,edgeTypes;
-	private	GrapherItem		vertexDelete,vertexDeleteAllOutgoings,vertexAccepted;
+	private	GrapherItem		vertexDelete,vertexDeleteAllOuts,vertexAccepted;
 	private	GrapherItem		edgeDelete,edgeTune;
-	private	GrapherItem		restart,parityGame,load,loadGame,save,saveAs;
+	private	GrapherItem		restart,parityGame,load,importGame,save,saveAs;
 	private GrapherItem		exportPNG,exportPDF,exportSVG,simulate,help;
 
 	
@@ -75,41 +75,41 @@ public class MenuOptions extends JPopupMenu{
 	//-------------------------------------------------------------------------------------
 
 	private void initElements(){
-		Font currentFont		= UIManager.getFont("Label.font");
-		Font defaultFont		= new Font(currentFont.getName(),Font.PLAIN,currentFont.getSize());
+		Font currentFont	= UIManager.getFont("Label.font");
+		Font defaultFont	= new Font(currentFont.getName(),Font.PLAIN,currentFont.getSize());
 
-		vertexMenu				= new GrapherMenu("Vertex",defaultFont,"state.png");
-		edgeMenu				= new GrapherMenu("Edge",defaultFont,"connection.png");
-		grapherMenu				= new GrapherMenu("Grapher",defaultFont,"application.png");
-		template				= new GrapherMenu("Use Template",defaultFont,"credits.png");
+		vertexMenu			= new GrapherMenu("Vertex",defaultFont,"state.png");
+		edgeMenu			= new GrapherMenu("Edge",defaultFont,"connection.png");
+		grapherMenu			= new GrapherMenu("Grapher",defaultFont,"application.png");
+		template			= new GrapherMenu("Use Template",defaultFont,"credits.png");
 				
-		vertexDelete			= new GrapherItem("Delete Vertex",defaultFont,"delete_state.png");
-		vertexDeleteAllOutgoings= new GrapherItem("Delete all Outgoing Edges",defaultFont,"delete_connection.png");
-		vertexAccepted			= new GrapherItem("Set as Final State",defaultFont,"accepted_state.png");
-		vertexTypes				= new GrapherMenu("Set Type",defaultFont,"owner.png");
+		vertexDelete		= new GrapherItem("Delete Vertex",defaultFont,"delete_state.png");
+		vertexDeleteAllOuts	= new GrapherItem("Delete all Outgoing Edges",defaultFont,"delete_connection.png");
+		vertexAccepted		= new GrapherItem("Set as Final State",defaultFont,"accepted_state.png");
+		vertexTypes			= new GrapherMenu("Set Type",defaultFont,"owner.png");
 		
-		edgeDelete				= new GrapherItem("Delete Edge",defaultFont,"delete_connection.png");
-		edgeTune				= new GrapherItem("Tuning the edge",defaultFont,"tune_connection.png");
-		edgeTypes				= new GrapherMenu("Set type",defaultFont,"type_connection.png");
+		edgeDelete			= new GrapherItem("Delete Edge",defaultFont,"delete_connection.png");
+		edgeTune			= new GrapherItem("Tuning the edge",defaultFont,"tune_connection.png");
+		edgeTypes			= new GrapherMenu("Set type",defaultFont,"type_connection.png");
 
-		restart					= new GrapherItem("Restar Session",defaultFont,"new.png");
-		parityGame				= new GrapherItem("Parity Game",defaultFont,"");
-		load					= new GrapherItem("Load Session",defaultFont,"open.png");
-		loadGame				= new GrapherItem("Import Game (gm)",defaultFont,"open.png");
-		save					= new GrapherItem("Save Session",defaultFont,"save.png");
-		saveAs					= new GrapherItem("Save Session as ...",defaultFont,"saveas.png");
-		exportPNG				= new GrapherItem("Export as Image PNG",defaultFont,"print.png");
-		exportSVG				= new GrapherItem("Export as Drawing SVG",defaultFont,"print.png");
-		exportPDF				= new GrapherItem("Export as Document PDF",defaultFont,"print.png");
-		simulate				= new GrapherItem("Simulate",defaultFont,"simulate.png");
-		help					= new GrapherItem("Help",defaultFont,"help.png");
+		restart				= new GrapherItem("Restar Session",defaultFont,"new.png");
+		parityGame			= new GrapherItem("Parity Game",defaultFont,"");
+		load				= new GrapherItem("Load Session",defaultFont,"open.png");
+		importGame			= new GrapherItem("Import Game (GM)",defaultFont,"open.png");
+		save				= new GrapherItem("Save Session",defaultFont,"save.png");
+		saveAs				= new GrapherItem("Save Session as ...",defaultFont,"saveas.png");
+		exportPNG			= new GrapherItem("Export as Image PNG",defaultFont,"print.png");
+		exportSVG			= new GrapherItem("Export as Drawing SVG",defaultFont,"print.png");
+		exportPDF			= new GrapherItem("Export as Document PDF",defaultFont,"print.png");
+		simulate			= new GrapherItem("Simulate",defaultFont,"simulate.png");
+		help				= new GrapherItem("Help",defaultFont,"help.png");
 		
 		add(vertexMenu);
 		add(edgeMenu);
 		add(grapherMenu);
 		
 		vertexMenu.add(vertexDelete);
-		vertexMenu.add(vertexDeleteAllOutgoings);
+		vertexMenu.add(vertexDeleteAllOuts);
 		vertexMenu.add(vertexAccepted);
 		vertexMenu.add(vertexTypes);
 		edgeMenu.add(edgeDelete);
@@ -119,9 +119,10 @@ public class MenuOptions extends JPopupMenu{
 		grapherMenu.add(restart);
 		grapherMenu.add(template);
 		grapherMenu.add(load);
-		grapherMenu.add(loadGame);
 		grapherMenu.add(save);
 		grapherMenu.add(saveAs);
+		grapherMenu.addSeparator();
+		grapherMenu.add(importGame);
 		grapherMenu.addSeparator();
 		grapherMenu.add(exportPNG);
 		grapherMenu.add(exportSVG);
@@ -270,7 +271,7 @@ public class MenuOptions extends JPopupMenu{
 			}
 		});
 		
-		vertexDeleteAllOutgoings.addActionListener(new ActionListener(){
+		vertexDeleteAllOuts.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
 				main.currentSession.board.vertexTarget.deleteAllEdges();
 				main.currentSession.setModified(true);
@@ -313,29 +314,33 @@ public class MenuOptions extends JPopupMenu{
 
 		parityGame.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ev) {
-				GrapherSettings sets = main.currentSession.board.settings;
-				sets.dictionary.graph		= "game";
-				sets.dictionary.vertex		= "vertex";
-				sets.dictionary.vertexValue	= "priors";
-				sets.dictionary.vertexType	= "owners";
-				sets.dictionary.vertexLabel	= "player";
-				sets.dictionary.edge		= "edge";
-				sets.dictionary.edgeValue	= "weights";
-				sets.dictionary._graph		= "g";
-				sets.dictionary._vertex		= "v";
-				sets.dictionary._vertexType	= "o";
-				sets.dictionary._vertexValue= "p";
-				sets.dictionary._edge		= "e";
-				sets.dictionary._edgeValue	= "w";
-				sets.showVertexSequence	= false;
-				sets.showVertexValue	= true;
-				sets.showVertexType		= true;
-				sets.showVertexLabel	= false;
-				sets.showEdgeSequence	= false;
-				sets.showEdgeValue		= false;
-				sets.showEdgeType		= false;
-				sets.showEdgeLabel		= false;
-				sets.exportType			= 1;
+				GrapherSettings s = main.currentSession.board.settings;
+				s.lexicon.graph			= "game";
+				s.lexicon.vertex		= "vertex";
+				s.lexicon.vertexValue	= "priors";
+				s.lexicon.vertexType	= "owners";
+				s.lexicon.vertexLabel	= "label";
+				s.lexicon.edge			= "edge";
+				s.lexicon.edgeValue		= "weights";
+				s.lexicon.edgeType		= "type";
+				s.lexicon.edgeLabel		= "label";
+				s.lexicon._graph		= "g";
+				s.lexicon._vertex		= "v";
+				s.lexicon._vertexType	= "o";
+				s.lexicon._vertexValue	= "p";
+				s.lexicon._edge			= "e";
+				s.lexicon._edgeValue	= "w";
+				s.lexicon._edgeType		= " ";
+				s.lexicon._edgeLabel	= " ";
+				s.showVertexSequence	= false;
+				s.showVertexValue		= true;
+				s.showVertexType		= true;
+				s.showVertexLabel		= false;
+				s.showEdgeSequence		= false;
+				s.showEdgeValue			= false;
+				s.showEdgeType			= false;
+				s.showEdgeLabel			= false;
+				s.exportType			= 1;
 
 				Vector<Type> vTypes = main.currentSession.board.vTypes;
 				if (vTypes.size()<=0) {
@@ -373,7 +378,7 @@ public class MenuOptions extends JPopupMenu{
 				}
 				eTypes.clear();
 
-				main.properties.dictionaryView.refresh();
+				main.properties.lexiconView.refresh();
 				main.properties.generalView.refresh();
 				main.properties.typesView.refresh();
 				main.currentSession.setModified(true);
@@ -382,12 +387,11 @@ public class MenuOptions extends JPopupMenu{
 
 		load.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
-				// main.currentSession.board.load("");
 				main.persistence.loadSession("",false);
 			}
 		});
 
-		loadGame.addActionListener(new ActionListener(){
+		importGame.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
 				main.persistence.importGame();
 			}
@@ -396,14 +400,12 @@ public class MenuOptions extends JPopupMenu{
 		save.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
 				main.persistence.saveSession(false,null);
-				// main.currentSession.board.save(false);
 			}
 		});
 		
 		saveAs.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
 				main.persistence.saveSession(true,null);
-				// main.currentSession.board.save(true);
 			}
 		});
 		

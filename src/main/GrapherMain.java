@@ -1,6 +1,5 @@
 package main;
 import java.awt.Desktop;
-import java.awt.FileDialog;
 import java.awt.Font;
 import java.awt.Image;
 import java.awt.Toolkit;
@@ -12,7 +11,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyVetoException;
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URI;
 
@@ -34,7 +32,7 @@ public class GrapherMain extends JFrame{
 	//-------------------------------------------------------------------------------------
 	final int	family			= 1;
 	final int	version			= 3;
-	final int	construction	= 1;
+	final int	construction	= 2;
 	
 	//-------------------------------------------------------------------------------------
 
@@ -43,8 +41,9 @@ public class GrapherMain extends JFrame{
 	
 	private	JSplitPane		split;
 	private	JMenuBar		menuBar;
-	private	JMenu			system,help,relatedTopics,samples;
-	private	JMenuItem		newSession,open,importGame,exit,contents,shortcuts,about,credits;
+	private	JMenu			file,help,relatedTopics,samples;
+	private	JMenuItem		newSession,openSession,saveSession,saveSessionAs,importGame;
+	private	JMenuItem		exit,contents,shortcuts,about,credits;
 	
 	protected	String			dialogReturn;
 	protected	MenuOptions		menuOptions;
@@ -82,11 +81,13 @@ public class GrapherMain extends JFrame{
 		
 		menuBar			= new JMenuBar();
 		desktop			= new JDesktopPane();
-		system			= new GrapherMenu("System",defaultFont,"system.png");
+		file			= new GrapherMenu("File",defaultFont,"system.png");
 		newSession		= new GrapherItem("New Session",defaultFont,"new.png");
-		open			= new GrapherItem("Open Session",defaultFont,"open.png");
-		importGame	= new GrapherItem("Import Graph",defaultFont,"open.png");
+		openSession		= new GrapherItem("Open Session",defaultFont,"open.png");
 		recent			= new GrapherMenu("Recent Sessions",defaultFont,"recent.png");
+		saveSession		= new GrapherItem("Save Session",defaultFont,"save.png");
+		saveSessionAs	= new GrapherItem("Save Session as ...",defaultFont,"saveas.png");
+		importGame		= new GrapherItem("Import Game (GM)",defaultFont,"open.png");
 		exit			= new GrapherItem("Exit",defaultFont,"exit.png");
 		
 		help			= new GrapherMenu("Help",defaultFont,"help.png");
@@ -103,14 +104,16 @@ public class GrapherMain extends JFrame{
 		currentSession	= null;
 		setJMenuBar(menuBar);
 		
-		menuBar.add(system);
-		system.add(newSession);
-		system.add(open);
-		system.add(importGame);
-		system.addSeparator();
-		system.add(recent);
-		system.addSeparator();
-		system.add(exit);
+		menuBar.add(file);
+		file.add(newSession);
+		file.add(openSession);
+		file.add(recent);
+		file.add(saveSession);
+		file.add(saveSessionAs);
+		file.addSeparator();
+		file.add(importGame);
+		file.addSeparator();
+		file.add(exit);
 		
 		menuBar.add(help);
 		help.add(contents);
@@ -156,14 +159,14 @@ public class GrapherMain extends JFrame{
 				}
 			}
 			public void windowActivated(WindowEvent e){
-				split.setDividerLocation(getWidth()-310);
+				split.setDividerLocation(getWidth()-320);
 			}
 		});
 		
 		addComponentListener(new ComponentListener(){
 
 			public void componentResized(ComponentEvent arg0) {
-				split.setDividerLocation(getWidth()-310);
+				split.setDividerLocation(getWidth()-320);
 			}
 
 			public void componentMoved(ComponentEvent arg0) {
@@ -183,12 +186,24 @@ public class GrapherMain extends JFrame{
 			}
 		});
 		
-		open.addActionListener(new ActionListener(){
+		openSession.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
 				persistence.loadSession("",true);
 			}
 		});
 		
+		saveSession.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				persistence.saveSession(false,null);
+			}
+		});
+
+		saveSessionAs.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				persistence.saveSession(true,null);
+			}
+		});
+
 		importGame.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
 				persistence.importGame();

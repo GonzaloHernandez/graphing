@@ -2,7 +2,6 @@ package main;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FileDialog;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
@@ -20,15 +19,10 @@ import java.awt.print.Paper;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.util.Vector;
 
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -146,7 +140,7 @@ public class Board extends JComponent implements Printable{
 		}
 
 		exportView();
-		session.main.properties.elementsView.refresh();
+		session.main.properties.stockView.refresh();
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -205,7 +199,11 @@ public class Board extends JComponent implements Printable{
 
 				if (e.isControlDown()){
 					if (e.getKeyCode() == KeyEvent.VK_S) {
-						session.main.persistence.saveSession(false,null);
+						if (e.isShiftDown()) {
+							session.main.persistence.saveSession(true,null);
+						} else {
+							session.main.persistence.saveSession(false,null);
+						}
 					}
 					else if (e.getKeyChar() == '+' || e.getKeyChar() == '=' || 
 							e.getKeyChar() == '*' || e.getKeyCode() == KeyEvent.VK_PLUS) {
@@ -222,11 +220,6 @@ public class Board extends JComponent implements Printable{
 						Dimension d = getPreferredSize();
 						session.manualResizing = true;
 						session.setSize((int)(d.width*scaleFactor)+session.deltaWidth,(int)(d.height*scaleFactor)+session.deltaHeight);
-					}
-				}
-				else if (e.isControlDown() && e.isShiftDown()) {
-					if (e.getKeyCode() == KeyEvent.VK_S) {
-						session.main.persistence.saveSession(true,null);
 					}
 				}
 
@@ -321,21 +314,21 @@ public class Board extends JComponent implements Printable{
 						panel.add(info,BorderLayout.WEST);
 						panel.add(data,BorderLayout.CENTER);
 						
-						String val = settings.dictionary.vertexValue;
-						String lab = settings.dictionary.vertexLabel;
-						String typ = settings.dictionary.vertexType;
+						String val = settings.lexicon.vertexValue;
+						String lab = settings.lexicon.vertexLabel;
+						String typ = settings.lexicon.vertexType;
 						
-						info.add(new JLabel(""+Dictionary.capitalize(val)+" "));
+						info.add(new JLabel(""+Lexicon.capitalize(val)+" "));
 						data.add(value);
-						info.add(new JLabel(""+Dictionary.capitalize(typ)+" "));
+						info.add(new JLabel(""+Lexicon.capitalize(typ)+" "));
 						data.add(type);
-						info.add(new JLabel(""+Dictionary.capitalize(lab)+" "));
+						info.add(new JLabel(""+Lexicon.capitalize(lab)+" "));
 						data.add(label);
 
 						panel.setPreferredSize(new Dimension(300, 100));
 
 						String title = "Properties for "+
-							Dictionary.capitalize(settings.dictionary.vertex);
+							Lexicon.capitalize(settings.lexicon.vertex);
 						String result = session.main.grapherDialog(title,panel,"Ok|Cancel");
 						if (result.equals("Ok")) {
 							try {
@@ -379,21 +372,21 @@ public class Board extends JComponent implements Printable{
 						panel.add(info,BorderLayout.WEST);
 						panel.add(data,BorderLayout.CENTER);
 						
-						String val = settings.dictionary.edgeValue;
-						String lab = settings.dictionary.edgeLabel;
-						String typ = settings.dictionary.edgeType;
+						String val = settings.lexicon.edgeValue;
+						String lab = settings.lexicon.edgeLabel;
+						String typ = settings.lexicon.edgeType;
 						
-						info.add(new JLabel(""+Dictionary.capitalize(val)+" "));
+						info.add(new JLabel(""+Lexicon.capitalize(val)+" "));
 						data.add(value);
-						info.add(new JLabel(""+Dictionary.capitalize(typ)+" "));
+						info.add(new JLabel(""+Lexicon.capitalize(typ)+" "));
 						data.add(type);
-						info.add(new JLabel(""+Dictionary.capitalize(lab)+" "));
+						info.add(new JLabel(""+Lexicon.capitalize(lab)+" "));
 						data.add(label);
 
 						panel.setPreferredSize(new Dimension(300, 100));
 
 						String title = "Properties for "+
-							Dictionary.capitalize(settings.dictionary.edge);
+							Lexicon.capitalize(settings.lexicon.edge);
 						String result = session.main.grapherDialog(title,panel,"Ok|Cancel");
 
 						if (result.equals("Ok")) {
@@ -568,150 +561,6 @@ public class Board extends JComponent implements Printable{
 
 	//-------------------------------------------------------------------------------------
 
-	// public void load(String fileName){
-	// 	if (fileName.equals("")) {
-	// 		if (session.isModified()) {
-	// 			String messageReturn = session.main.messageBox(
-	// 						"This session was no saved.|Do you want to close anyway?",
-	// 						"Warning","Yes|No");
-	// 			if (messageReturn.equals("No")||messageReturn.equals("")) return;
-	// 		}
-
-	// 		FileDialog dialog = new FileDialog(session.main,"Select a file",FileDialog.LOAD);
-			
-	// 		dialog.setFilenameFilter(new FilenameFilter() {
-	// 			@Override
-	// 			public boolean accept(java.io.File dir, String name) {
-	// 				return name.toLowerCase().endsWith(".aut");
-	// 			}
-	// 		});
-
-	// 		dialog.setDirectory(session.main.curdir);
-	// 		dialog.setFile("*.aut");
-	// 		dialog.setVisible(true);
-	// 		session.main.requestFocus();		
-	// 		if (dialog.getFile()==null) return;
-	// 		session.main.curdir = dialog.getDirectory();
-	// 		fileName = session.main.curdir+dialog.getFile();
-	// 	}
-
-	// 	try {
-	//         RandomAccessFile file = new RandomAccessFile(new File(fileName), "r");
-
-	//         if (	file.readShort()	!= 7 ||
-	//         		file.readShort()	!= 4 ||
-	//         		!file.readUTF().equals("GRAPHER")	) {
-	//         	file.close();
-	//         	session.dispose();
-	//         	session.main.messageBox("Invalid file","Warning","Accept");
-	//         	return;
-	//         }
-	        
-	//         int family	= file.readShort();
-	//         int version	= file.readShort();
-
-	// 		if (family <= 0 || version <= 2) {
-	// 			session.main.persistence.load_1_2(file);
-	// 		} else {
-	// 			session.main.persistence.load(file);
-	// 		}
-
-	// 		file.close();
-	// 		repaint();
-
-	// 		session.setTitle(fileName.substring(session.main.curdir.length()));
-	// 		session.setName(fileName);
-	// 		session.main.addRecentSession(fileName);
-	// 		session.main.properties.refresh();
-	// 		session.setModified(false);
-	// 		this.fileName = fileName;
-	// 	} catch (IOException e) {
-	//     	session.main.messageBox("The file ["+fileName+"] does not exists","File error","Accept");
-	//     }
-	// }
-
-	//-------------------------------------------------------------------------------------
-
-	// public void loadImport(){
-	// 	if (session.isModified()) {
-	// 		String messageReturn = session.main.messageBox("This session was no saved.|Do you want to close anyway?","Warning","Yes|No");
-	// 		if (messageReturn.equals("No")||messageReturn.equals("")) return;
-	// 	}
-	// 	FileDialog dialog = new FileDialog(session.main,"Select a file",FileDialog.LOAD);
-        
-	// 	dialog.setFilenameFilter(new FilenameFilter() {
-    //         @Override
-    //         public boolean accept(java.io.File dir, String name) {
-    //             return name.toLowerCase().endsWith(".gm");
-    //         }
-    //     });
-
-	// 	dialog.setDirectory(session.main.curdir);
-	// 	dialog.setFile("*.gm");
-	// 	dialog.setVisible(true);
-	// 	session.main.requestFocus();
-	// 	if (dialog.getFile()==null) return;
-
-	// 	session.main.persistence.loadImport(dialog.getDirectory()+dialog.getFile());
-	// }
-
-	//-------------------------------------------------------------------------------------
-
-	// public boolean save(boolean saveAs) {
-	// 	try {
-	// 		if (saveAs || fileName.equals("")) {
-	// 			FileDialog dialog = new FileDialog(session.main,"Select a file name",FileDialog.SAVE);
-
-	// 			dialog.setFilenameFilter(new FilenameFilter() {
-	// 				@Override
-	// 				public boolean accept(java.io.File dir, String name) {
-	// 					return name.endsWith(".aut");
-	// 				}
-	// 			});
-	// 			dialog.setDirectory(session.main.curdir);
-	// 			dialog.setFile("*.aut");
-
-	// 			dialog.pack();
-	// 			int x = session.main.getX() + 100;
-	// 			int y = session.main.getY() + 100;
-	// 			dialog.setLocation(x, y);
-
-	// 			dialog.setVisible(true);
-	// 			session.main.requestFocus();
-	// 			if (dialog.getFile()==null) return false;
-	// 			session.main.curdir = dialog.getDirectory();
-	// 			fileName = session.main.curdir+dialog.getFile();
-	// 		}
-			
-	// 		JInternalFrame iframes[] =  session.main.desktop.getAllFrames();
-	// 		for (int i=0;i<iframes.length;i++){
-	// 			if (iframes[i].getClass().getName().equals("GrapherSession")){
-	// 				GrapherSession	session = (GrapherSession)iframes[i];
-	// 				if (session.equals(this.session)) continue;
-	// 				if (session.getName().equals(fileName)){
-	// 					session.main.messageBox("Name invalid.|There exists a session opened with the same indentifier","Warning","Accept");
-	// 					fileName = "";
-	// 					return false;
-	// 				}
-	// 			}
-	// 		}
-			
-	// 		RandomAccessFile file = new RandomAccessFile(new File(fileName), "rw");
-	// 		session.main.persistence.save(file);
-	//         if (settings.exportAuto) session.main.persistence.export();
-	// 		file.close();
-
-	// 		session.setTitle(fileName.substring(session.main.curdir.length()));
-	//         session.setName(fileName);
-	// 		session.setModified(false);
-	// 	} catch (IOException e) {
-	// 		e.printStackTrace();
-	//     }
-	// 	return true;
-	// }
-
-	//-------------------------------------------------------------------------------------
-
 	public boolean exportView() {
 		if (session.main.currentSession == null) {
 			session.main.properties.generalView.export.setText(
@@ -732,8 +581,8 @@ public class Board extends JComponent implements Printable{
 			for (int i = 0; i < vertices.size(); i++) {
 				Vertex s = vertices.elementAt(i);
 				json.append("    { \"id\": ").append(i + first)
-					.append(", \""+settings.dictionary.vertexType+"\": ").append(s.getType())
-					.append(", \""+settings.dictionary.vertexValue+"\": ").append(s.getValue())
+					.append(", \""+settings.lexicon.vertexType+"\": ").append(s.getType())
+					.append(", \""+settings.lexicon.vertexValue+"\": ").append(s.getValue())
 					.append(" }");
 				if (i < vertices.size() - 1) json.append(",");
 				json.append("\n");
@@ -751,7 +600,7 @@ public class Board extends JComponent implements Printable{
 						.append(c.getSource().getNumber() + first)
 						.append(", \"target\": ")
 						.append(c.getTarget().getNumber() + first)
-						.append(", \""+settings.dictionary.edgeValue+"\": ")
+						.append(", \""+settings.lexicon.edgeValue+"\": ")
 						.append(c.getValue())
 						.append(" }");
 					firstEdge = false;
@@ -811,13 +660,13 @@ public class Board extends JComponent implements Printable{
 
 			session.main.properties.generalView.export.setText(
 				"nvertices = " + size + ";\n" +
-				settings.dictionary.vertexType + " = [" + vertexTypes + "];\n" +
-				settings.dictionary.vertexValue + " = [" + vertexValues + "];\n" +
+				settings.lexicon.vertexType + " = [" + vertexTypes + "];\n" +
+				settings.lexicon.vertexValue + " = [" + vertexValues + "];\n" +
 				"nedges = " + nConections + ";\n" +
 				"sources = [" + from + "];\n" +
 				"targets = [" + to + "];\n" +
-				settings.dictionary.edgeValue + " = [" + edgeValues + "];\n" +
-				settings.dictionary.edgeLabel + " = [" + edgeLabels + "];\n"
+				settings.lexicon.edgeValue + " = [" + edgeValues + "];\n" +
+				settings.lexicon.edgeLabel + " = [" + edgeLabels + "];\n"
 			);
 			return true;
 

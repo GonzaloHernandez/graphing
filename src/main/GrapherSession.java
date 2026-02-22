@@ -103,7 +103,9 @@ public class GrapherSession extends JInternalFrame{
 			@Override
 			public void componentResized(ComponentEvent e) {
 				if (!manualResizing) {
-					Dimension nd = new Dimension((int)(board.getWidth()/board.scaleFactor),(int)(board.getHeight()/board.scaleFactor));
+					Dimension nd = new Dimension(
+						(int)(board.getWidth()/board.scaleFactor),
+						(int)(board.getHeight()/board.scaleFactor));
 					board.setPreferredSize(new Dimension(nd.width, nd.height));
 				}
 				manualResizing = false;
@@ -125,14 +127,14 @@ public class GrapherSession extends JInternalFrame{
 		}
 		else {
 			String messageReturn;
-			messageReturn = main.messageBox("Session no saved.|Do you want to save it?","Warning","Yes|No Save|Cancel");
+			messageReturn = main.messageBox("Session ["+getTitle()+"] no saved.|Do you want to save it?",
+				"Warning","Yes|No Save|Cancel");
 			if (messageReturn.equals("No Save")){
 				dispose();
 				return true;
 			}
 			else if (messageReturn.equals("Yes")){
-				// if (!board.save(false)) return false;
-				if (main.persistence.saveSession(false, board)) return false;
+				if (!main.persistence.saveSession(false, board)) return false;
 				dispose();
 				return true;
 			}
