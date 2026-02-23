@@ -3,7 +3,7 @@
 # Define versioning variables
 FAMILY=1
 VERSION=3
-CONSTRUCTION=2
+CONSTRUCTION=3
 
 # File paths
 JAVA_FILE="src/main/GrapherMain.java"
@@ -59,9 +59,6 @@ echo ":: Build Success: $OUTPUT_FILE"
 echo ":: Documentation updated in $README_FILE"
 
 # # ===============================================================================
-# (DONE) Several corrections in saving and loading files
-# (DONE) Editing of types
-# (DONE) Updating labels of menu
-# (DONE) Exporting to SVG and PNG
-# (DONE) More updating in Persistence module
-# (DONE) Current dir updated
+# (DONE) Path from files fixed (currentDir)
+# (DONE) Improvement on SVG exporting
+

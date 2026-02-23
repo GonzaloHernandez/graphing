@@ -118,7 +118,9 @@ public class ViewTypes extends JPanel {
 
 			public Object getValueAt(int row, int column) {
 				switch(column) {
-					case 0: return row;
+					case 0: 
+						int id = types.elementAt(row).getId();
+						return id==row?""+row:""+row+"("+id+")";
 					case 1:	return types.elementAt(row).getName();
 					case 2: return types.elementAt(row).getDescription();		
 				}
