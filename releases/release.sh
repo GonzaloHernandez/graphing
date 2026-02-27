@@ -3,7 +3,7 @@
 # Define versioning variables
 FAMILY=1
 VERSION=3
-CONSTRUCTION=4 #(in progress)
+CONSTRUCTION=4
 
 # File paths
 JAVA_FILE="src/main/GrapherMain.java"
@@ -60,4 +60,5 @@ echo ":: Documentation updated in $README_FILE"
 
 # # ===============================================================================
 # (DONE) Correction on safeClosing windows.
+# (DONE) Fixing Templates
 

@@ -11,8 +11,6 @@ class Lexicon {
 	public String edgeType,		_edgeType;
 	public String edgeLabel,	_edgeLabel;
 
-	public String[] words;
-
 	public Lexicon(){
 		this.graph			= "graph";	this._graph			= "g";
 
@@ -25,13 +23,6 @@ class Lexicon {
 		this.edgeValue		= "cost";	this._edgeValue		= " ";
 		this.edgeType		= "type";	this._edgeType		= " ";
 		this.edgeLabel		= "label";	this._edgeLabel		= " ";
-
-		this.words = new String[]{graph,
-			vertex, vertexType, vertexValue, vertexLabel, 
-			edge, edgeValue, edgeType, edgeLabel,
-			_graph,
-			_vertex, _vertexType, _vertexValue, _vertexLabel, 
-			_edge, _edgeValue, _edgeType, _edgeLabel};
 	}
 
 	static public String capitalize(String input) {

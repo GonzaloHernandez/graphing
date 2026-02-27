@@ -841,7 +841,7 @@ public class Persistence {
     //-------------------------------------------------------------------------
 
 	public void load_1_2(RandomAccessFile file) throws IOException {
-        String result = main.messageBox("Importing file from version 1.2|Some 'types' can be affected.", "Warning", "Accept|Cancel");
+        String result = main.messageBox("Importing file from version 1.2|Some 'types' and exporting variables can be affected.", "Warning", "Accept|Cancel");
 
         if (result.equals("Cancel")) {
             return;

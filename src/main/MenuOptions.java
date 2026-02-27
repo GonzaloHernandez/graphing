@@ -61,7 +61,7 @@ public class MenuOptions extends JPopupMenu{
 	private	GrapherItem		vertexDelete,vertexDeleteAllOuts,vertexAccepted;
 	private	GrapherItem		edgeDelete,edgeTune;
 	private	GrapherItem		restart,load,importGame,save,saveAs;
-	private GrapherItem		parityGame,parityGameQ,sParityGame;
+	private GrapherItem		parityGame,parityGameQ,mdp,sParityGame;
 	private GrapherItem		exportPNG,exportPDF,exportSVG,simulate,help;
 
 	
@@ -106,6 +106,7 @@ public class MenuOptions extends JPopupMenu{
 		
 		parityGame			= new GrapherItem("Parity Game",defaultFont,"");
 		parityGameQ			= new GrapherItem("Parity Game + Quantitative conditions",defaultFont,"");
+		mdp					= new GrapherItem("Markov Decision Process",defaultFont,"");
 		sParityGame			= new GrapherItem("Stochastic Parity Games",defaultFont,"");
 
 		add(vertexMenu);
@@ -137,6 +138,7 @@ public class MenuOptions extends JPopupMenu{
 
 		template.add(parityGame);
 		template.add(parityGameQ);
+		template.add(mdp);
 		template.add(sParityGame);
 	}
 
@@ -421,10 +423,15 @@ public class MenuOptions extends JPopupMenu{
 				s.showVertexValue		= true;
 				s.showVertexType		= true;
 				s.showVertexLabel		= false;
+				s.showVertexValueDiff	= "";
+				s.showVertexLabelDiff	= "";
+
 				s.showEdgeSequence		= false;
 				s.showEdgeValue			= false;
 				s.showEdgeType			= false;
 				s.showEdgeLabel			= false;
+				s.showEdgeValueDiff		= "";
+				s.showEdgeLabelDiff		= "";
 				s.exportType			= 1;
 
 				Vector<Type> vTypes = main.currentSession.board.vTypes;
@@ -448,9 +455,7 @@ public class MenuOptions extends JPopupMenu{
 							v.setType(null);
 						}
 					}
-					for (int i=2;i<vTypes.size();i++) {
-						vTypes.remove(i);
-					}
+					while (vTypes.size()>2) vTypes.remove(2);
 				}
 
 				Vector<Type> eTypes = main.currentSession.board.eTypes;
@@ -494,10 +499,16 @@ public class MenuOptions extends JPopupMenu{
 				s.showVertexValue		= true;
 				s.showVertexType		= true;
 				s.showVertexLabel		= false;
+				s.showVertexValueDiff	= "";
+				s.showVertexLabelDiff	= "";
+				
 				s.showEdgeSequence		= false;
 				s.showEdgeValue			= true;
 				s.showEdgeType			= false;
 				s.showEdgeLabel			= false;
+				s.showEdgeValueDiff		= "";
+				s.showEdgeLabelDiff		= "";
+
 				s.exportType			= 1;
 
 				Vector<Type> vTypes = main.currentSession.board.vTypes;
@@ -521,9 +532,7 @@ public class MenuOptions extends JPopupMenu{
 							v.setType(null);
 						}
 					}
-					for (int i=2;i<vTypes.size();i++) {
-						vTypes.remove(i);
-					}
+					while (vTypes.size()>3) vTypes.remove(2);
 				}
 
 				Vector<Type> eTypes = main.currentSession.board.eTypes;
@@ -553,7 +562,7 @@ public class MenuOptions extends JPopupMenu{
 				s.lexicon.vertexLabel	= "Label";
 				s.lexicon.edge			= "edge";
 				s.lexicon.edgeValue		= "Weights";
-				s.lexicon.edgeType		= "Type";
+				s.lexicon.edgeType		= "Actions";
 				s.lexicon.edgeLabel		= "chances";
 				s.lexicon._graph		= "g";
 				s.lexicon._vertex		= "v";
@@ -561,16 +570,22 @@ public class MenuOptions extends JPopupMenu{
 				s.lexicon._vertexValue	= "p";
 				s.lexicon._edge			= "e";
 				s.lexicon._edgeValue	= "w";
-				s.lexicon._edgeType		= " ";
+				s.lexicon._edgeType		= "a";
 				s.lexicon._edgeLabel	= "c";
 				s.showVertexSequence	= false;
 				s.showVertexValue		= true;
 				s.showVertexType		= true;
 				s.showVertexLabel		= false;
+				s.showVertexValueDiff	= "-0";
+				s.showVertexLabelDiff	= "";	
+
 				s.showEdgeSequence		= false;
 				s.showEdgeValue			= false;
 				s.showEdgeType			= false;
 				s.showEdgeLabel			= true;
+				s.showEdgeValueDiff		= "";
+				s.showEdgeLabelDiff		= "1";
+				
 				s.exportType			= 1;
 
 				Vector<Type> vTypes = main.currentSession.board.vTypes;
@@ -589,10 +604,10 @@ public class MenuOptions extends JPopupMenu{
 				}
 
 				if (vTypes.size()<=2) {
-					vTypes.add(new Type(1,"Nature", "Diamond"));
+					vTypes.add(new Type(2,"Nature", "Diamond"));
 				} else {
-					vTypes.elementAt(1).setName("Nature");
-					vTypes.elementAt(1).setDescription("Diamond");
+					vTypes.elementAt(2).setName("Nature");
+					vTypes.elementAt(2).setDescription("Diamond");
 				}
 
 				if (vTypes.size()>=3) {
@@ -601,20 +616,8 @@ public class MenuOptions extends JPopupMenu{
 							v.setType(null);
 						}
 					}
-					for (int i=2;i<vTypes.size();i++) {
-						vTypes.remove(i);
-					}
+					while (vTypes.size()>3) vTypes.remove(3);
 				}
-
-				Vector<Type> eTypes = main.currentSession.board.eTypes;
-				for (Vertex v : main.currentSession.board.vertices) {
-					for (Edge e : v.getOuts()) {
-						if (e.getType() != null) {
-							e.setType(null);
-						}
-					}
-				}
-				eTypes.clear();
 
 				main.properties.lexiconView.refresh();
 				main.properties.generalView.refresh();
@@ -622,5 +625,80 @@ public class MenuOptions extends JPopupMenu{
 				main.currentSession.setModified(true);
 			}
 		});
+
+		mdp.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent ev) {
+				GrapherSettings s = main.currentSession.board.settings;
+				s.lexicon.graph			= "game";
+				s.lexicon.vertex		= "node";
+				s.lexicon.vertexValue	= "Value";
+				s.lexicon.vertexType	= "Type";
+				s.lexicon.vertexLabel	= "Label";
+				s.lexicon.edge			= "edge";
+				s.lexicon.edgeValue		= "reward";
+				s.lexicon.edgeType		= "actions";
+				s.lexicon.edgeLabel		= "chances";
+				s.lexicon._graph		= "g";
+				s.lexicon._vertex		= "n";
+				s.lexicon._vertexValue	= "v";
+				s.lexicon._vertexType	= "p";
+				s.lexicon._edge			= "e";
+				s.lexicon._edgeValue	= "r";
+				s.lexicon._edgeType		= "a";
+				s.lexicon._edgeLabel	= "c";
+				s.showVertexSequence	= false;
+				s.showVertexValue		= false;
+				s.showVertexType		= true;
+				s.showVertexLabel		= true;
+				s.showVertexValueDiff	= "-0";
+				s.showVertexLabelDiff	= "";
+
+				s.showEdgeSequence		= false;
+				s.showEdgeValue			= true;
+				s.showEdgeType			= true;
+				s.showEdgeLabel			= true;
+				s.showEdgeValueDiff		= "0";
+				s.showEdgeLabelDiff		= "1";
+				
+				s.exportType			= 1;
+
+				Vector<Type> vTypes = main.currentSession.board.vTypes;
+				if (vTypes.size()<=0) {
+					vTypes.add(new Type(0,"Player1", "Round"));
+				} else {
+					vTypes.elementAt(0).setName("Player1");
+					vTypes.elementAt(0).setDescription("Round");
+				}
+
+				if (vTypes.size()<=1) {
+					vTypes.add(new Type(1,"Player2", "Square"));
+				} else {
+					vTypes.elementAt(1).setName("Player2");
+					vTypes.elementAt(1).setDescription("Square");
+				}
+
+				if (vTypes.size()<=2) {
+					vTypes.add(new Type(2,"Nature", "Diamond"));
+				} else {
+					vTypes.elementAt(2).setName("Nature");
+					vTypes.elementAt(2).setDescription("Diamond");
+				}
+
+				if (vTypes.size()>=3) {
+					for (Vertex v : main.currentSession.board.vertices) {
+						if (v.getType() != null && v.getType().getId() >=3) {
+							v.setType(null);
+						}
+					}
+					while (vTypes.size()>3) vTypes.remove(3);
+				}
+
+				main.properties.lexiconView.refresh();
+				main.properties.generalView.refresh();
+				main.properties.typesView.refresh();
+				main.currentSession.setModified(true);
+			}
+		});
+
 	}
 }
