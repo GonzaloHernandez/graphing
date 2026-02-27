@@ -58,7 +58,7 @@ public class GrapherSession extends JInternalFrame{
 			}
 
 			public void internalFrameClosing(InternalFrameEvent arg0) {
-				save();
+				safeClosing();
 			}
 
 			public void internalFrameClosed(InternalFrameEvent arg0) {
@@ -120,7 +120,7 @@ public class GrapherSession extends JInternalFrame{
 
 	//-------------------------------------------------------------------------------------
 	
-	public boolean save(){
+	public boolean safeClosing(){
 		if (!modified) {
 			dispose();
 			return true;
@@ -134,7 +134,7 @@ public class GrapherSession extends JInternalFrame{
 				return true;
 			}
 			else if (messageReturn.equals("Yes")){
-				if (!main.persistence.saveSession(false, board)) return false;
+				if (!main.persistence.saveSession(false)) return false;
 				dispose();
 				return true;
 			}

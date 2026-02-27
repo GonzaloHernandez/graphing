@@ -200,9 +200,9 @@ public class Board extends JComponent implements Printable{
 				if (e.isControlDown()){
 					if (e.getKeyCode() == KeyEvent.VK_S) {
 						if (e.isShiftDown()) {
-							session.main.persistence.saveSession(true,null);
+							session.main.persistence.saveSession(true);
 						} else {
-							session.main.persistence.saveSession(false,null);
+							session.main.persistence.saveSession(false);
 						}
 					}
 					else if (e.getKeyChar() == '+' || e.getKeyChar() == '=' || 
@@ -634,39 +634,59 @@ public class Board extends JComponent implements Printable{
 
 			String vertexTypes = "";
 			String vertexValues = "";
+			String vertexLabels = "";
+			String edgeTypes = "";
 			String edgeValues = "";
 			String edgeLabels = "";
 
-			for (int v=0;v<vertices.size();v++){ 
-				Vertex vertex = vertices.elementAt(v);
-				if (v>0){
-					vertexValues += ",";
+			for (Vertex v  : vertices){ 
+				if (vertexValues.length() > 0){
 					vertexTypes += ",";
+					vertexValues += ",";
+					vertexLabels += ",";
 				}
-				vertexValues += vertex.getValue();
-				Type type = vertex.getType();
-				vertexTypes += type==null?0:type.getId();
-				for (Edge e : vertex.getOuts()) {
+				Type vType		= v.getType();
+				vertexTypes		+= vType==null?0:vType.getId();
+				vertexValues	+= v.getValue();
+				vertexLabels	+= v.getLabel();
+
+				for (Edge e : v.getOuts()) {
 					if (edgeValues.length()>0)  {
+						edgeTypes  += ",";
 						edgeValues += ",";
 						edgeLabels += ",";
 					}
-					edgeValues += e.getValue();
-					edgeLabels += e.getLabel().trim().isEmpty()?0:e.getLabel();
+					Type eType	= e.getType();
+					edgeTypes	+= eType==null?0:eType.getId();
+					edgeValues	+= e.getValue();
+					edgeLabels	+= e.getLabel();
 				}
 			}
 
 			//----------------------------------------------------------
 
+			String vertex 	= settings.lexicon.vertex;
+			String edge		= settings.lexicon.edge;
+
+			String vertexType	= settings.lexicon.vertexType;
+			String vertexValue	= settings.lexicon.vertexValue;
+			String vertexLabel	= settings.lexicon.vertexLabel;
+			String edgeType		= settings.lexicon.edgeType;
+			String edgeValue	= settings.lexicon.edgeValue;
+			String edgeLabel	= settings.lexicon.edgeLabel;
+
 			session.main.properties.generalView.export.setText(
-				"nvertices = " + size + ";\n" +
-				settings.lexicon.vertexType + " = [" + vertexTypes + "];\n" +
-				settings.lexicon.vertexValue + " = [" + vertexValues + "];\n" +
-				"nedges = " + nConections + ";\n" +
+				(vertex		.charAt(0) <= 'Z'?"":"nvertices = " + size + ";\n") +
+				(vertexType	.charAt(0) <= 'Z'?"":vertexType  + " = [" + vertexTypes  + "];\n") +
+				(vertexValue.charAt(0) <= 'Z'?"":vertexValue + " = [" + vertexValues + "];\n") +
+				(vertexLabel.charAt(0) <= 'Z'?"":vertexLabel + " = [" + vertexLabels + "];\n") +
+				(edge       .charAt(0) <= 'Z'?"":"nedges = " + nConections + ";\n") +
 				"sources = [" + from + "];\n" +
 				"targets = [" + to + "];\n" +
-				settings.lexicon.edgeValue + " = [" + edgeValues + "];\n" +
-				settings.lexicon.edgeLabel + " = [" + edgeLabels + "];\n"
+				(edgeType	.charAt(0) <= 'Z'?"":edgeType  + " = [" + edgeTypes  + "];\n") +
+				(edgeValue	.charAt(0) <= 'Z'?"":edgeValue + " = [" + edgeValues + "];\n") +
+				(edgeLabel	.charAt(0) <= 'Z'?"":edgeLabel + " = [" + edgeLabels + "];\n") +
+				""
 			);
 			return true;
 

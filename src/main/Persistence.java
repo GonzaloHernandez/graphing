@@ -93,13 +93,10 @@ public class Persistence {
 
     //-------------------------------------------------------------------------
 
-    public boolean saveSession(boolean saveAs,Board pBoard) {
-        if (main.currentSession == null && pBoard == null) 
-            return false;
+    public boolean saveSession(boolean saveAs) {
+        if (main.currentSession == null) return false;
 
         Board board = main.currentSession.board;
-
-        if (pBoard!=null) board = pBoard;
 
 		try {
 			if (saveAs || board.fileName.equals("")) {

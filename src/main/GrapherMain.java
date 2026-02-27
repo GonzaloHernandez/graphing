@@ -152,11 +152,12 @@ public class GrapherMain extends JFrame{
 	private void progListeners(){
 		addWindowListener(new WindowAdapter(){
 			public void windowClosing(WindowEvent e){
-				if (verify()){
-					persistence.saveGrapher();
-					dispose();
-					System.exit(0);
+				while (currentSession!=null) {
+					if (!currentSession.safeClosing()) return;
 				}
+				persistence.saveGrapher();
+				dispose();
+				System.exit(0);
 			}
 			public void windowActivated(WindowEvent e){
 				split.setDividerLocation(getWidth()-320);
@@ -194,13 +195,13 @@ public class GrapherMain extends JFrame{
 		
 		saveSession.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
-				persistence.saveSession(false,null);
+				persistence.saveSession(false);
 			}
 		});
 
 		saveSessionAs.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
-				persistence.saveSession(true,null);
+				persistence.saveSession(true);
 			}
 		});
 
@@ -449,20 +450,5 @@ public class GrapherMain extends JFrame{
 				}
 			});
 		}
-	}
-
-	//-------------------------------------------------------------------------------------
-	
-	private boolean verify(){
-		JInternalFrame frames[] = desktop.getAllFrames();
-		for (int i=0;i<frames.length;i++){
-			if (frames[i].getClass().getName().equals("main.GrapherSession")){
-				GrapherSession session = (GrapherSession)frames[i];
-				if (session.modified) {
-					if (!session.save()) return false;
-				}
-			}
-		}
-		return true;
 	}
 }

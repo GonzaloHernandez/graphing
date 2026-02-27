@@ -60,7 +60,8 @@ public class MenuOptions extends JPopupMenu{
 	private GrapherMenu		vertexTypes,edgeTypes;
 	private	GrapherItem		vertexDelete,vertexDeleteAllOuts,vertexAccepted;
 	private	GrapherItem		edgeDelete,edgeTune;
-	private	GrapherItem		restart,parityGame,load,importGame,save,saveAs;
+	private	GrapherItem		restart,load,importGame,save,saveAs;
+	private GrapherItem		parityGame,parityGameQ,sParityGame;
 	private GrapherItem		exportPNG,exportPDF,exportSVG,simulate,help;
 
 	
@@ -93,7 +94,6 @@ public class MenuOptions extends JPopupMenu{
 		edgeTypes			= new GrapherMenu("Set type",defaultFont,"type_connection.png");
 
 		restart				= new GrapherItem("Restar Session",defaultFont,"new.png");
-		parityGame			= new GrapherItem("Parity Game",defaultFont,"");
 		load				= new GrapherItem("Load Session",defaultFont,"open.png");
 		importGame			= new GrapherItem("Import Game (GM)",defaultFont,"open.png");
 		save				= new GrapherItem("Save Session",defaultFont,"save.png");
@@ -104,6 +104,10 @@ public class MenuOptions extends JPopupMenu{
 		simulate			= new GrapherItem("Simulate",defaultFont,"simulate.png");
 		help				= new GrapherItem("Help",defaultFont,"help.png");
 		
+		parityGame			= new GrapherItem("Parity Game",defaultFont,"");
+		parityGameQ			= new GrapherItem("Parity Game + Quantitative conditions",defaultFont,"");
+		sParityGame			= new GrapherItem("Stochastic Parity Games",defaultFont,"");
+
 		add(vertexMenu);
 		add(edgeMenu);
 		add(grapherMenu);
@@ -132,6 +136,8 @@ public class MenuOptions extends JPopupMenu{
 		grapherMenu.add(help);
 
 		template.add(parityGame);
+		template.add(parityGameQ);
+		template.add(sParityGame);
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -312,6 +318,85 @@ public class MenuOptions extends JPopupMenu{
 			}
 		});
 
+		load.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				main.persistence.loadSession("",false);
+			}
+		});
+
+		importGame.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				main.persistence.importGame();
+			}
+		});
+
+		save.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				main.persistence.saveSession(false);
+			}
+		});
+		
+		saveAs.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				main.persistence.saveSession(true);
+			}
+		});
+		
+		exportPNG.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				main.persistence.exportPNG();
+			}
+		});
+		
+		exportPDF.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				main.persistence.exportPDF();
+			}
+		});
+
+		exportSVG.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				main.persistence.exportSVG();
+			}
+		});
+
+		simulate.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				main.openCompiler(main.currentSession.board);
+			}
+		});
+
+		help.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				if (Desktop.isDesktopSupported()) {
+					try {
+						File myFile = new File("docs/help.pdf");
+						Desktop.getDesktop().open(myFile);
+					} catch (IOException ex) {
+						// no application registered for PDFs
+					}
+				}
+			}
+		});
+		
+		addPopupMenuListener(new PopupMenuListener(){
+
+			public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
+				main.currentSession.board.menuBlock = true;
+				setMenuTypes(vertexTypes,main.currentSession.board.vTypes);
+				setMenuTypes(edgeTypes,main.currentSession.board.eTypes);
+			}
+
+			public void popupMenuWillBecomeInvisible(PopupMenuEvent arg0) {
+				main.currentSession.board.menuBlock = false;
+			}
+
+			public void popupMenuCanceled(PopupMenuEvent arg0) {
+				main.currentSession.board.menuBlock = false;
+			}
+		});
+
+		// Templates
 		parityGame.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ev) {
 				GrapherSettings s = main.currentSession.board.settings;
@@ -319,11 +404,11 @@ public class MenuOptions extends JPopupMenu{
 				s.lexicon.vertex		= "vertex";
 				s.lexicon.vertexValue	= "priors";
 				s.lexicon.vertexType	= "owners";
-				s.lexicon.vertexLabel	= "label";
+				s.lexicon.vertexLabel	= "Label";
 				s.lexicon.edge			= "edge";
-				s.lexicon.edgeValue		= "weights";
-				s.lexicon.edgeType		= "type";
-				s.lexicon.edgeLabel		= "label";
+				s.lexicon.edgeValue		= "Weights";
+				s.lexicon.edgeType		= "Type";
+				s.lexicon.edgeLabel		= "Label";
 				s.lexicon._graph		= "g";
 				s.lexicon._vertex		= "v";
 				s.lexicon._vertexType	= "o";
@@ -385,83 +470,157 @@ public class MenuOptions extends JPopupMenu{
 			}
 		});
 
-		load.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e) {
-				main.persistence.loadSession("",false);
-			}
-		});
+		parityGameQ.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent ev) {
+				GrapherSettings s = main.currentSession.board.settings;
+				s.lexicon.graph			= "game";
+				s.lexicon.vertex		= "vertex";
+				s.lexicon.vertexValue	= "priors";
+				s.lexicon.vertexType	= "owners";
+				s.lexicon.vertexLabel	= "Label";
+				s.lexicon.edge			= "edge";
+				s.lexicon.edgeValue		= "weights";
+				s.lexicon.edgeType		= "Type";
+				s.lexicon.edgeLabel		= "Label";
+				s.lexicon._graph		= "g";
+				s.lexicon._vertex		= "v";
+				s.lexicon._vertexType	= "o";
+				s.lexicon._vertexValue	= "p";
+				s.lexicon._edge			= "e";
+				s.lexicon._edgeValue	= "w";
+				s.lexicon._edgeType		= " ";
+				s.lexicon._edgeLabel	= " ";
+				s.showVertexSequence	= false;
+				s.showVertexValue		= true;
+				s.showVertexType		= true;
+				s.showVertexLabel		= false;
+				s.showEdgeSequence		= false;
+				s.showEdgeValue			= true;
+				s.showEdgeType			= false;
+				s.showEdgeLabel			= false;
+				s.exportType			= 1;
 
-		importGame.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e) {
-				main.persistence.importGame();
-			}
-		});
+				Vector<Type> vTypes = main.currentSession.board.vTypes;
+				if (vTypes.size()<=0) {
+					vTypes.add(new Type(0,"Even", "Round"));
+				} else {
+					vTypes.elementAt(0).setName("Even");
+					vTypes.elementAt(0).setDescription("Round");
+				}
 
-		save.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e) {
-				main.persistence.saveSession(false,null);
-			}
-		});
-		
-		saveAs.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e) {
-				main.persistence.saveSession(true,null);
-			}
-		});
-		
-		exportPNG.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e) {
-				main.persistence.exportPNG();
-			}
-		});
-		
-		exportPDF.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e) {
-				main.persistence.exportPDF();
-			}
-		});
+				if (vTypes.size()<=1) {
+					vTypes.add(new Type(1,"Odd", "Square"));
+				} else {
+					vTypes.elementAt(1).setName("Odd");
+					vTypes.elementAt(1).setDescription("Square");
+				}
 
-		exportSVG.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e) {
-				main.persistence.exportSVG();
-			}
-		});
-
-		simulate.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e) {
-				main.openCompiler(main.currentSession.board);
-			}
-		});
-
-		help.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e) {
-				if (Desktop.isDesktopSupported()) {
-					try {
-						File myFile = new File("docs/help.pdf");
-						Desktop.getDesktop().open(myFile);
-					} catch (IOException ex) {
-						// no application registered for PDFs
+				if (vTypes.size()>=2) {
+					for (Vertex v : main.currentSession.board.vertices) {
+						if (v.getType() != null && v.getType().getId() >=2) {
+							v.setType(null);
+						}
+					}
+					for (int i=2;i<vTypes.size();i++) {
+						vTypes.remove(i);
 					}
 				}
+
+				Vector<Type> eTypes = main.currentSession.board.eTypes;
+				for (Vertex v : main.currentSession.board.vertices) {
+					for (Edge e : v.getOuts()) {
+						if (e.getType() != null) {
+							e.setType(null);
+						}
+					}
+				}
+				eTypes.clear();
+
+				main.properties.lexiconView.refresh();
+				main.properties.generalView.refresh();
+				main.properties.typesView.refresh();
+				main.currentSession.setModified(true);
 			}
 		});
-		
-		addPopupMenuListener(new PopupMenuListener(){
 
-			public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
-				main.currentSession.board.menuBlock = true;
-				setMenuTypes(vertexTypes,main.currentSession.board.vTypes);
-				setMenuTypes(edgeTypes,main.currentSession.board.eTypes);
-			}
+		sParityGame.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent ev) {
+				GrapherSettings s = main.currentSession.board.settings;
+				s.lexicon.graph			= "game";
+				s.lexicon.vertex		= "vertex";
+				s.lexicon.vertexValue	= "priors";
+				s.lexicon.vertexType	= "owners";
+				s.lexicon.vertexLabel	= "Label";
+				s.lexicon.edge			= "edge";
+				s.lexicon.edgeValue		= "Weights";
+				s.lexicon.edgeType		= "Type";
+				s.lexicon.edgeLabel		= "chances";
+				s.lexicon._graph		= "g";
+				s.lexicon._vertex		= "v";
+				s.lexicon._vertexType	= "o";
+				s.lexicon._vertexValue	= "p";
+				s.lexicon._edge			= "e";
+				s.lexicon._edgeValue	= "w";
+				s.lexicon._edgeType		= " ";
+				s.lexicon._edgeLabel	= "c";
+				s.showVertexSequence	= false;
+				s.showVertexValue		= true;
+				s.showVertexType		= true;
+				s.showVertexLabel		= false;
+				s.showEdgeSequence		= false;
+				s.showEdgeValue			= false;
+				s.showEdgeType			= false;
+				s.showEdgeLabel			= true;
+				s.exportType			= 1;
 
-			public void popupMenuWillBecomeInvisible(PopupMenuEvent arg0) {
-				main.currentSession.board.menuBlock = false;
-			}
+				Vector<Type> vTypes = main.currentSession.board.vTypes;
+				if (vTypes.size()<=0) {
+					vTypes.add(new Type(0,"Even", "Round"));
+				} else {
+					vTypes.elementAt(0).setName("Even");
+					vTypes.elementAt(0).setDescription("Round");
+				}
 
-			public void popupMenuCanceled(PopupMenuEvent arg0) {
-				main.currentSession.board.menuBlock = false;
+				if (vTypes.size()<=1) {
+					vTypes.add(new Type(1,"Odd", "Square"));
+				} else {
+					vTypes.elementAt(1).setName("Odd");
+					vTypes.elementAt(1).setDescription("Square");
+				}
+
+				if (vTypes.size()<=2) {
+					vTypes.add(new Type(1,"Nature", "Diamond"));
+				} else {
+					vTypes.elementAt(1).setName("Nature");
+					vTypes.elementAt(1).setDescription("Diamond");
+				}
+
+				if (vTypes.size()>=3) {
+					for (Vertex v : main.currentSession.board.vertices) {
+						if (v.getType() != null && v.getType().getId() >=2) {
+							v.setType(null);
+						}
+					}
+					for (int i=2;i<vTypes.size();i++) {
+						vTypes.remove(i);
+					}
+				}
+
+				Vector<Type> eTypes = main.currentSession.board.eTypes;
+				for (Vertex v : main.currentSession.board.vertices) {
+					for (Edge e : v.getOuts()) {
+						if (e.getType() != null) {
+							e.setType(null);
+						}
+					}
+				}
+				eTypes.clear();
+
+				main.properties.lexiconView.refresh();
+				main.properties.generalView.refresh();
+				main.properties.typesView.refresh();
+				main.currentSession.setModified(true);
 			}
 		});
-		
 	}
 }

@@ -3,7 +3,7 @@
 # Define versioning variables
 FAMILY=1
 VERSION=3
-CONSTRUCTION=3
+CONSTRUCTION=4 #(in progress)
 
 # File paths
 JAVA_FILE="src/main/GrapherMain.java"
@@ -59,6 +59,5 @@ echo ":: Build Success: $OUTPUT_FILE"
 echo ":: Documentation updated in $README_FILE"
 
 # # ===============================================================================
-# (DONE) Path from files fixed (currentDir)
-# (DONE) Improvement on SVG exporting
+# (DONE) Correction on safeClosing windows.
 
