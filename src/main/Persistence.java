@@ -109,7 +109,7 @@ public class Persistence {
 					}
 				});
 				dialog.setDirectory(main.curdir);
-				dialog.setFile("*.aut");
+				dialog.setFile(board.fileName.isEmpty()?"*.aut":board.fileName);
 
 				dialog.pack();
 				int x = main.getX() + 100;
@@ -146,6 +146,7 @@ public class Persistence {
 
 			main.currentSession.setTitle(name);
 	        main.currentSession.setName(board.fileName);
+            main.addRecentSession(board.fileName);
 			main.currentSession.setModified(false);
             return true;
 		} catch (IOException e) {

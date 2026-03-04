@@ -612,7 +612,7 @@ public class MenuOptions extends JPopupMenu{
 
 				if (vTypes.size()>=3) {
 					for (Vertex v : main.currentSession.board.vertices) {
-						if (v.getType() != null && v.getType().getId() >=2) {
+						if (v.getType() != null && v.getType().getId() >=3) {
 							v.setType(null);
 						}
 					}
