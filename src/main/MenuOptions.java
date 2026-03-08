@@ -300,6 +300,7 @@ public class MenuOptions extends JPopupMenu{
 			public void actionPerformed(ActionEvent e) {
 				Vertex source = main.currentSession.board.currentEdge.getSource();
 				source.deleteEdge(main.currentSession.board.currentEdge);
+				main.properties.stockView.refresh();
 				main.currentSession.setModified(true);
 				main.currentSession.board.repaint();
 			}
@@ -316,6 +317,7 @@ public class MenuOptions extends JPopupMenu{
 		restart.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
 				main.currentSession.board.restart();
+				main.properties.stockView.refresh();
 				main.currentSession.setModified(false);
 			}
 		});

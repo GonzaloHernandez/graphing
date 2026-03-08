@@ -57,7 +57,7 @@ public class Board extends JComponent implements Printable{
 		this.menuBlock		= false;
 		this.compiler		= null;
 		this.scaleFactor	= 1;
-		this.gridScale		= 10;
+		this.gridScale		= 15;
 		this.hidden			= false;
 		this.showGrid		= false;
 		getInputMap().put(KeyStroke.getKeyStroke("A"), "actionName");
@@ -140,7 +140,6 @@ public class Board extends JComponent implements Printable{
 		}
 
 		exportView();
-		session.main.properties.stockView.refresh();
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -149,6 +148,7 @@ public class Board extends JComponent implements Printable{
 		Vertex n = new Vertex(vertices.size(),x,y);
 		vertices.add(n);
 		repaint();
+		session.main.properties.stockView.refresh();
 		session.setModified(true);
 		return n;
 	}
@@ -170,6 +170,7 @@ public class Board extends JComponent implements Printable{
 						else if (e.getKeyCode() == KeyEvent.VK_DELETE) {
 							Vertex source = currentEdge.getSource();
 							source.deleteEdge(currentEdge);
+							session.main.properties.stockView.refresh();
 						}
 						else  if (e.getKeyChar() >= '0' && e.getKeyChar() <= '9') {
 							currentEdge.setValue(""+e.getKeyChar());
@@ -265,6 +266,7 @@ public class Board extends JComponent implements Printable{
 						currentEdge.setActive(!currentEdge.isActive());
 						session.setModified(true);
 					}
+					session.main.properties.stockView.refresh();
 					repaint();
 					return;
 				}
@@ -275,6 +277,7 @@ public class Board extends JComponent implements Printable{
 						vertexTarget.setActive(!vertexTarget.isActive(), true);
 						session.setModified(true);
 					}
+					session.main.properties.stockView.refresh();
 					repaint();
 					return;
 				}
@@ -335,6 +338,7 @@ public class Board extends JComponent implements Printable{
 								Double.parseDouble(value.getText());
 							}
 							catch (NumberFormatException ex) {
+								session.main.messageBox("The number format is invalid.|<"+val+">","Error","Accept");
 								return;
 							}
 							Double.parseDouble(value.getText());
@@ -394,6 +398,7 @@ public class Board extends JComponent implements Printable{
 								Double.parseDouble(value.getText());
 							}
 							catch (NumberFormatException ex) {
+								session.main.messageBox("The number format is invalid.|<"+val+">","Error","Accept");
 								return;
 							} 
 							currentEdge.setValue(value.getText());
@@ -479,6 +484,7 @@ public class Board extends JComponent implements Printable{
 						if (settings.allowFirsVertex || vertexTarget.getNumber() > 0) {
 							vertexSource.addEdge(vertexTarget);
 							vertexSource.setStatus(Vertex.STILL);
+							session.main.properties.stockView.refresh();
 							session.setModified(true);
 						}
 					}
@@ -787,8 +793,8 @@ public class Board extends JComponent implements Printable{
 		for (int i=vertex.getNumber()+1;i<vertices.size();i++){
 			vertices.elementAt(i).setNumber(vertices.elementAt(i).getNumber()-1);
 		}
-		
 		vertices.removeElement(vertex);
+		session.main.properties.stockView.refresh();
 	}
 
 	//-------------------------------------------------------------------------------------

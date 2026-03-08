@@ -8,6 +8,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.event.TableModelListener;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
 public class ViewStock extends JPanel{
@@ -29,8 +31,8 @@ public class ViewStock extends JPanel{
     private void initElements(){
         tableStates         = new JTable();
         tableConnections    = new JTable();
-        tableStates.setName("States");
-        tableConnections.setName("Connections");
+        tableStates.setName("Vertices");
+        tableConnections.setName("Edges");
 
         JSplitPane splitPane = new JSplitPane(  JSplitPane.VERTICAL_SPLIT,
                                                 new JScrollPane(tableStates),
@@ -75,25 +77,37 @@ public class ViewStock extends JPanel{
         int first =  main.currentSession.board.settings.firstZero?0:1;
         TableModel model = new TableModel() {
             public int getRowCount() {
-                if (table.getName()=="States") {
+                if (table.getName()=="Vertices") {
                     return getStates().size();
                 }
-                if (table.getName()=="Connections") {
+                if (table.getName()=="Edges") {
                     return getConnections().size();
                 }
                 return 0;
             }
             public int getColumnCount() {
-                return 4;
+                return 5;
             }
             public String getColumnName(int columnIndex) {
-                switch (columnIndex) {
-                    case 0: return "Active";
-                    case 1: return "Id";
-                    case 2: return "Value";
-                    case 3: return "Label";
-                    default: return null;
+                Lexicon lexicon = main.currentSession.board.settings.lexicon;
+                if (table.getName()=="Vertices") {
+                    switch (columnIndex) {
+                        case 0: return "";
+                        case 1: return "Id";
+                        case 2: return lexicon.vertexValue;
+                        case 3: return lexicon.vertexType;
+                        case 4: return lexicon.vertexLabel;
+                    }
                 }
+                else if (table.getName()=="Edges") {
+                    switch (columnIndex) {
+                        case 0: return "";
+                        case 1: return "Id";
+                        case 2: return lexicon.edgeValue;
+                        case 3: return lexicon.edgeType;
+                        case 4: return lexicon.edgeLabel;
+                    }                }
+                return null;
             }
             public Class<?> getColumnClass(int columnIndex) {
                 switch (columnIndex) {
@@ -101,6 +115,7 @@ public class ViewStock extends JPanel{
                     case 1: return String.class;
                     case 2: return String.class;
                     case 3: return String.class;
+                    case 4: return String.class;
                     default: return Object.class;
                 }
             }
@@ -110,24 +125,29 @@ public class ViewStock extends JPanel{
                     case 1: return false;
                     case 2: return false;
                     case 3: return false;
+                    case 4: return false;
                     default: return false;
                 }
             }
             public Object getValueAt(int rowIndex, int columnIndex) {
-                if (table.getName()=="States") {
+                if (table.getName()=="Vertices") {
+                    Vertex v = main.currentSession.board.vertices.elementAt(rowIndex);
                     switch (columnIndex) {
                         case 0: return getStates().elementAt(rowIndex).isActive();
-                        case 1: return "V"+(rowIndex+first);
-                        case 2: return main.currentSession.board.vertices.elementAt(rowIndex).getValue();
-                        case 3: return "Label";
+                        case 1: return ""+(rowIndex+first);
+                        case 2: return v.getValue();
+                        case 3: return v.getType()!=null?v.getType().getName():"";
+                        case 4: return v.getLabel();
                     }
                 }
-                if (table.getName()=="Connections") {
+                if (table.getName()=="Edges") {
+                    Edge e = getConnections().elementAt(rowIndex);
                     switch (columnIndex) {
-                        case 0: return getConnections().elementAt(rowIndex).isActive();
-                        case 1: return "E"+(rowIndex+first);
-                        case 2: return "";
-                        case 3: return "Label";
+                        case 0: return e.isActive();
+                        case 1: return ""+(rowIndex+first);
+                        case 2: return e.getValue();
+                        case 3: return e.getType()!=null?e.getType().getName():"";
+                        case 4: return e.getLabel();
                     }
                 }
                 return null;
@@ -135,11 +155,9 @@ public class ViewStock extends JPanel{
             public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
                 if (columnIndex == 0) {
                     Boolean value = (Boolean) aValue;
-                    if (table.getName().equals("States")) {
-                        // stateSelection.put(rowIndex, value);
+                    if (table.getName().equals("Vertices")) {
                         getStates().elementAt(rowIndex).setActive(value);
-                    } else if (table.getName().equals("Connections")) {
-                        // connectionSelection.put(rowIndex, value);
+                    } else if (table.getName().equals("Edges")) {
                         getConnections().elementAt(rowIndex).setActive(value);
                     }
                     main.currentSession.board.repaint();
@@ -153,6 +171,17 @@ public class ViewStock extends JPanel{
             }
         };
         table.setModel(model);
+
+        TableColumnModel vColumnModel = table.getColumnModel();
+        vColumnModel.getColumn(0).setPreferredWidth(20);
+        vColumnModel.getColumn(0).setMaxWidth(20);
+        vColumnModel.getColumn(1).setPreferredWidth(40);
+        vColumnModel.getColumn(1).setMaxWidth(40);
+
+        DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
+        rightRenderer.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        table.getColumnModel().getColumn(1).setCellRenderer(rightRenderer);
+        table.getColumnModel().getColumn(2).setCellRenderer(rightRenderer);
     }
 
     Vector<Vertex> getStates() {

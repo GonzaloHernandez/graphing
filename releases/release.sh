@@ -3,7 +3,7 @@
 # Define versioning variables
 FAMILY=1
 VERSION=3
-CONSTRUCTION=5 #(in progress)
+CONSTRUCTION=5
 
 # File paths
 JAVA_FILE="src/main/GrapherMain.java"
@@ -62,5 +62,7 @@ echo ":: Documentation updated in $README_FILE"
 # (DONE) Template about stochastic games fixed
 # (DONE) Reusing the filename when save as.
 # (DONE) Updating list of recent sessions.
+# (DONE) Stock View improved
+
 
 
