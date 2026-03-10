@@ -3,7 +3,7 @@
 # Define versioning variables
 FAMILY=1
 VERSION=3
-CONSTRUCTION=5
+CONSTRUCTION=6 #In progress
 
 # File paths
 JAVA_FILE="src/main/GrapherMain.java"
@@ -59,10 +59,10 @@ echo ":: Build Success: $OUTPUT_FILE"
 echo ":: Documentation updated in $README_FILE"
 
 # # ===============================================================================
-# (DONE) Template about stochastic games fixed
-# (DONE) Reusing the filename when save as.
-# (DONE) Updating list of recent sessions.
-# (DONE) Stock View improved
+# (DONE) Number validation in property "value" (including fractionaries)
+# (DONE) New view for "accepted vertices"
+# (...) Batch settings for (de)activation of elements
+# (...) Listener for external batch settings (TCP connection)
 
 
 

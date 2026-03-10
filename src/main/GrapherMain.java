@@ -32,7 +32,7 @@ public class GrapherMain extends JFrame{
 	//-------------------------------------------------------------------------------------
 	final int	family			= 1;
 	final int	version			= 3;
-	final int	construction	= 5;
+	final int	construction	= 6;
 	
 	//-------------------------------------------------------------------------------------
 
@@ -245,6 +245,7 @@ public class GrapherMain extends JFrame{
 					"<ul>" +
 					"  <li><b>Ctrl + S:</b> Save session</li>" +
 					"  <li><b>Ctrl +Shift + S:</b> Save session as</li>" +
+					"  <li><b>Ctrl +Shift + E:</b> Export as Image (PNG)</li>" +
 					"  <li><b>G:</b> Toggle grid</li>" +
 					"  <li><b>H (Hold):</b> Hide elements</li>" +
 					"  <li><b>Ctrl + (+/-):</b> Zoom in/out</li>" +

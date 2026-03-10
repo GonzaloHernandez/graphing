@@ -507,7 +507,7 @@ public class Persistence {
 
     public void exportPNG() {
         try {
-			FileDialog dialog = new FileDialog(main,"Select a file name",FileDialog.SAVE);
+			FileDialog dialog = new FileDialog(main,"Select an Image file name",FileDialog.SAVE);
 
 			dialog.setFilenameFilter(new FilenameFilter() {
 				@Override
@@ -517,18 +517,20 @@ public class Persistence {
 			});
 			dialog.setDirectory(main.curdir);
 			dialog.setFile("*.png");
+            
 			dialog.setVisible(true);
 			main.requestFocus();            
 			if (dialog.getFile()==null) return;
             Board board = main.currentSession.board;
 
-            int width	= (int)(board.getWidth() * Math.max(board.scaleFactor,2));
-            int height	= (int)(board.getHeight() * Math.max(board.scaleFactor,2));
+            int zoom = 4;
+            int width	= (int)(board.getWidth() * Math.max(board.scaleFactor*zoom,2));
+            int height	= (int)(board.getHeight() * Math.max(board.scaleFactor*zoom,2));
 
             BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
             
             Graphics2D g2 = image.createGraphics();
-            g2.scale(Math.max(board.scaleFactor,2),Math.max(board.scaleFactor,2));
+            g2.scale(Math.max(board.scaleFactor*zoom,2),Math.max(board.scaleFactor*zoom,2));
             board.paint(g2);
             g2.dispose();
 
@@ -543,7 +545,7 @@ public class Persistence {
 
     public void exportSVG() {
         try {
-			FileDialog dialog = new FileDialog(main,"Select a file name",FileDialog.SAVE);
+			FileDialog dialog = new FileDialog(main,"Select a SVG file name",FileDialog.SAVE);
 
 			dialog.setFilenameFilter(new FilenameFilter() {
 				@Override
@@ -611,7 +613,7 @@ public class Persistence {
 
     public void exportPDF() {
         try {
-			FileDialog dialog = new FileDialog(main,"Select a file name",FileDialog.SAVE);
+			FileDialog dialog = new FileDialog(main,"Select a PDF file name",FileDialog.SAVE);
 
 			dialog.setFilenameFilter(new FilenameFilter() {
 				@Override

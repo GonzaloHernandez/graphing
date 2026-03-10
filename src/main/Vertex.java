@@ -1,4 +1,5 @@
 package main;
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -113,7 +114,7 @@ public class Vertex {
 			backColor = LIGHT_BLUE;
 		}
 		else if (status!=FOCUSED && !active) {
-			foreColor = Color.GRAY;
+			foreColor = new Color(220,220,220);
 			backColor = Color.WHITE;
 		}
 		
@@ -123,6 +124,9 @@ public class Vertex {
 		} else{ 
 			t = 0;
 		}
+
+		g.setStroke(new BasicStroke(accepted?2.0f:1.0f));
+
 		switch(t) {
 			case 0:	
 				g.setColor(backColor);
@@ -162,10 +166,8 @@ public class Vertex {
 			} break;
 		}
 
-		if (accepted) {
-			g.setColor(foreColor);
-			g.drawOval(x-RADIUS+3,y-RADIUS+3,(RADIUS-3)*2,(RADIUS-3)*2);
-		}
+		g.setStroke(new BasicStroke(1.0f));
+
 		if (settings.showVertexSequence) {
 
 			Lexicon lex = settings.lexicon;

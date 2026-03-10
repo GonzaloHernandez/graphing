@@ -83,7 +83,11 @@ public class Edge {
 		int connectionSequence,boolean hidden) 
 	{
 		if (hidden && !active) return connectionSequence+1;
-		
+
+		Color CACTIVE	= new Color(80,80,80);
+		Color CINACTIVE	= new Color(220,220,220);
+		Color CSELECTED	= Color.RED;
+
 		float[] dashPattern = {6, 4}; // 10 pixels on, 5 pixels off
 		Stroke dashed = new BasicStroke(
 				1,                      // Line width
@@ -99,9 +103,9 @@ public class Edge {
 		
 		if (source.equals(target)){
 			switch (status) {
-				case STILL:		if (active) g.setColor(Color.GRAY); else g.setColor(Color.lightGray); break;
-				case MARKED:	g.setColor(Color.YELLOW);	break;
-				case FOCUSED:	g.setColor(Color.RED);		break;
+				case STILL:		g.setColor(active?CACTIVE:CINACTIVE);	break;
+				case MARKED:	g.setColor(Color.YELLOW);				break;
+				case FOCUSED:	g.setColor(CSELECTED);					break;
 			}
 			
 			control.x	= (int)(source.getX() + Math.cos(rotation) * distance);
@@ -194,9 +198,9 @@ public class Edge {
 			//--- draw arc ---
 			
 			switch (status) {
-				case STILL:		if (active) g.setColor(Color.GRAY); else g.setColor(Color.lightGray); break;
-				case MARKED:	g.setColor(Color.YELLOW);	break;
-				case FOCUSED:	g.setColor(Color.RED);		break;
+				case STILL:		g.setColor(active?CACTIVE:CINACTIVE);	break;
+				case MARKED:	g.setColor(Color.YELLOW);				break;
+				case FOCUSED:	g.setColor(CSELECTED);					break;
 			}
 			
 			Graphics2D g2 = (Graphics2D)g;

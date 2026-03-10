@@ -1,12 +1,29 @@
 package main;
 
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.JToggleButton;
+import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumnModel;
@@ -16,6 +33,8 @@ public class ViewStock extends JPanel{
 
     protected JTable        tableStates;
     protected JTable        tableConnections;
+    protected JTextField    batchChanges;
+    protected JToggleButton listen;
     protected GrapherMain   main;
     
     //--------------------------------------------------------------------------
@@ -31,6 +50,8 @@ public class ViewStock extends JPanel{
     private void initElements(){
         tableStates         = new JTable();
         tableConnections    = new JTable();
+        batchChanges        = new JTextField();
+        listen              = new JToggleButton("Listen");
         tableStates.setName("Vertices");
         tableConnections.setName("Edges");
 
@@ -38,8 +59,13 @@ public class ViewStock extends JPanel{
                                                 new JScrollPane(tableStates),
                                                 new JScrollPane(tableConnections));
         splitPane.setDividerLocation(200); 
+
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.add(batchChanges,BorderLayout.CENTER);
+        panel.add(listen,BorderLayout.EAST);
         setLayout(new BorderLayout());
-        add(splitPane);
+        add(splitPane,BorderLayout.CENTER);
+        add(panel,BorderLayout.SOUTH);
         if (main.currentSession!=null) {
             loadTable(tableStates);
             loadTable(tableConnections);
@@ -54,9 +80,104 @@ public class ViewStock extends JPanel{
     }
     
     //--------------------------------------------------------------------------
+    private static Vector<Boolean> convertToVector(String bits) {
+        Vector<Boolean> v = new Vector<>();
+        for (char c : bits.toCharArray()) {
+            v.add(c == '1');
+        }
+        return v;
+    }
+
+    boolean runSettings(String settings) {
+        String regex = "^\\{?([01]+),([01]+)\\}?$";
+
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(settings.trim());
+
+        if (!matcher.matches()) {
+            main.messageBox("Invalid settings|Expected format: e.g. '010101,00110'", "Error", "Ok");
+            return false;
+        }
+
+        String bitStringV = matcher.group(1);
+        String bitStringE = matcher.group(2);
+
+        Vector<Boolean> vb = convertToVector(bitStringV);
+        Vector<Boolean> eb = convertToVector(bitStringE);
+
+        Vector<Vertex>  vs = getVertices();
+        Vector<Edge>    es = getEdges();
+        
+        if (vb.size()!=vs.size() || eb.size()!=es.size()) {
+            main.messageBox("Invalid settings|The amount of elements don't match", "Error", "Ok");
+            return false;
+        }
+
+        for (int i=0;i<vs.size();i++) vs.elementAt(i).setActive(vb.elementAt(i));
+        for (int i=0;i<es.size();i++) es.elementAt(i).setActive(eb.elementAt(i));
+        batchChanges.setText(settings);
+        repaint();
+        main.currentSession.board.repaint();
+        return true;
+    }
 
     private void progListeners(){
+        batchChanges.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                runSettings(batchChanges.getText());
+            }
+            
+        }); 
         
+        batchChanges.addFocusListener(new FocusAdapter() {
+            public void focusGained(FocusEvent e) {
+                batchChanges.selectAll();
+            }
+        });
+
+        listen.addItemListener(new ItemListener() {
+            private Thread serverThread;
+
+            @Override
+            public void itemStateChanged(ItemEvent ev) {
+                if (ev.getStateChange() == ItemEvent.SELECTED) {
+                    batchChanges.setEnabled(false);
+
+                    serverThread = new Thread(() -> {
+                        int port = 65432;
+                        try (ServerSocket serverSocket = new ServerSocket(port)) {
+                            System.out.println("Java Server is listening on port " + port);
+
+                            while (!Thread.currentThread().isInterrupted()) {
+                                try (Socket clientSocket = serverSocket.accept();
+                                    BufferedReader in = new BufferedReader(
+                                        new InputStreamReader(clientSocket.getInputStream()))) 
+                                {
+                                    String message = in.readLine();
+                                    if (message != null) {
+                                        SwingUtilities.invokeLater(() -> runSettings(message));
+                                    }
+                                } catch (IOException ex) {
+                                    System.out.println("Socket error: " + ex.getMessage());
+                                }
+                            }
+                        } catch (IOException ex) {
+                            System.out.println("Could not listen on port " + port);
+                        }
+                    });
+
+                    serverThread.start();
+                } else {
+                    batchChanges.setEnabled(true);
+                    if (serverThread != null) {
+                        serverThread.interrupt(); 
+                    }
+                }
+            }
+        });
     }
     
     //--------------------------------------------------------------------------
@@ -78,10 +199,10 @@ public class ViewStock extends JPanel{
         TableModel model = new TableModel() {
             public int getRowCount() {
                 if (table.getName()=="Vertices") {
-                    return getStates().size();
+                    return getVertices().size();
                 }
                 if (table.getName()=="Edges") {
-                    return getConnections().size();
+                    return getEdges().size();
                 }
                 return 0;
             }
@@ -133,7 +254,7 @@ public class ViewStock extends JPanel{
                 if (table.getName()=="Vertices") {
                     Vertex v = main.currentSession.board.vertices.elementAt(rowIndex);
                     switch (columnIndex) {
-                        case 0: return getStates().elementAt(rowIndex).isActive();
+                        case 0: return getVertices().elementAt(rowIndex).isActive();
                         case 1: return ""+(rowIndex+first);
                         case 2: return v.getValue();
                         case 3: return v.getType()!=null?v.getType().getName():"";
@@ -141,7 +262,7 @@ public class ViewStock extends JPanel{
                     }
                 }
                 if (table.getName()=="Edges") {
-                    Edge e = getConnections().elementAt(rowIndex);
+                    Edge e = getEdges().elementAt(rowIndex);
                     switch (columnIndex) {
                         case 0: return e.isActive();
                         case 1: return ""+(rowIndex+first);
@@ -156,9 +277,9 @@ public class ViewStock extends JPanel{
                 if (columnIndex == 0) {
                     Boolean value = (Boolean) aValue;
                     if (table.getName().equals("Vertices")) {
-                        getStates().elementAt(rowIndex).setActive(value);
+                        getVertices().elementAt(rowIndex).setActive(value);
                     } else if (table.getName().equals("Edges")) {
-                        getConnections().elementAt(rowIndex).setActive(value);
+                        getEdges().elementAt(rowIndex).setActive(value);
                     }
                     main.currentSession.board.repaint();
                 }
@@ -184,17 +305,17 @@ public class ViewStock extends JPanel{
         table.getColumnModel().getColumn(2).setCellRenderer(rightRenderer);
     }
 
-    Vector<Vertex> getStates() {
+    Vector<Vertex> getVertices() {
         return main.currentSession.board.vertices;
     }
 
-    Vector<Edge> getConnections() {
-        Vector<Edge> connections = new Vector<Edge>();
+    Vector<Edge> getEdges() {
+        Vector<Edge> edges = new Vector<Edge>();
         for (int i=0; i<main.currentSession.board.vertices.size(); i++) {
             for (int j=0; j<main.currentSession.board.vertices.elementAt(i).getOuts().size(); j++) {
-                connections.add(main.currentSession.board.vertices.elementAt(i).getOuts().elementAt(j));
+                edges.add(main.currentSession.board.vertices.elementAt(i).getOuts().elementAt(j));
             }
         }
-        return connections;
+        return edges;
     }
 }

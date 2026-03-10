@@ -222,6 +222,12 @@ public class Board extends JComponent implements Printable{
 						session.manualResizing = true;
 						session.setSize((int)(d.width*scaleFactor)+session.deltaWidth,(int)(d.height*scaleFactor)+session.deltaHeight);
 					}
+					else if (e.getKeyCode() == KeyEvent.VK_E) {
+						if (e.isShiftDown()) {
+							session.main.persistence.exportPNG();
+						}
+					}
+
 				}
 
 				if (e.getKeyCode() == KeyEvent.VK_H) {
@@ -334,14 +340,11 @@ public class Board extends JComponent implements Printable{
 							Lexicon.capitalize(settings.lexicon.vertex);
 						String result = session.main.grapherDialog(title,panel,"Ok|Cancel");
 						if (result.equals("Ok")) {
-							try {
-								Double.parseDouble(value.getText());
-							}
-							catch (NumberFormatException ex) {
+							String regex = "^-?([0-9]+/[1-9][0-9]*|[0-9]*\\.[0-9]+|[0-9]+)$";
+							if (!value.getText().matches(regex)) {
 								session.main.messageBox("The number format is invalid.|<"+val+">","Error","Accept");
 								return;
 							}
-							Double.parseDouble(value.getText());
 							vertexTarget.setValue(value.getText());
 							vertexTarget.setLabel(label.getText());
 							if (type.getSelectedIndex() == options.length-1) {
@@ -394,10 +397,8 @@ public class Board extends JComponent implements Printable{
 						String result = session.main.grapherDialog(title,panel,"Ok|Cancel");
 
 						if (result.equals("Ok")) {
-							try {
-								Double.parseDouble(value.getText());
-							}
-							catch (NumberFormatException ex) {
+							String regex = "^-?([0-9]+/[1-9][0-9]*|[0-9]*\\.[0-9]+|[0-9]+)$";
+							if (!value.getText().matches(regex)) {
 								session.main.messageBox("The number format is invalid.|<"+val+">","Error","Accept");
 								return;
 							} 
