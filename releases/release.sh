@@ -61,8 +61,8 @@ echo ":: Documentation updated in $README_FILE"
 # # ===============================================================================
 # (DONE) Number validation in property "value" (including fractionaries)
 # (DONE) New view for "accepted vertices"
-# (...) Batch settings for (de)activation of elements
-# (...) Listener for external batch settings (TCP connection)
+# (DONE) Batch settings for (de)activation of elements
+# (DONE) Listener for external batch settings (TCP connection)
 
 
 
