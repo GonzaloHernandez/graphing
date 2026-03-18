@@ -4,10 +4,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.GridLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -65,7 +62,7 @@ public class ViewGeneral extends JPanel {
 	protected JTextArea		comment;
 	protected JTextArea		export;
 
-	protected JButton		programSelection;
+	protected JButton		programSelection,runProgram;
 	protected JTextField	programFile;
 	protected JComboBox<String>	programType;
 	protected JToggleButton	listen;
@@ -189,6 +186,7 @@ public class ViewGeneral extends JPanel {
 		JPanel panelExecute = new JPanel(new FlowLayout());
 		programSelection	= new JButton("Select program");
 		programFile			= new JTextField();
+		runProgram			= new JButton("Run Program");
 		String[] types		= {"MiniZinc", "Python"};
 		programType			= new JComboBox<>(types);
 		listen              = new JToggleButton("Listen");
@@ -215,7 +213,8 @@ public class ViewGeneral extends JPanel {
 		row2.add(programType);
 		row2.setMaximumSize(new Dimension(Integer.MAX_VALUE, row2.getPreferredSize().height));
 
-		JPanel row3 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		JPanel row3 = new JPanel(new GridLayout(1,2));
+		row3.add(runProgram);
 		row3.add(listen);
 		row3.setMaximumSize(new Dimension(Integer.MAX_VALUE, row3.getPreferredSize().height));
 
@@ -507,72 +506,124 @@ public class ViewGeneral extends JPanel {
                     }
                 }
             }
-        });		
+        });
+
+		programSelection.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String file = main.persistence.getFileName("mzn");
+				if (file == null) return;
+				programFile.setText(file);
+			}			
+		});
+
+		runProgram.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String model	= programFile.getText();
+				String session	= main.currentSession.board.fileName;
+				int lastDot		= session.lastIndexOf('.');
+				String data 	= session.substring(0, lastDot) + ".dzn";
+				int init		= 1;
+				for(Vertex v:getVertices()) {
+					if (v.getStatus()==Vertex.FOCUSED) {
+						init = v.getNumber()+1;
+					}
+				}
+				String output = main.persistence.runMinizinc(model,data,"-Dinit="+init);
+				// listenLog.append("\n");
+				// listenLog.append(output);
+
+				output.lines().forEach(line -> {
+					runSettings(line);
+				});
+			}
+			
+		});
 	}
 
 	//-------------------------------------------------------------------------------------
 
     boolean runSettings(String message) {
-listenLog.append(message + "\n");
+		listenLog.append(message + "\n");
 
-    Pattern mainPattern = Pattern.compile("^([a-z]+)=\\[(.*)\\]$");
-    Matcher mainMatcher = mainPattern.matcher(message.trim());
+		Pattern mainPattern = Pattern.compile("^([a-z]+)=\\[(.*)\\]$");
+		Matcher mainMatcher = mainPattern.matcher(message.trim());
 
-    if (!mainMatcher.matches()) {
-        System.err.println("Invalid format: " + message);
-        return false;
-    }
-
-    String key = mainMatcher.group(1);
-    String content = mainMatcher.group(2);
-
-    Vector<String> elements = new Vector<>();
-    Pattern elementPattern = Pattern.compile("[^,\\s]+");
-    Matcher elementMatcher = elementPattern.matcher(content);
-
-    while (elementMatcher.find()) {
-        elements.add(elementMatcher.group());
-    }
-
-	Lexicon lex = main.currentSession.board.settings.lexicon;
-
-	if (key.equals(lex.vertex) || key.equals(lex.vertexValue) || key.equals(lex.vertexLabel)) {
-		Vector<Vertex>  vs = getVertices();
-		if (elements.size()!=vs.size()) {
-			listenLog.append("--- Error ---\n");
+		if (!mainMatcher.matches()) {
 			return false;
 		}
-		if (key.equals(lex.vertex)) {
-			for(int i=0;i<vs.size();i++) { String e = elements.elementAt(i);
-				if (e.toLowerCase().equals("true") || e.toLowerCase().equals("1")) {
-					vs.elementAt(i).setActive(true);
-				} else {
-					vs.elementAt(i).setActive(false);
+
+		String key = mainMatcher.group(1);
+		String content = mainMatcher.group(2);
+
+		Vector<String> elements = new Vector<>();
+		Pattern elementPattern = Pattern.compile("[^,\\s]+");
+		Matcher elementMatcher = elementPattern.matcher(content);
+
+		while (elementMatcher.find()) {
+			elements.add(elementMatcher.group());
+		}
+
+		Lexicon lex = main.currentSession.board.settings.lexicon;
+
+		if (key.equals(lex.vertex) || key.equals(lex.vertexValue) || key.equals(lex.vertexLabel)) {
+			Vector<Vertex>  vs = getVertices();
+			if (elements.size()!=vs.size()) {
+				listenLog.append("--- Error ---\n");
+				return false;
+			}
+			if (key.equals(lex.vertex)) {
+				for(int i=0;i<vs.size();i++) { String e = elements.elementAt(i);
+					if (e.toLowerCase().equals("true") || e.toLowerCase().equals("1")) {
+						vs.elementAt(i).setActive(true);
+					} else {
+						vs.elementAt(i).setActive(false);
+					}
+				}
+			}
+			else if (key.equals(lex.vertexValue)) {
+				for(int i=0;i<vs.size();i++) { String e = elements.elementAt(i);
+					vs.elementAt(i).setValue(e);
+				}
+			}
+			else if (key.equals(lex.vertexLabel)) {
+				for(int i=0;i<vs.size();i++) { String e = elements.elementAt(i);
+					vs.elementAt(i).setLabel(e);
 				}
 			}
 		}
-	}
-	else if (key.equals(lex.edge) || key.equals(lex.edgeValue) || key.equals(lex.edgeLabel)) {
-		Vector<Edge>  es = getEdges();
-		if (elements.size()!=es.size()) {
-			listenLog.append("--- Error ---\n");
-			return false;
-		}
-		if (key.equals(lex.edge)) {
-			for(int i=0;i<es.size();i++) { String e = elements.elementAt(i);
-				if (e.toLowerCase().equals("true") || e.toLowerCase().equals("1")) {
-					es.elementAt(i).setActive(true);
-				} else {
-					es.elementAt(i).setActive(false);
+		else if (key.equals(lex.edge) || key.equals(lex.edgeValue) || key.equals(lex.edgeLabel)) {
+			Vector<Edge>  es = getEdges();
+			if (elements.size()!=es.size()) {
+				listenLog.append("--- Error ---\n");
+				return false;
+			}
+			if (key.equals(lex.edge)) {
+				for(int i=0;i<es.size();i++) { String e = elements.elementAt(i);
+					if (e.toLowerCase().equals("true") || e.toLowerCase().equals("1")) {
+						es.elementAt(i).setActive(true);
+					} else {
+						es.elementAt(i).setActive(false);
+					}
+				}
+			}
+			else if (key.equals(lex.edgeValue)) {
+				for(int i=0;i<es.size();i++) { String e = elements.elementAt(i);
+					es.elementAt(i).setValue(e);
+				}
+			}
+			else if (key.equals(lex.edgeLabel)) {
+				for(int i=0;i<es.size();i++) { String e = elements.elementAt(i);
+					es.elementAt(i).setLabel(e);
 				}
 			}
 		}
-	}
 
-	listenLog.append("--- Done ---\n");
-	main.currentSession.board.repaint();
-	main.properties.stockView.refresh();
-	return true;
+		main.currentSession.board.repaint();
+		main.properties.stockView.refresh();
+		return true;
     }
 
 	//-------------------------------------------------------------------------------------

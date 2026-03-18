@@ -5,20 +5,25 @@ import java.awt.FileDialog;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyVetoException;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.RandomAccessFile;
 import java.io.Writer;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.JInternalFrame;
 import javax.swing.JMenuItem;
+import javax.swing.JTextArea;
 
 import com.lowagie.text.Document;
 import com.lowagie.text.Rectangle;
@@ -967,5 +972,63 @@ public class Persistence {
         dict._edge			= file.readUTF();
         dict.edgeValue		= file.readUTF();
         dict._edgeValue		= file.readUTF();
+    }
+
+    public String getFileName(String type) {
+        FileDialog dialog = new FileDialog(main,"Select a file",FileDialog.LOAD);
+        
+        dialog.setFilenameFilter(new FilenameFilter() {
+            @Override
+            public boolean accept(java.io.File dir, String name) {
+                return name.toLowerCase().endsWith("."+type);
+            }
+        });
+
+        dialog.setDirectory(main.curdir);
+        dialog.setFile("*."+type);
+        dialog.setVisible(true);
+        main.requestFocus();
+        if (dialog.getFile()==null) 
+            return null;
+        return dialog.getDirectory()+dialog.getFile();
+    }
+
+    public String runMinizinc(String modelFile,String dataFile,String parms) {
+        List<String> command = new ArrayList<>();
+        command.add("minizinc");           // The executable
+        command.add("--solver");           // Argument
+        command.add("highs");             // Value
+        command.add(modelFile);  // Your model file
+        command.add(dataFile);   // Your data file
+        command.add(parms);   // Your data file
+
+        ProcessBuilder pb = new ProcessBuilder(command);
+        
+        // Optionally redirect error stream to output stream to catch everything in one place
+        pb.redirectErrorStream(true);
+        String output = "";
+
+        try {
+            // 2. Start the process
+            Process process = pb.start();
+
+            // 3. Read the output
+            try (BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(process.getInputStream()))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    output += line + "\n";
+                    // System.out.println("MiniZinc: " + line);
+                }
+            }
+
+            // 4. Wait for the process to finish and check the exit code
+            int exitCode = process.waitFor();
+            output += "\nExited with error code : " + exitCode + "\n";
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return output;
     }
 }

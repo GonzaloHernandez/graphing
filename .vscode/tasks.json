@@ -11,7 +11,7 @@
             // "--add-modules", "com.formdev.flatlaf",
             // "--add-reads", "com.formdev.flatlaf=ALL-UNNAMED",
             "-d", "build",
-            "/home/chalo/Software/graphing/src/**/*.java"
+            "${workspaceFolder}/src/**/*.java"
         ],
         "group": {
           "kind": "build",
