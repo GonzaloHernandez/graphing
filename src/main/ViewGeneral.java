@@ -1,16 +1,31 @@
 package main;
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -22,7 +37,9 @@ import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JToggleButton;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
@@ -37,18 +54,25 @@ public class ViewGeneral extends JPanel {
 
 	protected	GrapherMain	main;
 
-	protected	JCheckBox	showVSeq,showVVal,showVTyp,showVLab;
-	protected	JCheckBox	showESeq,showEVal,showETyp,showELab;
-	protected	JTextField	showVValDiff,showVLabDiff;
-	protected	JTextField	showEValDiff,showELabDiff;
-	protected	JCheckBox	allowFirstState;
-	protected	JCheckBox	firstZero;
-	protected	JCheckBox	exportAuto;
-	protected	JTabbedPane	info;
-	protected	JTextArea	comment;
-	protected	JTextArea	export;
-	protected	JSpinner	gridScale;
-	protected	JComboBox<String>	exportType;
+	protected JCheckBox		showVSeq,showVVal,showVTyp,showVLab;
+	protected JCheckBox		showESeq,showEVal,showETyp,showELab;
+	protected JTextField	showVValDiff,showVLabDiff;
+	protected JTextField	showEValDiff,showELabDiff;
+	protected JCheckBox		allowFirstState;
+	protected JCheckBox		firstZero;
+	protected JCheckBox		exportAuto;
+	protected JTabbedPane	info;
+	protected JTextArea		comment;
+	protected JTextArea		export;
+
+	protected JButton		programSelection;
+	protected JTextField	programFile;
+	protected JComboBox<String>	programType;
+	protected JToggleButton	listen;
+	protected JTextArea		listenLog;
+
+	protected JSpinner		gridScale;
+	protected JComboBox<String>	exportType;
 
 	protected	TitledBorder vertexTitle;
 	protected	TitledBorder edgeTitle;
@@ -153,22 +177,61 @@ public class ViewGeneral extends JPanel {
 		comment = new JTextArea();
 		comment.setWrapStyleWord(true);
 		comment.setLineWrap(true);
+		comment.setFont(new Font("FreeMono", Font.PLAIN, 12));
 
 		JPanel panelExport = new JPanel(new BorderLayout());
-		exportType = new JComboBox<String>(GrapherSettings.exportTypes);
+		exportType = new JComboBox<>(GrapherSettings.exportTypes);
 		export = new JTextArea();
 		export.setWrapStyleWord(true);
 		export.setFont(new Font("FreeMono", Font.PLAIN, 12));
 		export.setEditable(false);
 
+		JPanel panelExecute = new JPanel(new FlowLayout());
+		programSelection	= new JButton("Select program");
+		programFile			= new JTextField();
+		String[] types		= {"MiniZinc", "Python"};
+		programType			= new JComboBox<>(types);
+		listen              = new JToggleButton("Listen");
+		listenLog			= new JTextArea();
+		listenLog.setEditable(false);
+
+		// ----- Sub tabs -----------------
+
 		panelComment.add(new JScrollPane(comment), BorderLayout.CENTER);
+
 		panelExport.add(exportType, BorderLayout.NORTH);
 		panelExport.add(new JScrollPane(export), BorderLayout.CENTER);
 		panelExport.add(exportAuto, BorderLayout.SOUTH);
 
+		panelExecute.setLayout(new BoxLayout(panelExecute, BoxLayout.Y_AXIS));
+
+		JPanel row1 = new JPanel(new BorderLayout(5, 0)); 
+		row1.add(programSelection, BorderLayout.WEST);
+		row1.add(programFile, BorderLayout.CENTER);
+		row1.setMaximumSize(new Dimension(Integer.MAX_VALUE, row1.getPreferredSize().height));
+
+		JPanel row2 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		row2.add(new JLabel("Program Type: "));
+		row2.add(programType);
+		row2.setMaximumSize(new Dimension(Integer.MAX_VALUE, row2.getPreferredSize().height));
+
+		JPanel row3 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		row3.add(listen);
+		row3.setMaximumSize(new Dimension(Integer.MAX_VALUE, row3.getPreferredSize().height));
+
+		panelExecute.add(row1);
+		panelExecute.add(row2);
+		panelExecute.add(row3);
+
+		JScrollPane scrollLog = new JScrollPane(listenLog);
+		panelExecute.add(scrollLog);
+
+		// ----------------------------------
+
 		info = new JTabbedPane();
 		info.addTab("Comment", panelComment);
 		info.addTab("Export", panelExport);
+		info.addTab("Execute", panelExecute);
 
 		add(northWrapper, BorderLayout.NORTH);
 		add(info, BorderLayout.CENTER);
@@ -405,7 +468,128 @@ public class ViewGeneral extends JPanel {
 			}
 			
 		});
+
+        listen.addItemListener(new ItemListener() {
+            private Thread serverThread;
+
+            @Override
+            public void itemStateChanged(ItemEvent ev) {
+                if (ev.getStateChange() == ItemEvent.SELECTED) {
+
+                    serverThread = new Thread(() -> {
+                        int port = 65432;
+                        try (ServerSocket serverSocket = new ServerSocket(port)) {
+                            System.out.println("Java Server is listening on port " + port);
+
+                            while (!Thread.currentThread().isInterrupted()) {
+                                try (Socket clientSocket = serverSocket.accept();
+                                    BufferedReader in = new BufferedReader(
+                                        new InputStreamReader(clientSocket.getInputStream()))) 
+                                {
+                                    String line;
+									while ((line = in.readLine()) != null) {
+										final String message = line;
+										SwingUtilities.invokeLater(() -> runSettings(message));
+									}
+                                } catch (IOException ex) {
+                                    System.out.println("Socket error: " + ex.getMessage());
+                                }
+                            }
+                        } catch (IOException ex) {
+                            System.out.println("Could not listen on port " + port);
+                        }
+                    });
+
+                    serverThread.start();
+                } else {
+                    if (serverThread != null) {
+                        serverThread.interrupt(); 
+                    }
+                }
+            }
+        });		
 	}
+
+	//-------------------------------------------------------------------------------------
+
+    boolean runSettings(String message) {
+listenLog.append(message + "\n");
+
+    Pattern mainPattern = Pattern.compile("^([a-z]+)=\\[(.*)\\]$");
+    Matcher mainMatcher = mainPattern.matcher(message.trim());
+
+    if (!mainMatcher.matches()) {
+        System.err.println("Invalid format: " + message);
+        return false;
+    }
+
+    String key = mainMatcher.group(1);
+    String content = mainMatcher.group(2);
+
+    Vector<String> elements = new Vector<>();
+    Pattern elementPattern = Pattern.compile("[^,\\s]+");
+    Matcher elementMatcher = elementPattern.matcher(content);
+
+    while (elementMatcher.find()) {
+        elements.add(elementMatcher.group());
+    }
+
+	Lexicon lex = main.currentSession.board.settings.lexicon;
+
+	if (key.equals(lex.vertex) || key.equals(lex.vertexValue) || key.equals(lex.vertexLabel)) {
+		Vector<Vertex>  vs = getVertices();
+		if (elements.size()!=vs.size()) {
+			listenLog.append("--- Error ---\n");
+			return false;
+		}
+		if (key.equals(lex.vertex)) {
+			for(int i=0;i<vs.size();i++) { String e = elements.elementAt(i);
+				if (e.toLowerCase().equals("true") || e.toLowerCase().equals("1")) {
+					vs.elementAt(i).setActive(true);
+				} else {
+					vs.elementAt(i).setActive(false);
+				}
+			}
+		}
+	}
+	else if (key.equals(lex.edge) || key.equals(lex.edgeValue) || key.equals(lex.edgeLabel)) {
+		Vector<Edge>  es = getEdges();
+		if (elements.size()!=es.size()) {
+			listenLog.append("--- Error ---\n");
+			return false;
+		}
+		if (key.equals(lex.edge)) {
+			for(int i=0;i<es.size();i++) { String e = elements.elementAt(i);
+				if (e.toLowerCase().equals("true") || e.toLowerCase().equals("1")) {
+					es.elementAt(i).setActive(true);
+				} else {
+					es.elementAt(i).setActive(false);
+				}
+			}
+		}
+	}
+
+	listenLog.append("--- Done ---\n");
+	main.currentSession.board.repaint();
+	main.properties.stockView.refresh();
+	return true;
+    }
+
+	//-------------------------------------------------------------------------------------
+
+    Vector<Vertex> getVertices() {
+        return main.currentSession.board.vertices;
+    }
+
+    Vector<Edge> getEdges() {
+        Vector<Edge> edges = new Vector<Edge>();
+        for (int i=0; i<main.currentSession.board.vertices.size(); i++) {
+            for (int j=0; j<main.currentSession.board.vertices.elementAt(i).getOuts().size(); j++) {
+                edges.add(main.currentSession.board.vertices.elementAt(i).getOuts().elementAt(j));
+            }
+        }
+        return edges;
+    }
 
 	//-------------------------------------------------------------------------------------
 
