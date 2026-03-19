@@ -59,10 +59,9 @@ echo ":: Build Success: $OUTPUT_FILE"
 echo ":: Documentation updated in $README_FILE"
 
 # # ===============================================================================
-# (DONE) Number validation in property "value" (including fractionaries)
-# (DONE) New view for "accepted vertices"
-# (DONE) Batch settings for (de)activation of elements
-# (DONE) Listener for external batch settings (TCP connection)
+# (DONE) Execute external program (MiniZinc so far)
+# (DONE) Improving Listener for external settings (TCP connection)
+
 
 
 

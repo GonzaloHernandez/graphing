@@ -575,18 +575,18 @@ public class MenuOptions extends JPopupMenu{
 				s.lexicon._edgeType		= "a";
 				s.lexicon._edgeLabel	= "l";
 				s.showVertexSequence	= false;
-				s.showVertexValue		= true;
+				s.showVertexValue		= false;
 				s.showVertexType		= true;
-				s.showVertexLabel		= false;
+				s.showVertexLabel		= true;
 				s.showVertexValueDiff	= "-0";
 				s.showVertexLabelDiff	= "";	
 
 				s.showEdgeSequence		= false;
-				s.showEdgeValue			= false;
+				s.showEdgeValue			= true;
 				s.showEdgeType			= false;
-				s.showEdgeLabel			= true;
-				s.showEdgeValueDiff		= "";
-				s.showEdgeLabelDiff		= "1";
+				s.showEdgeLabel			= false;
+				s.showEdgeValueDiff		= "1";
+				s.showEdgeLabelDiff		= "";
 				
 				s.exportType			= 1;
 

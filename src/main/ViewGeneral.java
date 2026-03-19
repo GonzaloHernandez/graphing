@@ -14,6 +14,8 @@ import java.awt.event.ItemListener;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Vector;
@@ -62,7 +64,7 @@ public class ViewGeneral extends JPanel {
 	protected JTextArea		comment;
 	protected JTextArea		export;
 
-	protected JButton		programSelection,runProgram;
+	protected JButton		programSelection,runProgram,cleanLog;
 	protected JTextField	programFile;
 	protected JComboBox<String>	programType;
 	protected JToggleButton	listen;
@@ -71,10 +73,10 @@ public class ViewGeneral extends JPanel {
 	protected JSpinner		gridScale;
 	protected JComboBox<String>	exportType;
 
-	protected	TitledBorder vertexTitle;
-	protected	TitledBorder edgeTitle;
+	protected TitledBorder vertexTitle;
+	protected TitledBorder edgeTitle;
 
-	private 	GrapherSettings settings;
+	protected GrapherSettings settings;
 	
 	//-------------------------------------------------------------------------------------
 
@@ -190,6 +192,7 @@ public class ViewGeneral extends JPanel {
 		String[] types		= {"MiniZinc", "Python"};
 		programType			= new JComboBox<>(types);
 		listen              = new JToggleButton("Listen");
+		cleanLog			= new JButton("Clean Log");
 		listenLog			= new JTextArea();
 		listenLog.setEditable(false);
 
@@ -213,9 +216,10 @@ public class ViewGeneral extends JPanel {
 		row2.add(programType);
 		row2.setMaximumSize(new Dimension(Integer.MAX_VALUE, row2.getPreferredSize().height));
 
-		JPanel row3 = new JPanel(new GridLayout(1,2));
+		JPanel row3 = new JPanel(new GridLayout(1,3));
 		row3.add(runProgram);
 		row3.add(listen);
+		row3.add(cleanLog);
 		row3.setMaximumSize(new Dimension(Integer.MAX_VALUE, row3.getPreferredSize().height));
 
 		panelExecute.add(row1);
@@ -469,9 +473,10 @@ public class ViewGeneral extends JPanel {
 		});
 
         listen.addItemListener(new ItemListener() {
-            private Thread serverThread;
-
-            @Override
+			protected Thread serverThread;
+			protected ServerSocket serverSocket;
+            
+			@Override
             public void itemStateChanged(ItemEvent ev) {
                 if (ev.getStateChange() == ItemEvent.SELECTED) {
 
@@ -496,14 +501,27 @@ public class ViewGeneral extends JPanel {
                             }
                         } catch (IOException ex) {
                             System.out.println("Could not listen on port " + port);
-                        }
+                        } finally {
+							try {
+								if (serverSocket != null && !serverSocket.isClosed()) {
+									serverSocket.close();
+								}
+							} catch (IOException e) {}
+						}
                     });
 
                     serverThread.start();
                 } else {
-                    if (serverThread != null) {
-                        serverThread.interrupt(); 
-                    }
+					try {
+						if (serverThread != null) {
+							serverThread.interrupt();
+						}
+						if (serverSocket != null && !serverSocket.isClosed()) {
+							serverSocket.close();
+						}
+					} catch (IOException e) {
+						System.err.println("Error closing server: " + e.getMessage());
+					}
                 }
             }
         });
@@ -559,13 +577,11 @@ public class ViewGeneral extends JPanel {
 
 				String from = "";
 				String to	= "";
-				int nConections = 0;
 				int first	= main.currentSession.board.settings.firstZero?0:1;
 				for (Vertex s : vs) {
 					for (Edge c : s.getOuts()) {
 						from	+= c.getSource().getNumber()+first + ",";
 						to		+= c.getTarget().getNumber()+first + ",";
-						nConections ++;
 					}
 				}
 
@@ -593,9 +609,16 @@ public class ViewGeneral extends JPanel {
 					"init		= "	+ init + ";";
 
 				String output = main.persistence.runMinizinc(model,parms);
-				output.lines().forEach(line -> {
-					runSettings(line);
-				});
+				output.lines().forEach(line -> runSettings(line));
+			}
+			
+		});
+
+		cleanLog.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				listenLog.setText("");
 			}
 			
 		});
@@ -642,7 +665,11 @@ public class ViewGeneral extends JPanel {
 			}
 			else if (key.equals(lex.vertexValue)) {
 				for(int i=0;i<vs.size();i++) { String e = elements.elementAt(i);
-					vs.elementAt(i).setValue(e);
+					BigDecimal dec = new BigDecimal(e);
+					if (dec.scale() > 3) {
+						dec = dec.setScale(3, RoundingMode.HALF_UP);
+					}
+					vs.elementAt(i).setValue(dec.stripTrailingZeros().toPlainString());
 				}
 			}
 			else if (key.equals(lex.vertexLabel)) {
@@ -668,7 +695,11 @@ public class ViewGeneral extends JPanel {
 			}
 			else if (key.equals(lex.edgeValue)) {
 				for(int i=0;i<es.size();i++) { String e = elements.elementAt(i);
-					es.elementAt(i).setValue(e);
+					BigDecimal dec = new BigDecimal(e);
+					if (dec.scale() > 3) {
+						dec = dec.setScale(3, RoundingMode.HALF_UP);
+					}
+					es.elementAt(i).setValue(dec.stripTrailingZeros().toPlainString());
 				}
 			}
 			else if (key.equals(lex.edgeLabel)) {
