@@ -558,22 +558,22 @@ public class MenuOptions extends JPopupMenu{
 			public void actionPerformed(ActionEvent ev) {
 				GrapherSettings s = main.currentSession.board.settings;
 				s.lexicon.graph			= "game";
-				s.lexicon.vertex		= "vertex";
-				s.lexicon.vertexValue	= "priors";
+				s.lexicon.vertex		= "vertices";
+				s.lexicon.vertexValue	= "values";
 				s.lexicon.vertexType	= "owners";
 				s.lexicon.vertexLabel	= "Label";
-				s.lexicon.edge			= "edge";
-				s.lexicon.edgeValue		= "Weights";
+				s.lexicon.edge			= "edges";
+				s.lexicon.edgeValue		= "chances";
 				s.lexicon.edgeType		= "Actions";
-				s.lexicon.edgeLabel		= "chances";
+				s.lexicon.edgeLabel		= "Labels";
 				s.lexicon._graph		= "g";
 				s.lexicon._vertex		= "v";
 				s.lexicon._vertexType	= "o";
-				s.lexicon._vertexValue	= "p";
+				s.lexicon._vertexValue	= " ";
 				s.lexicon._edge			= "e";
-				s.lexicon._edgeValue	= "w";
+				s.lexicon._edgeValue	= "c";
 				s.lexicon._edgeType		= "a";
-				s.lexicon._edgeLabel	= "c";
+				s.lexicon._edgeLabel	= "l";
 				s.showVertexSequence	= false;
 				s.showVertexValue		= true;
 				s.showVertexType		= true;
@@ -592,23 +592,23 @@ public class MenuOptions extends JPopupMenu{
 
 				Vector<Type> vTypes = main.currentSession.board.vTypes;
 				if (vTypes.size()<=0) {
-					vTypes.add(new Type(0,"Even", "Round"));
+					vTypes.add(new Type(0,"Min", "Round"));
 				} else {
-					vTypes.elementAt(0).setName("Even");
+					vTypes.elementAt(0).setName("Min");
 					vTypes.elementAt(0).setDescription("Round");
 				}
 
 				if (vTypes.size()<=1) {
-					vTypes.add(new Type(1,"Odd", "Square"));
+					vTypes.add(new Type(1,"Max", "Square"));
 				} else {
-					vTypes.elementAt(1).setName("Odd");
+					vTypes.elementAt(1).setName("Max");
 					vTypes.elementAt(1).setDescription("Square");
 				}
 
 				if (vTypes.size()<=2) {
-					vTypes.add(new Type(2,"Nature", "Diamond"));
+					vTypes.add(new Type(2,"Random", "Diamond"));
 				} else {
-					vTypes.elementAt(2).setName("Nature");
+					vTypes.elementAt(2).setName("Random");
 					vTypes.elementAt(2).setDescription("Diamond");
 				}
 

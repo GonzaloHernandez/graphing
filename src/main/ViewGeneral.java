@@ -521,6 +521,7 @@ public class ViewGeneral extends JPanel {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				if (programFile.getText().trim().isEmpty()) return;
 				String model	= programFile.getText();
 				String session	= main.currentSession.board.fileName;
 				int lastDot		= session.lastIndexOf('.');
@@ -532,9 +533,6 @@ public class ViewGeneral extends JPanel {
 					}
 				}
 				String output = main.persistence.runMinizinc(model,data,"-Dinit="+init);
-				// listenLog.append("\n");
-				// listenLog.append(output);
-
 				output.lines().forEach(line -> {
 					runSettings(line);
 				});

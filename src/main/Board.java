@@ -259,9 +259,9 @@ public class Board extends JComponent implements Printable{
 				int button = e.getButton();
 
 				boolean shiftDown = (modifiers & InputEvent.SHIFT_DOWN_MASK) != 0;
-				boolean ctrlDown = (modifiers & InputEvent.CTRL_DOWN_MASK) != 0;
-				boolean altDown = (modifiers & InputEvent.ALT_DOWN_MASK) != 0;
-				
+				boolean ctrlDown =	(modifiers & InputEvent.CTRL_DOWN_MASK) != 0;
+				boolean altDown =	(modifiers & InputEvent.ALT_DOWN_MASK) != 0 || 
+                					(modifiers & InputEvent.ALT_GRAPH_DOWN_MASK) != 0;
 				// SHIFT + BUTTON1
 				if (shiftDown && button == MouseEvent.BUTTON1) {
 					if (vertexTarget != null) {

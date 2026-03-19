@@ -190,8 +190,8 @@ public class Vertex {
 		if (settings.showVertexValue) {
 			if (!value.equals(settings.showVertexValueDiff)){
 				g.setColor(Color.BLACK);
-				g.setFont(new Font("Arial",Font.PLAIN,13));
-				g.drawString(""+value,x-(3*(new String(""+value)).length()),y+4);
+				g.setFont(new Font("Arial",Font.PLAIN,10));
+				g.drawString(""+value,x-(2*(new String(""+value)).length()),y+4);
 			}
 		} 
 		else if (settings.showVertexLabel) {
