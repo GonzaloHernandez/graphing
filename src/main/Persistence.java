@@ -23,7 +23,6 @@ import java.util.List;
 import javax.imageio.ImageIO;
 import javax.swing.JInternalFrame;
 import javax.swing.JMenuItem;
-import javax.swing.JTextArea;
 
 import com.lowagie.text.Document;
 import com.lowagie.text.Rectangle;
@@ -993,36 +992,30 @@ public class Persistence {
         return dialog.getDirectory()+dialog.getFile();
     }
 
-    public String runMinizinc(String modelFile,String dataFile,String parms) {
+    public String runMinizinc(String modelFile,String parms) {
         List<String> command = new ArrayList<>();
-        command.add("minizinc");           // The executable
-        command.add("--solver");           // Argument
-        command.add("highs");             // Value
-        command.add(modelFile);  // Your model file
-        command.add(dataFile);   // Your data file
-        command.add(parms);   // Your data file
+        command.add("minizinc");
+        command.add("--solver");
+        command.add("highs");
+        command.add(modelFile);
+        command.add(parms);
 
         ProcessBuilder pb = new ProcessBuilder(command);
         
-        // Optionally redirect error stream to output stream to catch everything in one place
         pb.redirectErrorStream(true);
         String output = "";
 
         try {
-            // 2. Start the process
             Process process = pb.start();
 
-            // 3. Read the output
             try (BufferedReader reader = new BufferedReader(
                     new InputStreamReader(process.getInputStream()))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
                     output += line + "\n";
-                    // System.out.println("MiniZinc: " + line);
                 }
             }
 
-            // 4. Wait for the process to finish and check the exit code
             int exitCode = process.waitFor();
             output += "\nExited with error code : " + exitCode + "\n";
 

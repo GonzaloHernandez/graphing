@@ -520,19 +520,79 @@ public class ViewGeneral extends JPanel {
 		runProgram.addActionListener(new ActionListener() {
 
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(ActionEvent ev) {
 				if (programFile.getText().trim().isEmpty()) return;
-				String model	= programFile.getText();
-				String session	= main.currentSession.board.fileName;
-				int lastDot		= session.lastIndexOf('.');
-				String data 	= session.substring(0, lastDot) + ".dzn";
+
+				Vector<Vertex>	vs = getVertices();
+				Vector<Edge>	es = getEdges();
+
+				String vertexTypes = "";
+				String vertexValues = "";
+				String vertexLabels = "";
+				String edgeTypes = "";
+				String edgeValues = "";
+				String edgeLabels = "";
+				
+				for (Vertex v  : vs){ 
+					if (vertexValues.length() > 0){
+						vertexTypes += ",";
+						vertexValues += ",";
+						vertexLabels += ",";
+					}
+					Type vType		= v.getType();
+					vertexTypes		+= vType==null?0:vType.getId();
+					vertexValues	+= v.getValue();
+					vertexLabels	+= v.getLabel();
+
+					for (Edge e : v.getOuts()) {
+						if (edgeValues.length()>0)  {
+							edgeTypes  += ",";
+							edgeValues += ",";
+							edgeLabels += ",";
+						}
+						Type eType	= e.getType();
+						edgeTypes	+= eType==null?0:eType.getId();
+						edgeValues	+= e.getValue();
+						edgeLabels	+= e.getLabel();
+					}
+				}
+
+				String from = "";
+				String to	= "";
+				int nConections = 0;
+				int first	= main.currentSession.board.settings.firstZero?0:1;
+				for (Vertex s : vs) {
+					for (Edge c : s.getOuts()) {
+						from	+= c.getSource().getNumber()+first + ",";
+						to		+= c.getTarget().getNumber()+first + ",";
+						nConections ++;
+					}
+				}
+
+				if (from.length()>0) {
+					from	= from	.substring(0, from.length()-1);
+					to		= to	.substring(0, to.length()-1);	
+				}
+
 				int init		= 1;
 				for(Vertex v:getVertices()) {
 					if (v.getStatus()==Vertex.FOCUSED) {
 						init = v.getNumber()+1;
 					}
 				}
-				String output = main.persistence.runMinizinc(model,data,"-Dinit="+init);
+				
+				String model	= programFile.getText();
+				String parms	= "-D" +
+					"nvertices	= "	+ vs.size() + ";" +
+					"nedges    	= "	+ es.size() + ";" +
+					"owners		= ["+ vertexTypes + "];" +
+					"values		= ["+ vertexValues + "];" +
+					"sources	= ["+ from + "];" +
+					"targets	= ["+ to + "];" +
+					"chances	= ["+ edgeValues + "];" +
+					"init		= "	+ init + ";";
+
+				String output = main.persistence.runMinizinc(model,parms);
 				output.lines().forEach(line -> {
 					runSettings(line);
 				});
@@ -545,7 +605,6 @@ public class ViewGeneral extends JPanel {
 
     boolean runSettings(String message) {
 		listenLog.append(message + "\n");
-
 		Pattern mainPattern = Pattern.compile("^([a-z]+)=\\[(.*)\\]$");
 		Matcher mainMatcher = mainPattern.matcher(message.trim());
 
