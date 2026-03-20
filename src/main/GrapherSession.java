@@ -19,8 +19,8 @@ public class GrapherSession extends JInternalFrame{
 
 	boolean		manualResizing;
 
-	int			deltaWidth	= 12;	// Difference between JInternalFrame and Jcomponent size
-	int			deltaHeight	= 36;
+	static int	deltaWidth	= 12;	// Difference between JInternalFrame and Jcomponent size
+	static int	deltaHeight	= 36;
 	
 	//-------------------------------------------------------------------------------------
 

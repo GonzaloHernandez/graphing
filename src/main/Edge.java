@@ -2,6 +2,7 @@ package main;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Stroke;
@@ -99,7 +100,8 @@ public class Edge {
 		);
 		Stroke originalStroke = g.getStroke();
 
-		double	angle,hypotenuse,alpha,theta,grandHypotenuse,beta,gamma,dx,dy;
+		double grandAngle=0,grandHypotenuse=0;
+		double angle,hypotenuse,alpha,theta,beta,gamma,dx,dy;
 		
 		if (source.equals(target)){
 			switch (status) {
@@ -135,18 +137,22 @@ public class Edge {
 		
 			//--- middle point ---
 			
-			hypotenuse	= (int)Math.sqrt(Math.pow(Math.abs(target.getX()-source.getX()),2)+Math.pow(Math.abs(target.getY()-source.getY()),2));
+			grandHypotenuse	= (int)Math.sqrt(Math.pow(Math.abs(target.getX()-source.getX()),2)+Math.pow(Math.abs(target.getY()-source.getY()),2));
 			if (Math.abs(source.getY()-target.getY())<Math.abs(source.getX()-target.getX()))
-				angle	= Math.asin(Math.abs(target.getY()-source.getY())/hypotenuse);
+				grandAngle	= Math.asin(Math.abs(target.getY()-source.getY())/grandHypotenuse);
 			else
-				angle	= Math.acos(Math.abs(target.getX()-source.getX())/hypotenuse);
+				grandAngle	= Math.acos(Math.abs(target.getX()-source.getX())/grandHypotenuse);
 			
-			if (source.getX()<target.getX())	middle.x	= (int)(source.getX() + Math.cos(angle) * (hypotenuse /2));
-			else								middle.x	= (int)(source.getX() - Math.cos(angle) * (hypotenuse /2));
-			if (source.getY()<target.getY())	middle.y	= (int)(source.getY() + Math.sin(angle) * (hypotenuse /2));
-			else								middle.y	= (int)(source.getY() - Math.sin(angle) * (hypotenuse /2));
+			if (source.getX()<target.getX())	
+				middle.x	= (int)(source.getX() + Math.cos(grandAngle) * (grandHypotenuse /2));
+			else
+				middle.x	= (int)(source.getX() - Math.cos(grandAngle) * (grandHypotenuse /2));
+			if (source.getY()<target.getY())	
+				middle.y	= (int)(source.getY() + Math.sin(grandAngle) * (grandHypotenuse /2));
+			else
+				middle.y	= (int)(source.getY() - Math.sin(grandAngle) * (grandHypotenuse /2));
 	
-			grandHypotenuse	= hypotenuse;
+			// grandHypotenuse	= hypotenuse;
 					
 			//--- control point ---
 			
@@ -156,13 +162,17 @@ public class Edge {
 			else
 				alpha	= Math.asin((distance*-1)/hypotenuse);
 				
-			theta	= angle - alpha;
+			theta	= grandAngle - alpha;
 			
-			if (source.getX() <= middle.x)	control.x	= (int)(source.getX() + Math.cos(theta) * (hypotenuse));
-			else							control.x	= (int)(source.getX() - Math.cos(theta) * (hypotenuse));
+			if (source.getX() <= middle.x)	
+				control.x	= (int)(source.getX() + Math.cos(theta) * (hypotenuse));
+			else
+				control.x	= (int)(source.getX() - Math.cos(theta) * (hypotenuse));
 	
-			if (source.getY() <= middle.y)	control.y	= (int)(source.getY() + Math.sin(theta) * (hypotenuse));
-			else							control.y	= (int)(source.getY() - Math.sin(theta) * (hypotenuse));
+			if (source.getY() <= middle.y)	
+				control.y	= (int)(source.getY() + Math.sin(theta) * (hypotenuse));
+			else
+				control.y	= (int)(source.getY() - Math.sin(theta) * (hypotenuse));
 	
 			//--- start point ---
 			
@@ -171,11 +181,15 @@ public class Edge {
 			else
 				angle	= Math.acos(Math.abs(control.x-source.getX())/hypotenuse);
 					
-			if (source.getX()<control.x)	start.x		= (int)(source.getX() + Math.cos(angle) * Vertex.RADIUS);
-			else							start.x		= (int)(source.getX() - Math.cos(angle) * Vertex.RADIUS);
+			if (source.getX()<control.x)	
+				start.x		= (int)(source.getX() + Math.cos(angle) * Vertex.RADIUS);
+			else
+				start.x		= (int)(source.getX() - Math.cos(angle) * Vertex.RADIUS);
 			
-			if (source.getY()<control.y)	start.y		= (int)(source.getY() + Math.sin(angle) * Vertex.RADIUS);
-			else							start.y		= (int)(source.getY() - Math.sin(angle) * Vertex.RADIUS);
+			if (source.getY()<control.y)	
+				start.y		= (int)(source.getY() + Math.sin(angle) * Vertex.RADIUS);
+			else
+				start.y		= (int)(source.getY() - Math.sin(angle) * Vertex.RADIUS);
 			
 			//--- end point ---
 			
@@ -184,11 +198,15 @@ public class Edge {
 			else
 				angle	= Math.acos(Math.abs(target.getX()-control.x)/hypotenuse);
 					
-			if (control.x<target.getX())	end.x		= (int)(control.x + Math.cos(angle) * (hypotenuse - Vertex.RADIUS-1));
-			else							end.x		= (int)(control.x - Math.cos(angle) * (hypotenuse - Vertex.RADIUS-1));
+			if (control.x<target.getX())	
+				end.x		= (int)(control.x + Math.cos(angle) * (hypotenuse - Vertex.RADIUS-1));
+			else
+				end.x		= (int)(control.x - Math.cos(angle) * (hypotenuse - Vertex.RADIUS-1));
 			
-			if (control.y<target.getY())	end.y		= (int)(control.y + Math.sin(angle) * (hypotenuse - Vertex.RADIUS-1));
-			else							end.y		= (int)(control.y - Math.sin(angle) * (hypotenuse - Vertex.RADIUS-1));
+			if (control.y<target.getY())
+				end.y		= (int)(control.y + Math.sin(angle) * (hypotenuse - Vertex.RADIUS-1));
+			else
+				end.y		= (int)(control.y - Math.sin(angle) * (hypotenuse - Vertex.RADIUS-1));
 	
 			//--- text point ---
 
@@ -250,63 +268,63 @@ public class Edge {
 		int ys [] = {end.y,arrowleft.y,arrowright.y};
 		g.fillPolygon(xs,ys,3);
 
-		//--- draw label ---
+		//--- draw labels ---
 		
-		String tag = "";
-		String seq = "";
-		int l = 0;
+		String tag1 = "";
+		String tag2 = "";
+		String tag3 = "";
+		String tag4 = "";
 
 		if (settings.showEdgeSequence) {
-			seq = ""+connectionSequence;
-			l += seq.length() + 1;
+			tag1 = (settings.lexicon._edge+connectionSequence).trim();
 		}
 
 		if (settings.showEdgeValue) {
 			if (!settings.showEdgeValueDiff.equals(getValue())) {
-				tag += getValue();
-				l += tag.length();
+				if (!tag1.isEmpty()) tag1 += " ";
+				tag2 = getValue();
 			}
 		}
 
 		if (type!=null && settings.showEdgeType) {
-			if (settings.showEdgeValue) {
-				tag += ":";
-			}
-			tag += type.getName();
-			l += tag.length();
-		}
-		
-		if (settings.showEdgeSequence) {
-			Lexicon lex = settings.lexicon;
-
-			g.setColor(Color.BLUE);
-			g.setFont(new Font("Arial",Font.ITALIC,9));
-			g.drawString(lex._edge,text.x-(l*5/2),text.y+5);
-
-			if (!tag.isEmpty()) {
-				seq += ":";
-			}
-
-			g.setFont(new Font("Arial",Font.ITALIC,7));
-			g.drawString(seq,text.x-(l*5/2)+5,text.y+6);
-		}
-
-
-		if (settings.showEdgeValue || settings.showEdgeType) {
-			g.setColor(Color.RED);
-			g.setFont(new Font("Arial",Font.ITALIC,9));
-			g.drawString(tag,text.x-(l*5/2)+(seq.length()*5),text.y+5);
+			tag3 += type.getName();
 		}
 
 		if (settings.showEdgeLabel) {
 			if (!settings.showEdgeLabelDiff.equals(label)) {
-				g.setColor(Color.BLACK);
-				g.setFont(new Font("Arial",Font.ITALIC,7));
-				l = label.length();
-				g.drawString(label,text.x-(l*5/2),text.y+13);
+				if (!tag3.isEmpty()) tag3 += " ";
+				tag4 = getLabel();
 			}
 		}
 
+		if ((target.getX()>source.getX() && target.getY()>source.getY()) ||
+			(target.getX()<source.getX() && target.getY()<source.getY()))
+			g.rotate(grandAngle,text.x,text.y);
+		else
+			g.rotate(2*Math.PI-grandAngle,text.x,text.y);
+
+		g.setFont(new Font("Arial",Font.PLAIN,9));
+		FontMetrics metrics = g.getFontMetrics(g.getFont());
+		int textWidth1 = metrics.stringWidth(tag1+tag2);
+		g.setColor(Color.BLUE);
+		g.drawString(tag1,text.x-(textWidth1/2),text.y-metrics.getDescent());
+		int textWidth2 = metrics.stringWidth(tag1);
+		g.setColor(Color.BLACK);
+		g.drawString(tag2,text.x-(textWidth1/2)+textWidth2,text.y-metrics.getDescent());
+
+		textWidth1 = metrics.stringWidth(tag3+tag4);
+		g.setColor(Color.BLUE);
+		g.drawString(tag3,text.x-(textWidth1/2),text.y+metrics.getDescent()+7);
+		textWidth2 = metrics.stringWidth(tag3);
+		g.setColor(Color.BLACK);
+		g.drawString(tag4,text.x-(textWidth1/2)+textWidth2,text.y+metrics.getDescent()+7);
+
+		if ((target.getX()>source.getX() && target.getY()>source.getY()) ||
+			(target.getX()<source.getX() && target.getY()<source.getY()))
+			g.rotate(-grandAngle,text.x,text.y);
+		else
+			g.rotate(-(2*Math.PI-grandAngle),text.x,text.y);
+		
 		return connectionSequence+1;
 	}
 	

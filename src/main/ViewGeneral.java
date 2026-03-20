@@ -609,7 +609,13 @@ public class ViewGeneral extends JPanel {
 					"init		= "	+ init + ";";
 
 				String output = main.persistence.runMinizinc(model,parms);
-				output.lines().forEach(line -> runSettings(line));
+
+				if (output != null) {
+					String[] lines = output.split("\\r?\\n");
+					for (String line : lines) {
+						runSettings(line);
+					}
+				}
 			}
 			
 		});

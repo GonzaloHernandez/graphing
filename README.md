@@ -33,8 +33,8 @@ For Developers
 
 ## JAR file ready to use
 
-Graphing-v1.3.6.jar 
-[Direct download](https://github.com/GonzaloHernandez/graphing/raw/refs/heads/master/releases/Graphing-v1.3.6.jar)
+Graphing-v1.3.7.jar 
+[Direct download](https://github.com/GonzaloHernandez/graphing/raw/refs/heads/master/releases/Graphing-v1.3.7.jar)
 
 ## Debugger interaction from Python
 
@@ -56,5 +56,7 @@ def send_to_graphing(message):
 Example
 
 ```python
-send_to_graphing("101011,00101") # vertices,edges
+send_to_graphing("vertices=[true,false,true]")
+send_to_graphing("edges=[true,true,false,true,true]")
+send_to_graphing("values=[4,6,1,3,3]")
 ```

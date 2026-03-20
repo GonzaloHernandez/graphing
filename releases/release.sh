@@ -3,7 +3,7 @@
 # Define versioning variables
 FAMILY=1
 VERSION=3
-CONSTRUCTION=6 #In progress
+CONSTRUCTION=7
 
 # File paths
 JAVA_FILE="src/main/GrapherMain.java"
@@ -61,7 +61,4 @@ echo ":: Documentation updated in $README_FILE"
 # # ===============================================================================
 # (DONE) Execute external program (MiniZinc so far)
 # (DONE) Improving Listener for external settings (TCP connection)
-
-
-
-
+# (DONE) Changes in values and labels presentation.

@@ -212,7 +212,9 @@ public class Board extends JComponent implements Printable{
 						scaleFactor += 0.1;
 						Dimension d = getPreferredSize();
 						session.manualResizing = true;
-						session.setSize((int)(d.width*scaleFactor)+session.deltaWidth,(int)(d.height*scaleFactor)+session.deltaHeight);
+						session.setSize(
+							(int)(d.width*scaleFactor)+GrapherSession.deltaWidth,
+							(int)(d.height*scaleFactor)+GrapherSession.deltaHeight);
 					}
 					else if (e.getKeyChar() == '-' || e.getKeyChar() == '_' ||
 							e.getKeyCode() == KeyEvent.VK_MINUS) {
@@ -220,7 +222,9 @@ public class Board extends JComponent implements Printable{
 						scaleFactor -= 0.1;
 						Dimension d = getPreferredSize();
 						session.manualResizing = true;
-						session.setSize((int)(d.width*scaleFactor)+session.deltaWidth,(int)(d.height*scaleFactor)+session.deltaHeight);
+						session.setSize(
+							(int)(d.width*scaleFactor)+GrapherSession.deltaWidth,
+							(int)(d.height*scaleFactor)+GrapherSession.deltaHeight);
 					}
 					else if (e.getKeyCode() == KeyEvent.VK_E) {
 						if (e.isShiftDown()) {

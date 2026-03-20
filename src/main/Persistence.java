@@ -188,25 +188,25 @@ public class Persistence {
         }
 
         // Write dictionary
-        Lexicon d = board.settings.lexicon;
-        file.writeUTF   (d.graph);
-        file.writeUTF   (d.vertex);
-        file.writeUTF   (d.vertexValue);
-        file.writeUTF   (d.vertexType);
-        file.writeUTF   (d.vertexLabel);
-        file.writeUTF   (d.edge);
-        file.writeUTF   (d.edgeValue);
-        file.writeUTF   (d.edgeType);
-        file.writeUTF   (d.edgeLabel);
-        file.writeUTF   (d._graph);
-        file.writeUTF   (d._vertex);
-        file.writeUTF   (d._vertexValue);
-        file.writeUTF   (d._vertexType);
-        file.writeUTF   (d._vertexLabel);
-        file.writeUTF   (d._edge);
-        file.writeUTF   (d._edgeValue);
-        file.writeUTF   (d._edgeType);
-        file.writeUTF   (d._edgeLabel);
+        Lexicon l = board.settings.lexicon;
+        file.writeUTF   (l.graph);
+        file.writeUTF   (l.vertex);
+        file.writeUTF   (l.vertexValue);
+        file.writeUTF   (l.vertexType);
+        file.writeUTF   (l.vertexLabel);
+        file.writeUTF   (l.edge);
+        file.writeUTF   (l.edgeValue);
+        file.writeUTF   (l.edgeType);
+        file.writeUTF   (l.edgeLabel);
+        file.writeUTF   (l._graph);
+        file.writeUTF   (l._vertex);
+        file.writeUTF   (l._vertexValue);
+        file.writeUTF   (l._vertexType);
+        file.writeUTF   (l._vertexLabel);
+        file.writeUTF   (l._edge);
+        file.writeUTF   (l._edgeValue);
+        file.writeUTF   (l._edgeType);
+        file.writeUTF   (l._edgeLabel);
 
         // Write settings
         GrapherSettings s = board.settings;
@@ -229,10 +229,10 @@ public class Persistence {
         file.writeShort     (s.exportType);
         file.writeBoolean   (s.exportAuto);
 
-        int width   = (int)(main.currentSession.getWidth()/board.scaleFactor);
-        int height  = (int)(main.currentSession.getHeight()/board.scaleFactor);
-        file.writeShort     (width);
-        file.writeShort     (height);
+        Dimension d = main.currentSession.board.getPreferredSize();
+
+        file.writeShort     (d.width+GrapherSession.deltaWidth);
+        file.writeShort     (d.height+GrapherSession.deltaHeight);
 
         short edgesCount = 0;
 
