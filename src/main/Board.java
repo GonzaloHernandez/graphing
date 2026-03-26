@@ -272,7 +272,7 @@ public class Board extends JComponent implements Printable{
 						vertexTarget.setActive(!vertexTarget.isActive());
 						session.setModified(true);
 					}
-					if (currentEdge != null) {
+					else if (currentEdge != null) {
 						currentEdge.setActive(!currentEdge.isActive());
 						session.setModified(true);
 					}
@@ -284,7 +284,26 @@ public class Board extends JComponent implements Printable{
 				// SHIFT + BUTTON3
 				if (shiftDown && button == MouseEvent.BUTTON3) {
 					if (vertexTarget != null) {
-						vertexTarget.setActive(!vertexTarget.isActive(), true);
+						vertexTarget.setActive(!vertexTarget.isActive(), 1);
+						session.setModified(true);
+					}
+					else if (currentEdge != null) {
+						currentEdge.setActive(!currentEdge.isActive(), 1);
+						session.setModified(true);
+					}
+					session.main.properties.stockView.refresh();
+					repaint();
+					return;
+				}
+
+				// SHIFT + BUTTON2
+				if (shiftDown && button == MouseEvent.BUTTON2) {
+					if (vertexTarget != null) {
+						vertexTarget.setActive(!vertexTarget.isActive(), 2);
+						session.setModified(true);
+					}
+					else if (currentEdge != null) {
+						currentEdge.setActive(!currentEdge.isActive(), 2);
 						session.setModified(true);
 					}
 					session.main.properties.stockView.refresh();
@@ -440,7 +459,6 @@ public class Board extends JComponent implements Printable{
 					}
 					return;
 				}
-
 			}
 
 			public void mousePressed(MouseEvent e) {
@@ -524,9 +542,7 @@ public class Board extends JComponent implements Printable{
 						Vertex vertex = (Vertex)vertices.elementAt(i);
 						if (vertex.isArea(mousex,mousey)) {
 							vertexTarget = vertex;
-							if (vertex != vertexSource) {
-								vertex.setStatus(Vertex.FOCUSED);
-							}
+							vertex.setStatus(Vertex.FOCUSED);
 							repaint();
 							return;
 						}
@@ -701,12 +717,25 @@ public class Board extends JComponent implements Printable{
 			);
 			return true;
 
-		case 2: { // Adjacency Matrix (MZN)
+		case 2: { // Adjacency Matrix (MZN) Regular
 		
+			boolean allowfirst = settings.allowFirsVertex;
+
+			String labels = "{";
 			String matrix = "[";
+			String finals = "{";
 			for (int v=0;v<size;v++){
+
+				if (!labels.equals("{")) labels +=",";
+				labels += vertices.elementAt(v).getLabel();
+
+				if (vertices.elementAt(v).isAccepted()) {
+					if (!finals.endsWith("{") && !finals.endsWith(",")) finals += ",";
+					finals += (v+first);
+				}
+
 				matrix += v==0?"|":" |";
-				for (int t=0;t<size;t++){
+				for (int t=allowfirst?0:1;t<size;t++){
 					boolean found = false;
 					for (int i=0;i<vertices.elementAt(v).getOuts().size();i++){
 						if (vertices.elementAt(v).getOuts().elementAt(i).getTarget().getNumber()==t) {
@@ -714,18 +743,22 @@ public class Board extends JComponent implements Printable{
 							break;
 						}
 					}
-					matrix += found?"1":"0";
+					matrix += found?t+first:"0";
+
 					if (t<vertices.size()-1) matrix += ","; 
 					else 
 						matrix += "";
 				}
 				if (v<vertices.size()-1) matrix += "\n"; 
 				else 
-					matrix += "|];\n";
+					matrix += "|]\n";
 			}
+			labels += "}\n";
+			finals += "}\n";
 			session.main.properties.generalView.export.setText(
-				matrix +
-				"\n"
+				labels + "\n" +
+				matrix + "\n" +
+				finals + "\n"
 			);
 		}
 		return true;

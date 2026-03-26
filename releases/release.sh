@@ -3,7 +3,7 @@
 # Define versioning variables
 FAMILY=1
 VERSION=3
-CONSTRUCTION=7
+CONSTRUCTION=8
 
 # File paths
 JAVA_FILE="src/main/GrapherMain.java"
@@ -58,7 +58,9 @@ echo "---------------------------------------"
 echo ":: Build Success: $OUTPUT_FILE"
 echo ":: Documentation updated in $README_FILE"
 
+# Step 7: For my local purposes
+cp $OUTPUT_FILE ../Graphing.jar
+
 # # ===============================================================================
-# (DONE) Execute external program (MiniZinc so far)
-# (DONE) Improving Listener for external settings (TCP connection)
-# (DONE) Changes in values and labels presentation.
+# (DONE) Updating Minizinc matrix export
+# (DONE) Improvements on presentation

@@ -50,7 +50,7 @@ public class Edge {
 		this.arrowright	= new Point();
 		this.arrow		= new Point();
 		this.rotation	= 0;
-		if (source.equals(target))	this.distance =25; else this.distance = 0; 
+		if (source.equals(target))	this.distance =20; else this.distance = 0; 
 	}
 	
 	//-------------------------------------------------------------------------
@@ -131,7 +131,9 @@ public class Edge {
 			beta	= alpha + Math.PI/4;
 			
 			arrow.x	= control.x - (int)(Math.cos(beta) * hypotenuse);
-			arrow.y	= control.y + (int)(Math.sin(beta) * hypotenuse);	
+			arrow.y	= control.y + (int)(Math.sin(beta) * hypotenuse);
+
+			grandAngle = 0;
 		}
 		else {
 		
@@ -152,8 +154,6 @@ public class Edge {
 			else
 				middle.y	= (int)(source.getY() - Math.sin(grandAngle) * (grandHypotenuse /2));
 	
-			// grandHypotenuse	= hypotenuse;
-					
 			//--- control point ---
 			
 			hypotenuse	= (int)Math.sqrt(Math.pow(distance,2)+Math.pow(grandHypotenuse/2,2));
@@ -297,13 +297,13 @@ public class Edge {
 			}
 		}
 
-		if ((target.getX()>source.getX() && target.getY()>source.getY()) ||
-			(target.getX()<source.getX() && target.getY()<source.getY()))
+		if ((text.x>source.getX() && text.y>source.getY()) ||
+			(text.x<source.getX() && text.y<source.getY()))
 			g.rotate(grandAngle,text.x,text.y);
 		else
 			g.rotate(2*Math.PI-grandAngle,text.x,text.y);
 
-		g.setFont(new Font("Arial",Font.PLAIN,9));
+		g.setFont(new Font("Arial",Font.PLAIN,8));
 		FontMetrics metrics = g.getFontMetrics(g.getFont());
 		int textWidth1 = metrics.stringWidth(tag1+tag2);
 		g.setColor(Color.BLUE);
@@ -319,8 +319,8 @@ public class Edge {
 		g.setColor(Color.BLACK);
 		g.drawString(tag4,text.x-(textWidth1/2)+textWidth2,text.y+metrics.getDescent()+7);
 
-		if ((target.getX()>source.getX() && target.getY()>source.getY()) ||
-			(target.getX()<source.getX() && target.getY()<source.getY()))
+		if ((text.x>source.getX() && text.y>source.getY()) ||
+			(text.x<source.getX() && text.y<source.getY()))
 			g.rotate(-grandAngle,text.x,text.y);
 		else
 			g.rotate(-(2*Math.PI-grandAngle),text.x,text.y);
@@ -343,7 +343,7 @@ public class Edge {
 			return (hypotenuse < distance+5 && hypotenuse > distance-5 && hypostate >= Vertex.RADIUS);
 		}
 		
-		int sill=8;
+		int sill=10;
 		double	alpha,theta,grandHypotenuse;
 		boolean	isInCurve1=false,isInCurve2=false;
 
@@ -572,9 +572,12 @@ public class Edge {
 		this.active = act;
 	}
 
-	public void setActive(boolean act,boolean propagate){
-		if (act == this.active) return;
+	public void setActive(boolean act,int propagate){
 		this.active = act;
+		if (propagate<1) return;
+		target.setActive(act);
+		if (propagate<2) return;
+		source.setActive(act);
 	}
 
 	public void setAmountRotation(double dif){

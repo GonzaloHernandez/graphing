@@ -137,7 +137,7 @@ public class ViewGeneral extends JPanel {
 
 		panelNorth.add(panelVertex);	panelNorth.add(panelEdge);
 
-		allowFirstState	= new JCheckBox("Allow first state");
+		allowFirstState	= new JCheckBox("Allow first vertex incoming edges");
 		firstZero       = new JCheckBox("Start at Zero (0)");
 		gridScale       = new JSpinner(new SpinnerNumberModel(10, 1, 100, 1));
 		exportAuto      = new JCheckBox("Export automatically");
@@ -606,6 +606,7 @@ public class ViewGeneral extends JPanel {
 					"sources	= ["+ from + "];" +
 					"targets	= ["+ to + "];" +
 					"chances	= ["+ edgeValues + "];" +
+					"rewards	= ["+ edgeLabels + "];" +
 					"init		= "	+ init + ";";
 
 				String output = main.persistence.runMinizinc(model,parms);
@@ -775,7 +776,7 @@ public class ViewGeneral extends JPanel {
 		showETyp.setText(Lexicon.capitalize(""+lex.edgeType));
 		showELab.setText(Lexicon.capitalize(""+lex.edgeLabel+"≠"));
 
-		allowFirstState.setText("Allow first "+lex.vertex);
+		allowFirstState.setText("Allow first "+lex.vertex+" incoming edges");
 	}
 
 }

@@ -2,6 +2,7 @@ package main;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.util.Vector;
 
@@ -83,8 +84,6 @@ public class Vertex {
 	public int draw(Graphics2D g,GrapherSettings settings,
 					int edgeSequence,boolean hidden) 
 	{		
-		if (hidden && !active) return edgeSequence + outs.size();
-
 		for (int i=0 ; i<outs.size() ; i++) {
 			Edge edge = (Edge)outs.elementAt(i);
 			if (hidden && !edge.isActive()) {
@@ -94,6 +93,8 @@ public class Vertex {
 				edgeSequence = edge.draw(g,settings,edgeSequence,hidden);
 			}
 		}
+
+		if (hidden && !active) return edgeSequence;
 
 		Color LIGHT_BLUE	= new Color(220,220,255);
 		Color LIGHT_RED		= new Color(235,168,168);
@@ -125,44 +126,63 @@ public class Vertex {
 			t = 0;
 		}
 
-		g.setStroke(new BasicStroke(accepted?2.0f:1.0f));
+		// g.setStroke(new BasicStroke(accepted?2.0f:1.0f));
 
 		switch(t) {
-			case 0:	
+			case 0:	// round
 				g.setColor(backColor);
 				g.fillOval(x-RADIUS,y-RADIUS,RADIUS*2,RADIUS*2);
 				g.setColor(foreColor);
 				g.drawOval(x-RADIUS,y-RADIUS,RADIUS*2,RADIUS*2);
+				if (accepted)
+					g.drawOval(x-(RADIUS-2),y-(RADIUS-2),(RADIUS-2)*2,(RADIUS-2)*2);
 				break;
-			case 1:	
+			case 1:	// square
 				g.setColor(backColor);
 				g.fillRect(x-RADIUS,y-RADIUS,RADIUS*2,RADIUS*2);
 				g.setColor(foreColor);
 				g.drawRect(x-RADIUS,y-RADIUS,RADIUS*2,RADIUS*2);
+				if (accepted)
+					g.drawRect(x-(RADIUS-2),y-(RADIUS-2),(RADIUS-2)*2,(RADIUS-2)*2);
 				break;
-			case 2:	{
+			case 2:	{ // diamond
 				int[] xs = {x,x+RADIUS,x,x-RADIUS};
 				int[] ys = {y-RADIUS,y,y+RADIUS,y};
 				g.setColor(backColor);
 				g.fillPolygon(xs,ys,4);
 				g.setColor(foreColor);
 				g.drawPolygon(xs,ys,4);
+				if (accepted){
+					int[] xs_ = {x,x+(RADIUS-3),x,x-(RADIUS-3)};
+					int[] ys_ = {y-(RADIUS-3),y,y+(RADIUS-3),y};
+					g.drawPolygon(xs_,ys_,4);
+				}
 			}	break;
-			case 3:	{
+			case 3:	{ // triangle
 				int[] xs = {x-RADIUS,x,x+RADIUS};
 				int[] ys = {y+RADIUS,y-RADIUS,y+RADIUS};
 				g.setColor(backColor);
 				g.fillPolygon(xs,ys,3);
 				g.setColor(foreColor);
 				g.drawPolygon(xs,ys,3);
+				if (accepted) {
+					int[] xs_ = {x-(RADIUS-3),x,x+(RADIUS-3)};
+					int[] ys_ = {y+(RADIUS-2),y-(RADIUS-4),y+(RADIUS-2)};
+					g.drawPolygon(xs_,ys_,3);
+				}
 			}	break;
-			default: {
+			default: { //octagon
 				int[] xs = {x-RADIUS/2,x+RADIUS/2,x+RADIUS,x+RADIUS,x+RADIUS/2,x-RADIUS/2,x-RADIUS,x-RADIUS};
 				int[] ys = {y-RADIUS,y-RADIUS,y-RADIUS/2,y+RADIUS/2,y+RADIUS,y+RADIUS,y+RADIUS/2,y-RADIUS/2};
 				g.setColor(backColor);
 				g.fillPolygon(xs,ys,8);
 				g.setColor(foreColor);
 				g.drawPolygon(xs,ys,8);
+				if (accepted) {
+					int[] xs_ = {x-(RADIUS-2)/2,x+(RADIUS-2)/2,x+(RADIUS-2),x+(RADIUS-2),x+(RADIUS-2)/2,x-(RADIUS-2)/2,x-(RADIUS-2),x-(RADIUS-2)};
+					int[] ys_ = {y-(RADIUS-2),y-(RADIUS-2),y-(RADIUS-2)/2,y+(RADIUS-2)/2,y+(RADIUS-2),y+(RADIUS-2),y+(RADIUS-2)/2,y-(RADIUS-2)/2};
+					g.drawPolygon(xs_,ys_,8);
+				}
 			} break;
 		}
 
@@ -190,15 +210,20 @@ public class Vertex {
 		if (settings.showVertexValue) {
 			if (!value.equals(settings.showVertexValueDiff)){
 				g.setColor(Color.BLACK);
-				g.setFont(new Font("Arial",Font.PLAIN,10));
-				g.drawString(""+value,x-(2*(new String(""+value)).length()),y+4);
+				g.setFont(new Font("Arial",Font.PLAIN,8));
+				FontMetrics metrics = g.getFontMetrics(g.getFont());
+				int textWidth = metrics.stringWidth(value);
+
+				g.drawString(""+value,x-(textWidth/2),y+(metrics.getAscent()-metrics.getDescent())/2);
 			}
 		} 
 		else if (settings.showVertexLabel) {
 			if (!label.equals(settings.showVertexLabelDiff)){
 				g.setColor(Color.BLACK);
-				g.setFont(new Font("Arial",Font.PLAIN,9));
-				g.drawString(""+label,x-(2*(new String(""+label)).length()),y+4);
+				g.setFont(new Font("Arial",Font.PLAIN,8));
+				FontMetrics metrics = g.getFontMetrics(g.getFont());
+				int textWidth = metrics.stringWidth(label);
+				g.drawString(""+label,x-(textWidth/2),y+(metrics.getAscent()-metrics.getDescent())/2);
 			}
 		}
 		return edgeSequence;
@@ -255,20 +280,17 @@ public class Vertex {
 
 	//-------------------------------------------------------------------------------------
 
-	public void setActive(boolean act, boolean propagate){
-		if (act == this.active) return;
+	public void setActive(boolean act, int propagate){
 		this.active = act;
-		if (propagate) {
-			for (int i=0 ; i<outs.size() ; i++) {
-				Edge c = (Edge)outs.elementAt(i);
-				if (act == true && !c.getTarget().isActive()) continue;
-				c.setActive(act, propagate);
-			}
-			for (int i=0 ; i<ins.size() ; i++) {
-				Edge c = (Edge)ins.elementAt(i);
-				if (act == true && !c.getSource().isActive()) continue;
-				c.setActive(act, propagate);
-			}
+		if (propagate<1) return;
+		for (int i=0 ; i<outs.size() ; i++) {
+			Edge e = (Edge)outs.elementAt(i);
+			e.setActive(act);
+		}
+		if (propagate<2) return;
+		for (int i=0 ; i<ins.size() ; i++) {
+			Edge e = (Edge)ins.elementAt(i);
+			e.setActive(act);
 		}
 	}
 

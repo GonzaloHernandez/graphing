@@ -39,7 +39,7 @@ public class GrapherSettings {
 	public static final String[] exportTypes = {
 		"Json", 
 		"Dzn", 
-		"Ajacency Matrix (Mzn)", 
+		"Ajacency Matrix (Mzn) for Regular", 
 		"Ajacency Matrix with costs(Mzn)", 
 		"Lists"};
 

@@ -32,7 +32,7 @@ public class GrapherMain extends JFrame{
 	//-------------------------------------------------------------------------------------
 	final int	family			= 1;
 	final int	version			= 3;
-	final int	construction	= 7;
+	final int	construction	= 8;
 	
 	//-------------------------------------------------------------------------------------
 
@@ -271,7 +271,8 @@ public class GrapherMain extends JFrame{
 					"  <li><b>Double-Click:</b> Add vertex / Edit properties</li>" +
 					"  <li><b>Ctrl + Drag:</b> Create new edge</li>" +
 					"  <li><b>Shift + Click:</b> Toggle active</li>" +
-					"  <li><b>Shift + Right-Click:</b> Toggle active propagating</li>" +
+					"  <li><b>Shift + Right-Click:</b> Toggle active (forward)</li>" +
+					"  <li><b>Shift + Middle-Click:</b> Toggle active (all)</li>" +
 					"  <li><b>Right-Click:</b> Open context menu</li>" +
 					"  <li><b>Alt + Right-Click:</b> Open context type menu</li>" +
 					"</ul>" +
