@@ -45,8 +45,8 @@ public class ViewLexicon extends JPanel{
 		graph       = new JTextField("");
 
 		vertex      = new JTextField("");
-		vertexType	= new JTextField("");
 		vertexValue = new JTextField("");
+		vertexType	= new JTextField("");
 		vertexLabel = new JTextField("");
 
 		edge        = new JTextField("");
@@ -56,8 +56,8 @@ public class ViewLexicon extends JPanel{
 
 		_graph      = new JTextField("");
 		_vertex     = new JTextField("");
-		_vertexType	= new JTextField("");
 		_vertexValue= new JTextField("");
+		_vertexType	= new JTextField("");
 		_vertexLabel= new JTextField("");
 		_edge       = new JTextField("");
 		_edgeValue  = new JTextField("");
@@ -80,8 +80,8 @@ public class ViewLexicon extends JPanel{
 		gbc.gridy = 0; add(new JLabel("Graph"), gbc);
 
 		gbc.gridy = 1; add(new JLabel("Vertex"), gbc);
-		gbc.gridy = 2; add(new JLabel("Vertex type"), gbc);
-		gbc.gridy = 3; add(new JLabel("Vertex value"), gbc);
+		gbc.gridy = 2; add(new JLabel("Vertex value"), gbc);
+		gbc.gridy = 3; add(new JLabel("Vertex type"), gbc);
 		gbc.gridy = 4; add(new JLabel("Vertex label"), gbc);
 		
 		gbc.gridy = 5; add(new JLabel("Edge"), gbc);
@@ -95,8 +95,8 @@ public class ViewLexicon extends JPanel{
 		gbc.gridx = 1;
 		gbc.gridy = 0; add(graph, gbc);
 		gbc.gridy = 1; add(vertex, gbc);
-		gbc.gridy = 2; add(vertexType, gbc);
-		gbc.gridy = 3; add(vertexValue, gbc);
+		gbc.gridy = 2; add(vertexValue, gbc);
+		gbc.gridy = 3; add(vertexType, gbc);
 		gbc.gridy = 4; add(vertexLabel, gbc);
 		gbc.gridy = 5; add(edge, gbc);
 		gbc.gridy = 6; add(edgeValue, gbc);
@@ -109,8 +109,8 @@ public class ViewLexicon extends JPanel{
 		gbc.gridx = 2;
 		gbc.gridy = 0; add(_graph, gbc);
 		gbc.gridy = 1; add(_vertex, gbc);
-		gbc.gridy = 2; add(_vertexType, gbc);
-		gbc.gridy = 3; add(_vertexValue, gbc);
+		gbc.gridy = 2; add(_vertexValue, gbc);
+		gbc.gridy = 3; add(_vertexType, gbc);
 		gbc.gridy = 4; add(_vertexLabel, gbc);
 		gbc.gridy = 5; add(_edge, gbc);
 		gbc.gridy = 6; add(_edgeValue, gbc);
@@ -133,8 +133,8 @@ public class ViewLexicon extends JPanel{
 			Lexicon lex = main.currentSession.board.settings.lexicon;
 			lex.graph			= graph.getText();
 			lex.vertex			= vertex.getText();
-			lex.vertexType		= vertexType.getText();
 			lex.vertexValue		= vertexValue.getText();
+			lex.vertexType		= vertexType.getText();
 			lex.vertexLabel		= vertexLabel.getText();
 			lex.edge			= edge.getText();
 			lex.edgeValue		= edgeValue.getText();
@@ -143,8 +143,8 @@ public class ViewLexicon extends JPanel{
 
 			lex._graph			= _graph.getText();
 			lex._vertex			= _vertex.getText();
-			lex._vertexType		= _vertexType.getText();
 			lex._vertexValue	= _vertexValue.getText();
+			lex._vertexType		= _vertexType.getText();
 			lex._vertexLabel	= _vertexLabel.getText();
 			lex._edge			= _edge.getText();
 			lex._edgeValue		= _edgeValue.getText();
@@ -158,8 +158,8 @@ public class ViewLexicon extends JPanel{
 			Lexicon lex = main.currentSession.board.settings.lexicon;
 			graph.setText(lex.graph);
 			vertex.setText(lex.vertex);
-			vertexType.setText(lex.vertexType);
 			vertexValue.setText(lex.vertexValue);
+			vertexType.setText(lex.vertexType);
 			vertexLabel.setText(lex.vertexLabel);
 			edge.setText(lex.edge);
 			edgeValue.setText(lex.edgeValue);
@@ -168,8 +168,8 @@ public class ViewLexicon extends JPanel{
 
 			_graph.setText(lex._graph);
 			_vertex.setText(lex._vertex);
-			_vertexType.setText(lex._vertexType);
 			_vertexValue.setText(lex._vertexValue);
+			_vertexType.setText(lex._vertexType);
 			_vertexLabel.setText(lex._vertexLabel);
 			_edge.setText(lex._edge);
 			_edgeValue.setText(lex._edgeValue);
@@ -232,8 +232,8 @@ public class ViewLexicon extends JPanel{
 		Lexicon lex = main.currentSession.board.settings.lexicon;
 		graph		.setText(lex.graph);
 		vertex		.setText(lex.vertex);
-		vertexType	.setText(lex.vertexType);
 		vertexValue	.setText(lex.vertexValue);
+		vertexType	.setText(lex.vertexType);
 		vertexLabel	.setText(lex.vertexLabel);
 		edge		.setText(lex.edge);
 		edgeValue	.setText(lex.edgeValue);
@@ -241,8 +241,8 @@ public class ViewLexicon extends JPanel{
 		edgeLabel	.setText(lex.edgeLabel);
 		_graph		.setText(lex._graph);
 		_vertex		.setText(lex._vertex);
-		_vertexType	.setText(lex._vertexType);
 		_vertexValue.setText(lex._vertexValue);
+		_vertexType	.setText(lex._vertexType);
 		_vertexLabel.setText(lex._vertexLabel);
 		_edge		.setText(lex._edge);
 		_edgeValue	.setText(lex._edgeValue);

@@ -631,36 +631,37 @@ public class MenuOptions extends JPopupMenu{
 		mdp.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ev) {
 				GrapherSettings s = main.currentSession.board.settings;
-				s.lexicon.graph			= "game";
-				s.lexicon.vertex		= "node";
-				s.lexicon.vertexValue	= "Value";
-				s.lexicon.vertexType	= "Type";
+				s.lexicon.graph			= "MDP";	
+				s.lexicon.vertex		= "states";
+				s.lexicon.vertexValue	= "rewards";
+				s.lexicon.vertexType	= "types";
 				s.lexicon.vertexLabel	= "Label";
-				s.lexicon.edge			= "edge";
-				s.lexicon.edgeValue		= "reward";
-				s.lexicon.edgeType		= "actions";
-				s.lexicon.edgeLabel		= "chances";
-				s.lexicon._graph		= "g";
-				s.lexicon._vertex		= "n";
-				s.lexicon._vertexValue	= "v";
-				s.lexicon._vertexType	= "p";
-				s.lexicon._edge			= "e";
-				s.lexicon._edgeValue	= "r";
+				s.lexicon.edge			= "actions";
+				s.lexicon.edgeValue		= "chances";
+				s.lexicon.edgeType		= "Actions";
+				s.lexicon.edgeLabel		= "Rewards";
+				s.lexicon._graph		= "m";
+				s.lexicon._vertex		= "s";
+				s.lexicon._vertexValue	= "r";
+				s.lexicon._vertexType	= "t";
+				s.lexicon._vertexLabel	= "l";
+				s.lexicon._edge			= "a";
+				s.lexicon._edgeValue	= "c";
 				s.lexicon._edgeType		= "a";
-				s.lexicon._edgeLabel	= "c";
+				s.lexicon._edgeLabel	= "r";
 				s.showVertexSequence	= false;
-				s.showVertexValue		= false;
+				s.showVertexValue		= true;
 				s.showVertexType		= true;
-				s.showVertexLabel		= true;
-				s.showVertexValueDiff	= "-0";
+				s.showVertexLabel		= false;
+				s.showVertexValueDiff	= "0";
 				s.showVertexLabelDiff	= "";
 
 				s.showEdgeSequence		= false;
 				s.showEdgeValue			= true;
-				s.showEdgeType			= true;
-				s.showEdgeLabel			= true;
-				s.showEdgeValueDiff		= "0";
-				s.showEdgeLabelDiff		= "1";
+				s.showEdgeType			= false;
+				s.showEdgeLabel			= false;
+				s.showEdgeValueDiff		= "1";
+				s.showEdgeLabelDiff		= "0";
 				
 				s.exportType			= 1;
 
@@ -680,7 +681,7 @@ public class MenuOptions extends JPopupMenu{
 				}
 
 				if (vTypes.size()<=2) {
-					vTypes.add(new Type(2,"Nature", "Diamond"));
+					vTypes.add(new Type(2,"Random", "Diamond"));
 				} else {
 					vTypes.elementAt(2).setName("Nature");
 					vTypes.elementAt(2).setDescription("Diamond");

@@ -9,11 +9,14 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 
+import javax.swing.ButtonGroup;
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
@@ -22,6 +25,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JSplitPane;
 import javax.swing.UIManager;
 
@@ -32,7 +36,7 @@ public class GrapherMain extends JFrame{
 	//-------------------------------------------------------------------------------------
 	final int	family			= 1;
 	final int	version			= 3;
-	final int	construction	= 8;
+	final int	construction	= 9;
 	
 	//-------------------------------------------------------------------------------------
 
@@ -41,7 +45,7 @@ public class GrapherMain extends JFrame{
 	
 	private	JSplitPane		split;
 	private	JMenuBar		menuBar;
-	private	JMenu			file,help,relatedTopics,samples;
+	private	JMenu			file,help,relatedTopics,samples,defaultScaleMenu;
 	private	JMenuItem		newSession,openSession,saveSession,saveSessionAs,importGame;
 	private	JMenuItem		exit,contents,shortcuts,about,credits;
 	
@@ -52,13 +56,16 @@ public class GrapherMain extends JFrame{
 	protected	JMenu			recent;
 	
 	protected	boolean			showAbout;
+	protected	double			defaultScale;
+	protected	boolean			isPropertiesHidden;
 	protected	String			curdir;
 
 	//-------------------------------------------------------------------------------------
 
 	public GrapherMain() {
 		super("Graphing");
-		persistence = new Persistence(this);		
+		defaultScale	= 1.0;
+		persistence		= new Persistence(this);		
 		setSize(1200,800);
 		initElements();
 		progListeners();
@@ -93,14 +100,20 @@ public class GrapherMain extends JFrame{
 		help			= new GrapherMenu("Help",defaultFont,"help.png");
 		contents		= new GrapherItem("Content",defaultFont,"contents.png");
 		shortcuts		= new GrapherItem("Short cuts",defaultFont,"shortcut.png");
+		defaultScaleMenu= new GrapherMenu("Default Scale",defaultFont,"help.png");
 		relatedTopics	= new GrapherMenu("Related Topics",defaultFont,"related_topics.png");
 		samples			= new GrapherMenu("Samples",defaultFont,"samples.png");
 		about			= new GrapherItem("About of Graphing",defaultFont,"about.png");
 		credits			= new GrapherItem("Copyright",defaultFont,"credits.png");
-		
+
+
 		properties		= new ViewProperties(this);
 		split			= new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,desktop,properties); 
-		
+
+		split.setDividerLocation(getWidth()-330);
+		split.setOneTouchExpandable(true);
+		isPropertiesHidden	= false;
+
 		currentSession	= null;
 		setJMenuBar(menuBar);
 		
@@ -118,6 +131,7 @@ public class GrapherMain extends JFrame{
 		menuBar.add(help);
 		help.add(contents);
 		help.add(shortcuts);
+		help.add(defaultScaleMenu);
 		help.add(relatedTopics);
 		// help.add(samples);
 		help.addSeparator();
@@ -126,7 +140,7 @@ public class GrapherMain extends JFrame{
 		
 		addRelatedTopics();
 		addSamples();
-		
+		addDefaultScales();
 		add(split);
 		
 		showAbout = false;
@@ -134,6 +148,7 @@ public class GrapherMain extends JFrame{
 		UIManager.put("InternalFrame.titleFont",defaultFont);
 		curdir = System.getProperty("user.dir");
 		persistence.loadGrapher();
+		setDefaultScale(defaultScale);
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -160,14 +175,20 @@ public class GrapherMain extends JFrame{
 				System.exit(0);
 			}
 			public void windowActivated(WindowEvent e){
-				split.setDividerLocation(getWidth()-320);
+				if (!isPropertiesHidden) {
+					split.setDividerLocation(getWidth() - 330);
+				}
 			}
 		});
 		
 		addComponentListener(new ComponentListener(){
 
 			public void componentResized(ComponentEvent arg0) {
-				split.setDividerLocation(getWidth()-320);
+				if (isPropertiesHidden) {
+					split.setDividerLocation(1.0); 
+				} else {
+					split.setDividerLocation(getWidth() - 330);
+				}
 			}
 
 			public void componentMoved(ComponentEvent arg0) {
@@ -282,6 +303,23 @@ public class GrapherMain extends JFrame{
 		        JOptionPane.showMessageDialog(frame, message, "Shortcuts", JOptionPane.INFORMATION_MESSAGE);
 			}
 		});
+
+		split.addPropertyChangeListener(new PropertyChangeListener() {
+
+			@Override
+			public void propertyChange(PropertyChangeEvent ev) {
+				if  (split.getWidth()==0) {
+					isPropertiesHidden = false;
+					return;
+				}
+				int currentLocation = split.getDividerLocation();
+				int maxWidth = split.getWidth() - split.getDividerSize();
+				isPropertiesHidden = (maxWidth == -5);
+				isPropertiesHidden = (currentLocation >= maxWidth - 5);
+			}
+			
+		});
+
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -453,4 +491,30 @@ public class GrapherMain extends JFrame{
 			});
 		}
 	}
+
+	//-------------------------------------------------------------------------------------
+
+	public void addDefaultScales() {
+		ButtonGroup group = new ButtonGroup();
+		for (int i=100;i<=200;i+=20){
+			JRadioButtonMenuItem item = new JRadioButtonMenuItem(""+i+"%");
+			group.add(item);
+			item.setName(""+i);
+			defaultScaleMenu.add(item);
+			item.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent e) {
+					String scale = ((JMenuItem)e.getSource()).getName();
+					defaultScale = Double.parseDouble(scale)/100.0;
+				}
+			});
+		}
+	}
+
+	//-------------------------------------------------------------------------------------
+
+	public void setDefaultScale(Double scale) {
+		int p = (int)((scale*10)-10)/2;
+		defaultScaleMenu.getItem(p).setSelected(true);
+	}
+
 }

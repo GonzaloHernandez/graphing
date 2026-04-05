@@ -201,7 +201,7 @@ public class ViewTypes extends JPanel {
 				info.add(new JLabel("Description "));
 				data.add(desc);
 
-				panel.setPreferredSize(new Dimension(300, 75));
+				panel.setPreferredSize(new Dimension(330, 75));
 				String result = main.grapherDialog("Vertices types",panel,"Ok|Cancel");
 				if (result.equals("Ok")) {
 					Vector<Type> type = main.currentSession.board.vTypes;
@@ -231,7 +231,7 @@ public class ViewTypes extends JPanel {
 				info.add(new JLabel("Description "));
 				data.add(desc);
 
-				panel.setPreferredSize(new Dimension(300, 75));
+				panel.setPreferredSize(new Dimension(330, 75));
 				String result = main.grapherDialog("Vertices types",panel,"Ok|Cancel");
 				if (result.equals("Ok")) {
 					Vector<Type> type = main.currentSession.board.eTypes;
@@ -264,7 +264,7 @@ public class ViewTypes extends JPanel {
 						info.add(new JLabel("Description "));
 						data.add(desc);
 
-						panel.setPreferredSize(new Dimension(300, 75));
+						panel.setPreferredSize(new Dimension(330, 75));
 						String result = main.grapherDialog("Vertices types",panel,"Ok|Cancel");
 						if (result.equals("Ok")) {
 							type.setName(name.getText());
@@ -307,7 +307,7 @@ public class ViewTypes extends JPanel {
 						info.add(new JLabel("Description "));
 						data.add(desc);
 
-						panel.setPreferredSize(new Dimension(300, 75));
+						panel.setPreferredSize(new Dimension(330, 75));
 						String result = main.grapherDialog("Vertices types",panel,"Ok|Cancel");
 						if (result.equals("Ok")) {
 							type.setName(name.getText());

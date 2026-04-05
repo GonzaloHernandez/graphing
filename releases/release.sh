@@ -3,7 +3,7 @@
 # Define versioning variables
 FAMILY=1
 VERSION=3
-CONSTRUCTION=8
+CONSTRUCTION=9
 
 # File paths
 JAVA_FILE="src/main/GrapherMain.java"
@@ -60,7 +60,8 @@ echo ":: Documentation updated in $README_FILE"
 
 # Step 7: For my local purposes
 cp $OUTPUT_FILE ../Graphing.jar
+echo ":: Local copy created Graphing.jar"
 
 # # ===============================================================================
-# (DONE) Updating Minizinc matrix export
-# (DONE) Improvements on presentation
+# (DONE) Starting with default scaling
+# (DONE) Hidding properties

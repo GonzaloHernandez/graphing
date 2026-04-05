@@ -56,7 +56,7 @@ public class Board extends JComponent implements Printable{
 
 		this.menuBlock		= false;
 		this.compiler		= null;
-		this.scaleFactor	= 1;
+		this.scaleFactor	= session.main.defaultScale;
 		this.gridScale		= 15;
 		this.hidden			= false;
 		this.showGrid		= false;
@@ -155,6 +155,22 @@ public class Board extends JComponent implements Printable{
 
 	//-------------------------------------------------------------------------------------
 
+	boolean scale(double newScalFactor) {
+		if (newScalFactor < 0.2) return false;
+		if (newScalFactor > 5.0) return false;
+
+		scaleFactor = newScalFactor;
+		Dimension d = getPreferredSize();
+		session.manualResizing = true;
+		session.setSize(
+			(int)(d.width*scaleFactor)+GrapherSession.deltaWidth,
+			(int)(d.height*scaleFactor)+GrapherSession.deltaHeight);
+
+		return true;		
+	}
+
+	//-------------------------------------------------------------------------------------
+
 	public void progListeners() {
 		addKeyListener(new KeyListener(){
 
@@ -208,23 +224,11 @@ public class Board extends JComponent implements Printable{
 					}
 					else if (e.getKeyChar() == '+' || e.getKeyChar() == '=' || 
 							e.getKeyChar() == '*' || e.getKeyCode() == KeyEvent.VK_PLUS) {
-						if (scaleFactor > 5.0) return;
-						scaleFactor += 0.1;
-						Dimension d = getPreferredSize();
-						session.manualResizing = true;
-						session.setSize(
-							(int)(d.width*scaleFactor)+GrapherSession.deltaWidth,
-							(int)(d.height*scaleFactor)+GrapherSession.deltaHeight);
+						scale(scaleFactor+0.1);
 					}
 					else if (e.getKeyChar() == '-' || e.getKeyChar() == '_' ||
 							e.getKeyCode() == KeyEvent.VK_MINUS) {
-						if (scaleFactor < 0.2) return;
-						scaleFactor -= 0.1;
-						Dimension d = getPreferredSize();
-						session.manualResizing = true;
-						session.setSize(
-							(int)(d.width*scaleFactor)+GrapherSession.deltaWidth,
-							(int)(d.height*scaleFactor)+GrapherSession.deltaHeight);
+						scale(scaleFactor-0.1);
 					}
 					else if (e.getKeyCode() == KeyEvent.VK_E) {
 						if (e.isShiftDown()) {

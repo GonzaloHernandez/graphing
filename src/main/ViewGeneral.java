@@ -188,11 +188,11 @@ public class ViewGeneral extends JPanel {
 		JPanel panelExecute = new JPanel(new FlowLayout());
 		programSelection	= new JButton("Select program");
 		programFile			= new JTextField();
-		runProgram			= new JButton("Run Program");
+		runProgram			= new JButton("Run");
 		String[] types		= {"MiniZinc", "Python"};
 		programType			= new JComboBox<>(types);
 		listen              = new JToggleButton("Listen");
-		cleanLog			= new JButton("Clean Log");
+		cleanLog			= new JButton("Clean");
 		listenLog			= new JTextArea();
 		listenLog.setEditable(false);
 
@@ -206,7 +206,7 @@ public class ViewGeneral extends JPanel {
 
 		panelExecute.setLayout(new BoxLayout(panelExecute, BoxLayout.Y_AXIS));
 
-		JPanel row1 = new JPanel(new BorderLayout(5, 0)); 
+		JPanel row1 = new JPanel(new BorderLayout(5, 0));
 		row1.add(programSelection, BorderLayout.WEST);
 		row1.add(programFile, BorderLayout.CENTER);
 		row1.setMaximumSize(new Dimension(Integer.MAX_VALUE, row1.getPreferredSize().height));

@@ -33,8 +33,8 @@ For Developers
 
 ## JAR file ready to use
 
-Graphing-v1.3.8.jar 
-[Direct download](https://github.com/GonzaloHernandez/graphing/raw/refs/heads/master/releases/Graphing-v1.3.8.jar)
+Graphing-v1.3.9.jar 
+[Direct download](https://github.com/GonzaloHernandez/graphing/raw/refs/heads/master/releases/Graphing-v1.3.9.jar)
 
 ## Debugger interaction from Python
 

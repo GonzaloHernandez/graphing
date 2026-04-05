@@ -40,7 +40,6 @@ public class Persistence {
         this.main = main;
     }
 
-
 	//-------------------------------------------------------------------------
 
 	public void saveGrapher() {
@@ -60,6 +59,7 @@ public class Persistence {
 			file.writeShort(main.getLocation().y);
 			file.writeShort(main.getSize().width);
 	        file.writeShort(main.getSize().height);
+            // file.writeDouble(main.defaultScale);
 	        file.close();
 	        
 	    } catch (IOException e) {
@@ -82,14 +82,14 @@ public class Persistence {
 			}
 	        
 			main.showAbout = file.readBoolean();
-			short	x	= file.readShort();
-			short	y	= file.readShort();
-			short	w	= file.readShort();
-			short	h	= file.readShort();
-			main.setLocation(x, y);
+			short	x	        = file.readShort();
+			short	y	        = file.readShort();
+			short	w	        = file.readShort();
+			short	h	        = file.readShort();
+            main.defaultScale   = file.readDouble();
+            main.setLocation(x, y);
 			main.setSize(w,h);
 	        file.close();
-	        
 	    } catch (IOException e) {
 	    	System.out.println("Creating configuration (CNF) file.");
 	    }
@@ -345,8 +345,6 @@ public class Persistence {
             String path = fullName.getParent().toString();
             String name = fullName.getFileName().toString();
 
-			// main.currentSession.setTitle(fileName.substring(main.curdir.length()));
-            
 			main.currentSession.setName(fileName);
             main.currentSession.setTitle(name);
             main.curdir = path+"/";
