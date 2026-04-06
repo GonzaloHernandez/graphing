@@ -363,8 +363,9 @@ public class Board extends JComponent implements Printable{
 
 						panel.setPreferredSize(new Dimension(300, 100));
 
-						String title = "Properties for "+
-							Lexicon.capitalize(settings.lexicon.vertex);
+						String title = "Properties for " +
+							Lexicon.capitalize(settings.lexicon.vertex) + 
+							" " + (vertexTarget.getNumber()+(settings.firstZero?0:1));
 						String result = session.main.grapherDialog(title,panel,"Ok|Cancel");
 						if (result.equals("Ok")) {
 							String regex = "^-?([0-9]+/[1-9][0-9]*|[0-9]*\\.[0-9]+|[0-9]+)$";

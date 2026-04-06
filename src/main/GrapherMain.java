@@ -30,13 +30,14 @@ import javax.swing.JSplitPane;
 import javax.swing.UIManager;
 
 import com.formdev.flatlaf.FlatLightLaf;
+import java.awt.Rectangle;
 
 public class GrapherMain extends JFrame{
 
 	//-------------------------------------------------------------------------------------
 	final int	family			= 1;
 	final int	version			= 3;
-	final int	construction	= 9;
+	final int	construction	= 10;
 	
 	//-------------------------------------------------------------------------------------
 
@@ -58,6 +59,7 @@ public class GrapherMain extends JFrame{
 	protected	boolean			showAbout;
 	protected	double			defaultScale;
 	protected	boolean			isPropertiesHidden;
+	protected	Rectangle		restoredBounds;
 	protected	String			curdir;
 
 	//-------------------------------------------------------------------------------------
@@ -189,9 +191,15 @@ public class GrapherMain extends JFrame{
 				} else {
 					split.setDividerLocation(getWidth() - 330);
 				}
+				if (getExtendedState() == JFrame.NORMAL) {
+					restoredBounds = getBounds();
+				}
 			}
 
 			public void componentMoved(ComponentEvent arg0) {
+				if (getExtendedState() == JFrame.NORMAL) {
+					restoredBounds = getBounds();
+				}
 			}
 
 			public void componentShown(ComponentEvent arg0) {

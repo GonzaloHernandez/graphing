@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.imageio.ImageIO;
+import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JMenuItem;
 
@@ -55,12 +56,20 @@ public class Persistence {
 				file.writeUTF(item.getText());
 			}
 			file.writeBoolean(main.showAbout);
-			file.writeShort(main.getLocation().x);
-			file.writeShort(main.getLocation().y);
-			file.writeShort(main.getSize().width);
-	        file.writeShort(main.getSize().height);
-            // file.writeDouble(main.defaultScale);
-	        file.close();
+            if ((main.getExtendedState() & JFrame.MAXIMIZED_BOTH) == JFrame.MAXIMIZED_BOTH) {
+                file.writeShort(main.restoredBounds.x);
+                file.writeShort(main.restoredBounds.y);
+                file.writeShort(main.restoredBounds.width);
+                file.writeShort(main.restoredBounds.height);
+            } else {
+                file.writeShort(main.getLocation().x);
+                file.writeShort(main.getLocation().y);
+                file.writeShort(main.getSize().width);
+                file.writeShort(main.getSize().height);
+            }
+            file.writeDouble(main.defaultScale);
+
+            file.close();
 	        
 	    } catch (IOException e) {
 	    	e.printStackTrace();
@@ -81,7 +90,7 @@ public class Persistence {
 				main.addRecentSession(file.readUTF());
 			}
 	        
-			main.showAbout = file.readBoolean();
+			main.showAbout      = file.readBoolean();
 			short	x	        = file.readShort();
 			short	y	        = file.readShort();
 			short	w	        = file.readShort();
@@ -91,7 +100,11 @@ public class Persistence {
 			main.setSize(w,h);
 	        file.close();
 	    } catch (IOException e) {
-	    	System.out.println("Creating configuration (CNF) file.");
+	    	System.out.println("Creating configuration (CNF) file with default values.");
+            main.showAbout      = true;
+			main.setLocation    (100,100);
+            main.setSize        (1200,800);
+			main.defaultScale   = 1.0;
 	    }
 	}
 
