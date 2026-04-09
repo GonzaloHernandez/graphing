@@ -75,7 +75,7 @@ public class ViewStock extends JPanel{
     //--------------------------------------------------------------------------
     
     private void loadTable(JTable table) {
-        int first =  main.currentSession.board.settings.firstZero?0:1;
+        int first =  main.currentSession.board.settings.sequenceType==0?1:0;
         TableModel model = new TableModel() {
             public int getRowCount() {
                 if (table.getName()=="Vertices") {
@@ -135,7 +135,7 @@ public class ViewStock extends JPanel{
                     Vertex v = main.currentSession.board.vertices.elementAt(rowIndex);
                     switch (columnIndex) {
                         case 0: return getVertices().elementAt(rowIndex).isActive();
-                        case 1: return ""+(rowIndex+first);
+                        case 1: return getVertices().elementAt(rowIndex).getIdString(main.currentSession.board.settings);
                         case 2: return v.getValue();
                         case 3: return v.getType()!=null?v.getType().getName():"";
                         case 4: return v.getLabel();

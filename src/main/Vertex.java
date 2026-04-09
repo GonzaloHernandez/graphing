@@ -18,7 +18,7 @@ public class Vertex {
 	
 	//-------------------------------------------------------------------------------------
 	
-	private	int		number,x,y;
+	private	int		id,x,y;
 	private	int		status;
 	private String	value;
 	private Type	type;
@@ -31,8 +31,8 @@ public class Vertex {
 
 	//-------------------------------------------------------------------------------------
 	
-	public Vertex(int number,int x,int y) {
-		this.number		= number;
+	public Vertex(int id,int x,int y) {
+		this.id			= id;
 		this.x			= x;
 		this.y			= y;
 		this.status		= FOCUSED;
@@ -47,8 +47,8 @@ public class Vertex {
 	
 	//-------------------------------------------------------------------------
 	
-	public Vertex(int number,int x,int y,int status,boolean accepted) {
-		this.number		= number;
+	public Vertex(int id,int x,int y,int status,boolean accepted) {
+		this.id			= id;
 		this.x			= x;
 		this.y			= y;
 		this.status		= status;
@@ -63,10 +63,10 @@ public class Vertex {
 	
 	//-------------------------------------------------------------------------
 	
-	public Vertex(int number,int x,int y,int status,boolean accepted,
+	public Vertex(int id,int x,int y,int status,boolean accepted,
 		String value,Type type,String label) 
 	{
-		this.number		= number;
+		this.id			= id;
 		this.x			= x;
 		this.y			= y;
 		this.status		= status;
@@ -125,8 +125,6 @@ public class Vertex {
 		} else{ 
 			t = 0;
 		}
-
-		// g.setStroke(new BasicStroke(accepted?2.0f:1.0f));
 
 		switch(t) {
 			case 0:	// round
@@ -192,19 +190,39 @@ public class Vertex {
 
 			Lexicon lex = settings.lexicon;
 
-			int first = settings.firstZero?0:1;
+			String sequence = getIdString(settings);
+			// switch (settings.sequenceType) {
+			// 	case 0:
+			// 		sequence += (id+1);
+			// 		break;
+			// 	case 1:
+			// 		sequence += id;
+			// 		break;
+			// 	case 2:
+			// 		sequence += (char)(id%26+97);
+			// 		sequence += new String(new char[(int)(id/26)]).replace('\0', '\'');
+			// 		break;
+			// 	case 3:
+			// 		sequence +=(char)(id%26+65);
+			// 		sequence += new String(new char[(int)(id/26)]).replace('\0', '\'');
+			// 		break;
+			// 	default:
+			// 		sequence += (id+1);
+			// 		break;
+			// }
+			
 			g.setColor(Color.darkGray);
 			if (settings.showVertexValue || settings.showVertexLabel) {
 				g.setFont(new Font("Arial",Font.ITALIC,9));
-				g.drawString(lex._vertex,x-1-(3*(new String(""+number)).length()),y+RADIUS+9);
+				g.drawString(lex._vertex,x-1-(3*sequence.length()),y+RADIUS+9);
 				g.setFont(new Font("Arial",Font.ITALIC,7));
-				g.drawString(""+(number+first),x+3-(3*(new String(""+number)).length()),y+RADIUS+11);
+				g.drawString(sequence,x+3-(3*sequence.length()),y+RADIUS+11);
 			}
 			else {
 				g.setFont(new Font("Arial",Font.ITALIC,13));
-				g.drawString(lex._vertex,x-2-(3*(new String(""+number)).length()),y+4);
+				g.drawString(lex._vertex,x-2-(3*sequence.length()),y+4);
 				g.setFont(new Font("Arial",Font.ITALIC,8));
-				g.drawString(""+(number+first),x+3-(3*(new String(""+number)).length()),y+8);
+				g.drawString(sequence,x+3-(3*sequence.length()),y+8);
 			}
 		}
 		if (settings.showVertexValue) {
@@ -231,8 +249,8 @@ public class Vertex {
 	
 	//-------------------------------------------------------------------------------------
 
-	public void setNumber(int number){
-		this.number = number;
+	public void setId(int id){
+		this.id = id;
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -309,8 +327,34 @@ public class Vertex {
 	
 	//-------------------------------------------------------------------------------------
 
-	public int getNumber() {
-		return number;
+	public int getId() {
+		return id;
+	}
+	
+	//-------------------------------------------------------------------------------------
+
+	public String getIdString(GrapherSettings settings) {
+		String sequence = "";
+		switch (settings.sequenceType) {
+			case 0:
+				sequence += (id+1);
+				break;
+			case 1:
+				sequence += id;
+				break;
+			case 2:
+				sequence += (char)(id%26+97);
+				sequence += new String(new char[(int)(id/26)]).replace('\0', '\'');
+				break;
+			case 3:
+				sequence +=(char)(id%26+65);
+				sequence += new String(new char[(int)(id/26)]).replace('\0', '\'');
+				break;
+			default:
+				sequence += (id+1);
+				break;
+		}
+		return sequence;
 	}
 	
 	//-------------------------------------------------------------------------------------

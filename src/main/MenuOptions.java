@@ -61,7 +61,7 @@ public class MenuOptions extends JPopupMenu{
 	private	GrapherItem		vertexDelete,vertexDeleteAllOuts,vertexAccepted;
 	private	GrapherItem		edgeDelete,edgeTune;
 	private	GrapherItem		restart,load,importGame,save,saveAs;
-	private GrapherItem		parityGame,parityGameQ,mdp,sParityGame;
+	private GrapherItem		parityGame,parityGameQ,stochasticGames;
 	private GrapherItem		exportPNG,exportPDF,exportSVG,simulate,help;
 
 	
@@ -106,8 +106,7 @@ public class MenuOptions extends JPopupMenu{
 		
 		parityGame			= new GrapherItem("Parity Game",defaultFont,"");
 		parityGameQ			= new GrapherItem("Parity Game + Quantitative conditions",defaultFont,"");
-		mdp					= new GrapherItem("Markov Decision Process",defaultFont,"");
-		sParityGame			= new GrapherItem("Stochastic Parity Games",defaultFont,"");
+		stochasticGames		= new GrapherItem("Stochastic Games",defaultFont,"");
 
 		add(vertexMenu);
 		add(edgeMenu);
@@ -138,8 +137,7 @@ public class MenuOptions extends JPopupMenu{
 
 		template.add(parityGame);
 		template.add(parityGameQ);
-		template.add(mdp);
-		template.add(sParityGame);
+		template.add(stochasticGames);
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -554,94 +552,20 @@ public class MenuOptions extends JPopupMenu{
 			}
 		});
 
-		sParityGame.addActionListener(new ActionListener() {
+		stochasticGames.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ev) {
 				GrapherSettings s = main.currentSession.board.settings;
-				s.lexicon.graph			= "game";
+				s.lexicon.graph			= "game";	
 				s.lexicon.vertex		= "vertices";
-				s.lexicon.vertexValue	= "values";
-				s.lexicon.vertexType	= "owners";
-				s.lexicon.vertexLabel	= "Label";
-				s.lexicon.edge			= "edges";
-				s.lexicon.edgeValue		= "chances";
-				s.lexicon.edgeType		= "Actions";
-				s.lexicon.edgeLabel		= "Labels";
-				s.lexicon._graph		= "g";
-				s.lexicon._vertex		= "v";
-				s.lexicon._vertexType	= "o";
-				s.lexicon._vertexValue	= " ";
-				s.lexicon._edge			= "e";
-				s.lexicon._edgeValue	= "c";
-				s.lexicon._edgeType		= "a";
-				s.lexicon._edgeLabel	= "l";
-				s.showVertexSequence	= false;
-				s.showVertexValue		= false;
-				s.showVertexType		= true;
-				s.showVertexLabel		= true;
-				s.showVertexValueDiff	= "-0";
-				s.showVertexLabelDiff	= "";	
-
-				s.showEdgeSequence		= false;
-				s.showEdgeValue			= true;
-				s.showEdgeType			= false;
-				s.showEdgeLabel			= false;
-				s.showEdgeValueDiff		= "1";
-				s.showEdgeLabelDiff		= "";
-				
-				s.exportType			= 1;
-
-				Vector<Type> vTypes = main.currentSession.board.vTypes;
-				if (vTypes.size()<=0) {
-					vTypes.add(new Type(0,"Min", "Round"));
-				} else {
-					vTypes.elementAt(0).setName("Min");
-					vTypes.elementAt(0).setDescription("Round");
-				}
-
-				if (vTypes.size()<=1) {
-					vTypes.add(new Type(1,"Max", "Square"));
-				} else {
-					vTypes.elementAt(1).setName("Max");
-					vTypes.elementAt(1).setDescription("Square");
-				}
-
-				if (vTypes.size()<=2) {
-					vTypes.add(new Type(2,"Random", "Diamond"));
-				} else {
-					vTypes.elementAt(2).setName("Random");
-					vTypes.elementAt(2).setDescription("Diamond");
-				}
-
-				if (vTypes.size()>=3) {
-					for (Vertex v : main.currentSession.board.vertices) {
-						if (v.getType() != null && v.getType().getId() >=3) {
-							v.setType(null);
-						}
-					}
-					while (vTypes.size()>3) vTypes.remove(3);
-				}
-
-				main.properties.lexiconView.refresh();
-				main.properties.generalView.refresh();
-				main.properties.typesView.refresh();
-				main.currentSession.setModified(true);
-			}
-		});
-
-		mdp.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent ev) {
-				GrapherSettings s = main.currentSession.board.settings;
-				s.lexicon.graph			= "MDP";	
-				s.lexicon.vertex		= "states";
 				s.lexicon.vertexValue	= "rewards";
 				s.lexicon.vertexType	= "types";
-				s.lexicon.vertexLabel	= "Label";
+				s.lexicon.vertexLabel	= "Labels";
 				s.lexicon.edge			= "actions";
 				s.lexicon.edgeValue		= "chances";
 				s.lexicon.edgeType		= "Actions";
 				s.lexicon.edgeLabel		= "Rewards";
-				s.lexicon._graph		= "m";
-				s.lexicon._vertex		= "s";
+				s.lexicon._graph		= "g";
+				s.lexicon._vertex		= "v";
 				s.lexicon._vertexValue	= "r";
 				s.lexicon._vertexType	= "t";
 				s.lexicon._vertexLabel	= "l";
@@ -683,7 +607,7 @@ public class MenuOptions extends JPopupMenu{
 				if (vTypes.size()<=2) {
 					vTypes.add(new Type(2,"Random", "Diamond"));
 				} else {
-					vTypes.elementAt(2).setName("Nature");
+					vTypes.elementAt(2).setName("Random");
 					vTypes.elementAt(2).setDescription("Diamond");
 				}
 

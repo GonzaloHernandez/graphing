@@ -3,7 +3,7 @@
 # Define versioning variables
 FAMILY=1
 VERSION=3
-CONSTRUCTION=10
+CONSTRUCTION=11
 
 # File paths
 JAVA_FILE="src/main/GrapherMain.java"
@@ -63,5 +63,5 @@ cp $OUTPUT_FILE ../Graphing.jar
 echo ":: Local copy created Graphing.jar"
 
 # # ===============================================================================
-# (DONE) Starting with default scaling
-# (DONE) Hidding properties
+# (DONE) Sequence type (different options)
+# (DONE) More corrections

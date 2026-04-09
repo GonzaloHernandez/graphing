@@ -236,7 +236,7 @@ public class Persistence {
         file.writeUTF       (s.showEdgeValueDiff);
         file.writeUTF       (s.showEdgeLabelDiff);
         file.writeBoolean   (s.allowFirsVertex);
-        file.writeBoolean   (s.firstZero);
+        file.writeByte      (s.sequenceType);
         file.writeShort     (s.gridScale);
         file.writeUTF       (s.comment);
         file.writeShort     (s.exportType);
@@ -252,7 +252,7 @@ public class Persistence {
         // Write vertices
         file.writeShort(board.vertices.size());
         for (Vertex v : board.vertices) {
-            file.writeShort     (v.getNumber());
+            file.writeShort     (v.getId());
             file.writeShort     (v.getX());
             file.writeShort     (v.getY());
             file.writeUTF       (v.getValue());
@@ -266,8 +266,8 @@ public class Persistence {
         // Write edges
         file.writeShort(edgesCount);
         for (Vertex v : board.vertices) for (Edge e: v.getOuts()) {
-            file.writeShort     (e.getSource().getNumber());
-            file.writeShort     (e.getTarget().getNumber());
+            file.writeShort     (e.getSource().getId());
+            file.writeShort     (e.getTarget().getId());
             file.writeShort     (e.getType()!=null?e.getType().getId():-1);
             file.writeUTF       (e.getValue());
             file.writeUTF       (e.getLabel());
@@ -436,7 +436,7 @@ public class Persistence {
         s.showEdgeValueDiff     = file.readUTF();
         s.showEdgeLabelDiff     = file.readUTF();
         s.allowFirsVertex       = file.readBoolean();
-        s.firstZero             = file.readBoolean();
+        s.sequenceType          = file.readByte();
         s.gridScale             = file.readShort();
         s.comment               = file.readUTF();
         s.exportType            = file.readShort();
@@ -790,7 +790,7 @@ public class Persistence {
         
         file.writeShort(board.vertices.size());
         for (int i=0;i<board.vertices.size();i++){
-            file.writeShort(board.vertices.elementAt(i).getNumber());
+            file.writeShort(board.vertices.elementAt(i).getId());
             file.writeShort(board.vertices.elementAt(i).getX());
             file.writeShort(board.vertices.elementAt(i).getY());
             file.writeBoolean(board.vertices.elementAt(i).isAccepted());
@@ -805,8 +805,8 @@ public class Persistence {
         file.writeShort(connectionsCount);
         for (int s=0;s<board.vertices.size();s++){
             for (int i=0;i<board.vertices.elementAt(s).getOuts().size();i++){
-                file.writeShort(board.vertices.elementAt(s).getOuts().elementAt(i).getSource().getNumber());
-                file.writeShort(board.vertices.elementAt(s).getOuts().elementAt(i).getTarget().getNumber());
+                file.writeShort(board.vertices.elementAt(s).getOuts().elementAt(i).getSource().getId());
+                file.writeShort(board.vertices.elementAt(s).getOuts().elementAt(i).getTarget().getId());
                 if (board.vertices.elementAt(s).getOuts().elementAt(i).getType()!=null) {
                     file.writeShort(board.vertices.elementAt(s).getOuts().elementAt(i).getType().getId());
                 }
@@ -827,7 +827,7 @@ public class Persistence {
         file.writeBoolean(settings.showEdgeSequence);
         file.writeBoolean(settings.showVertexValue);
         file.writeBoolean(settings.allowFirsVertex);
-        file.writeBoolean(settings.firstZero);
+        file.writeByte(settings.sequenceType);
 
         file.writeUTF(settings.comment);	        
 
@@ -915,13 +915,13 @@ public class Persistence {
             active          = file.readBoolean();
             
             for (int s=0;s<board.vertices.size();s++){
-                if (board.vertices.elementAt(s).getNumber()==numberSource){
+                if (board.vertices.elementAt(s).getId()==numberSource){
                     source = board.vertices.elementAt(s);
                     break;
                 }
             }
             for (int t=0;t<board.vertices.size();t++){
-                if (board.vertices.elementAt(t).getNumber()==numberTarget){
+                if (board.vertices.elementAt(t).getId()==numberTarget){
                     target = board.vertices.elementAt(t);
                     break;
                 }
@@ -957,7 +957,7 @@ public class Persistence {
         settings.showEdgeSequence	= file.readBoolean();
         settings.showVertexValue	= file.readBoolean();
         settings.allowFirsVertex	= file.readBoolean();
-        settings.firstZero			= file.readBoolean();
+        settings.sequenceType		= file.readByte();
 
         settings.comment			= file.readUTF();
         

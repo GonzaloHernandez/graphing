@@ -58,7 +58,7 @@ public class ViewGeneral extends JPanel {
 	protected JTextField	showVValDiff,showVLabDiff;
 	protected JTextField	showEValDiff,showELabDiff;
 	protected JCheckBox		allowFirstState;
-	protected JCheckBox		firstZero;
+	protected JComboBox<String>		sequenceType;
 	protected JCheckBox		exportAuto;
 	protected JTabbedPane	info;
 	protected JTextArea		comment;
@@ -138,7 +138,8 @@ public class ViewGeneral extends JPanel {
 		panelNorth.add(panelVertex);	panelNorth.add(panelEdge);
 
 		allowFirstState	= new JCheckBox("Allow first vertex incoming edges");
-		firstZero       = new JCheckBox("Start at Zero (0)");
+		String[] sequenceTypes = {"1,2,3,...","0,1,2,...","a,b,c,...","A,B,C,..."};
+		sequenceType	= new JComboBox<>(sequenceTypes);
 		gridScale       = new JSpinner(new SpinnerNumberModel(10, 1, 100, 1));
 		exportAuto      = new JCheckBox("Export automatically");
 
@@ -162,8 +163,12 @@ public class ViewGeneral extends JPanel {
 		Border marginGeneral = BorderFactory.createEmptyBorder(8,8,8,0);
 		panelGeneral.setBorder(BorderFactory.createCompoundBorder(null, marginGeneral));
 
+		JPanel panelSequenceType = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		panelSequenceType.add(new JLabel("Sequence type "));
+		panelSequenceType.add(sequenceType);
+
 		panelGeneral.add(allowFirstState);
-		panelGeneral.add(firstZero);
+		panelGeneral.add(panelSequenceType);
 
 		panelChecks.add(panelNorth);
 		panelChecks.add(panelGeneral);
@@ -413,12 +418,13 @@ public class ViewGeneral extends JPanel {
 			}
 		});
 
-		firstZero.addActionListener(new ActionListener(){
+		sequenceType.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
 				settings = main.currentSession.board.settings;
-				settings.firstZero = firstZero.isSelected();
+				settings.sequenceType = sequenceType.getSelectedIndex();
 				main.currentSession.setModified(true);
 				main.currentSession.board.repaint();
+				main.properties.stockView.refresh();
 			}
 		});
 
@@ -577,11 +583,11 @@ public class ViewGeneral extends JPanel {
 
 				String from = "";
 				String to	= "";
-				int first	= main.currentSession.board.settings.firstZero?0:1;
+				int first	= main.currentSession.board.settings.sequenceType==0?1:0;
 				for (Vertex s : vs) {
 					for (Edge c : s.getOuts()) {
-						from	+= c.getSource().getNumber()+first + ",";
-						to		+= c.getTarget().getNumber()+first + ",";
+						from	+= c.getSource().getId()+first + ",";
+						to		+= c.getTarget().getId()+first + ",";
 					}
 				}
 
@@ -593,7 +599,7 @@ public class ViewGeneral extends JPanel {
 				int init		= 1;
 				for(Vertex v:getVertices()) {
 					if (v.getStatus()==Vertex.FOCUSED) {
-						init = v.getNumber()+1;
+						init = v.getId()+1;
 					}
 				}
 				
@@ -757,7 +763,7 @@ public class ViewGeneral extends JPanel {
 		showELabDiff.setText(settings.showEdgeLabelDiff);
 
 		allowFirstState.setSelected(settings.allowFirsVertex);
-		firstZero.setSelected(settings.firstZero);
+		sequenceType.setSelectedIndex(settings.sequenceType);
 		gridScale.setValue(settings.gridScale);
 
 		exportAuto.setSelected(settings.exportAuto);

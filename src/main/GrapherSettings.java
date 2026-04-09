@@ -60,7 +60,7 @@ public class GrapherSettings {
 	protected	String	showEdgeLabelDiff;
 
 	protected	boolean allowFirsVertex;
-	protected	boolean firstZero;
+	protected	int		sequenceType;
 	protected	int		gridScale;
 
 	protected	String	comment;
@@ -90,7 +90,7 @@ public class GrapherSettings {
 		this.comment			= "";
 		this.measure			= 1; // 0=Centimeters  1=Inch
 		this.allowFirsVertex	= true;
-		this.firstZero			= true;
+		this.sequenceType		= 0;
 		this.gridScale			= 15;
 		this.exportAuto			= false;
 		this.exportType			= 0;
